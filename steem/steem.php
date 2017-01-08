@@ -64,7 +64,10 @@ function steem_plugin_settings_page() {
 * Short Code
 */
 function steem_plugin( $atts ) {
-    $shortcode_replace_content = '<div class="steem-container" data-steemtag="'.get_option('steem_tag').'"></div>';
+    $shortcode_replace_content = '<div class="steemContainer" data-steemtag="'.get_option('steem_tag').'">';
+    $shortcode_replace_content .= '<div class="tagLabel">TAG: </div><div class="tagName"></div>';
+    $shortcode_replace_content .= '<div class="discussions"></div>';
+    $shortcode_replace_content .= '</div>';
     return $shortcode_replace_content;
 }
 
@@ -75,8 +78,17 @@ add_shortcode('steemplugin', 'steem_plugin');
 * Display DB.options.steemtag at front-end
 */
 function steem_plugin_frontend_js() {
-    wp_register_script('steem.js', plugin_dir_url( __FILE__ ) . 'js/steem.js');
-    wp_enqueue_script('steem.js');
+    wp_register_script('steemconnect.js', 'https://cdn.steemjs.com/lib/latest/steemconnect.min.js');
+    wp_enqueue_script('steemconnect.js');
+
+
+    wp_register_script('steem.min.js', 'https://cdn.steemjs.com/lib/latest/steem.min.js');
+    wp_enqueue_script('steem.min.js');
+
+
+
+    wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
+    wp_enqueue_script('steem.plugin.js');
 }
 
 
