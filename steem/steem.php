@@ -9,11 +9,17 @@ Author URI:  htps://steemit.com/@morning
 Text Domain: steemit
 License:     GPL2
 */
-?>
 
 
+// Make sure we don't expose any info if called directly
+if (!function_exists('add_action')) {
+    echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
+    exit;
+}
 
-<?php
+//register_activation_hook( __FILE__, array( 'Steem', 'plugin_activation' ) );
+//register_deactivation_hook( __FILE__, array( 'Steem', 'plugin_deactivation' ) );
+
 //if (is_admin()) {
     // create custom plugin settings menu
     add_action('admin_menu', 'steem_plugin_menu');
@@ -24,9 +30,9 @@ function steem_plugin_menu() {
     add_menu_page('Steem Plugin Settings', 'Steem', 'administrator', __FILE__, 'steem_plugin_settings_page' , null );
 
     //call register settings function
-    add_action( 'admin_init', 'register_steem_plugin_settings' );
+    add_action('admin_init', 'register_steem_plugin_settings' );
 
-    add_option( 'steem_tag', null, null, 'yes' );
+    add_option('steem_tag');
 }
 
 function register_steem_plugin_settings() {
@@ -52,15 +58,30 @@ function steem_plugin_settings_page() {
     </form>
 </div>
 <?php
-} 
-?>
-
-<?php
-function steem_plugin( $atts ){
-    return get_option('steem_tag');
 }
-add_shortcode( 'steemplugin', 'steem_plugin' );
+
+/**
+* Short Code
+*/
+function steem_plugin( $atts ) {
+    $shortcode_replace_content = '<div class="steem-container" data-steemtag="'.get_option('steem_tag').'"></div>';
+    return $shortcode_replace_content;
+}
+
+add_shortcode('steemplugin', 'steem_plugin');
 
 
-?>
+/**
+* Display DB.options.steemtag at front-end
+*/
+function steem_plugin_frontend_js() {
+    wp_register_script('steem.js', plugin_dir_url( __FILE__ ) . 'js/steem.js');
+    wp_enqueue_script('steem.js');
+}
+
+
+add_action('steem_plugin_frontend_js', 'steem_plugin_frontend_js');
+do_action('steem_plugin_frontend_js');
+
+
 
