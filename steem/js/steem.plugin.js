@@ -20,6 +20,13 @@ function createLink(title, url) {
 	el.href = url;
 	return el;
 }
+function createVoteBtn(author, permlink) {
+	var el = document.createElement('span');
+	el.classList.add('sc-vote');
+	el.setAttribute('data-author', author);
+	el.setAttribute('data-permlink', permlink);
+	return el;
+}
 
 /**********
 *	Constant
@@ -44,16 +51,26 @@ ready(function() {
 			for (i = 0; i < len; i++) {
 				var discussion = result[i];
 				var container = createDiv('steemPost', '');
-				var title = createDiv('steemPostTitle', '');
-				var author = createDiv('steemPostAuthor', discussion.author);
-				var created = createDiv('steemPostCreated', discussion.created);
+				var title = createDiv('title', '');
+				var author = createDiv('author', discussion.author);
+				var vote = createDiv('vote', '');
+				var voteBtn = createVoteBtn(discussion.author, discussion.permlink);
+				var created = createDiv('created', discussion.created);
 				var link = createLink(discussion.title, '#' + discussion.permlink);
 				title.append(link);
+				vote.append(voteBtn);
 				container.append(title);
+				container.append(vote);
 				container.append(author);
 				container.append(created);
 				discussions.append(container);
-			}		
+			}
+			var js, fjs = document.getElementsByTagName("script")[0];  
+			if (document.getElementById("sc-sdk")) return;  
+			js = document.createElement("script"); 
+			js.id = "sc-sdk";  
+			js.src = "//cdn.steemjs.com/lib/latest/steemconnect-widget.js";  
+			fjs.parentNode.insertBefore(js, fjs);
 		} else {
 			console.log('ERROR:', error);
 		}

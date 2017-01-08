@@ -1,0 +1,12 @@
+.steemContainer{font-size:12px;font-family:Dotum,sans-serif;}
+.entry-content .steemContainer a, .entry-summary .steemContainer a, .page-content .steemContainer a, .comment-content .steemContainer a, .pingback .steemContainer .comment-body > a,
+.steemContainer a, .steemContainer a:hover{text-decoration:none;border:none;}
+.steemContainer .tagLabel,.steemContainer .tagName{font-weight:bold;font-size:15px;display:inline-block;}
+.steemPost{width:100%;min-width:320px;border-bottom:1px solid #ccc;position:relative;display:table}
+.steemPost:before{content:' ';display:table}
+.steemPost:after{content:' ';display:table}
+.steemPost>div{display:table-cell;vertical-align:middle;zoom:1;letter-spacing:normal;word-spacing:normal;padding:5px 0}
+.steemPost .title{width:60%;}
+.steemPost .author{width:20%;}
+.steemPost .author{width:70px;}
+.steemPost .created{width:10%;max-width:61px;overflow:hidden;white-space:nowrap;}

@@ -89,6 +89,9 @@ function steem_plugin_frontend_js() {
 
     wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
     wp_enqueue_script('steem.plugin.js');
+
+    wp_register_style('steem.plugin.css', plugin_dir_url( __FILE__ ) . 'css/steem.plugin.css');
+    wp_enqueue_style('steem.plugin.css');
 }
 
 
