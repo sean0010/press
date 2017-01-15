@@ -66,6 +66,7 @@ function steem_plugin_settings_page() {
 function steem_plugin( $atts ) {
     $shortcode_replace_content = '<div class="steemContainer" data-steemtag="'.get_option('steem_tag').'">';
     $shortcode_replace_content .= '<div class="tagLabel">TAG: </div><div class="tagName"></div>';
+    $shortcode_replace_content .= '<div class="steemAccount"></div>';
     $shortcode_replace_content .= '<div class="discussions"></div>';
     $shortcode_replace_content .= '</div>';
     return $shortcode_replace_content;

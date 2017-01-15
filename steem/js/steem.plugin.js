@@ -31,7 +31,7 @@ function createVoteBtn(author, permlink) {
 /**********
 *	Constant
 ***********/
-var perPage = 20;
+var perPage = 25;
 
 
 /**********
@@ -42,6 +42,7 @@ ready(function() {
 	var steemTag = steemContainer.getAttribute('data-steemtag');
 	var tagName = steemContainer.querySelector('.tagName');
 	var discussions = steemContainer.querySelector('.discussions');
+	var acc = steemContainer.querySelector('.steemAccount');
 
 	tagName.innerHTML = steemTag;
 
@@ -53,26 +54,39 @@ ready(function() {
 				var container = createDiv('steemPost', '');
 				var title = createDiv('title', '');
 				var author = createDiv('author', discussion.author);
-				var vote = createDiv('vote', '');
-				var voteBtn = createVoteBtn(discussion.author, discussion.permlink);
+				var vote = createDiv('vote', discussion.net_votes);
 				var created = createDiv('created', discussion.created);
 				var link = createLink(discussion.title, '#' + discussion.permlink);
 				title.append(link);
-				vote.append(voteBtn);
 				container.append(title);
 				container.append(vote);
 				container.append(author);
 				container.append(created);
 				discussions.append(container);
 			}
-			var js, fjs = document.getElementsByTagName("script")[0];  
-			if (document.getElementById("sc-sdk")) return;  
-			js = document.createElement("script"); 
-			js.id = "sc-sdk";  
-			js.src = "//cdn.steemjs.com/lib/latest/steemconnect-widget.js";  
-			fjs.parentNode.insertBefore(js, fjs);
 		} else {
 			console.log('ERROR:', error);
+		}
+	});
+	
+	// Draw login
+	steemconnect.init({
+		app: 'wp-steem-plugin-dev-local001',
+		callbackURL: window.location.href
+	});
+	var isAuth = false;
+	var loginURL = steemconnect.getLoginURL();
+	steemconnect.isAuthenticated(function(err, result) {
+		if (!err && result.isAuthenticated) {
+			isAuth = true;
+			var username = result.username;
+			var accBtn = createLink(username, '#');
+			var createPostBtn = createLink('Submit a Story', '#');
+			acc.append(createPostBtn);
+			acc.append(accBtn);
+		} else {
+			var loginBtn = createLink('Login', loginURL);
+			acc.append(loginBtn);
 		}
 	});
 });
