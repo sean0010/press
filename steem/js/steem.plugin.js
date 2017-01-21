@@ -74,11 +74,9 @@ function renderPostsList(tag, limit, startPermLink) {
 	if (startPermLink !== undefined && startPermLink !== '' && startPermLink !== null) {
 		params.start_permlink = startPermLink;
 	}
-	//console.log('params:', params);
 	loader.style.display = 'display';
 
-	steem.api.getDiscussionsByCreated({"tag": "kr", "limit": 3, "start_permlink": "study-abroad-manual-2-the-language-you-learned-is-not-the-language-you-ll-use"}, function(err, result) {
-	//steem.api.getDiscussionsByCreated(params, function(err, result) {
+	steem.api.getDiscussionsByCreated(params, function(err, result) {
 		if (err === null) {
 			var i, len = result.length;
 			for (i = 0; i < len; i++) {
