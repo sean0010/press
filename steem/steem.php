@@ -65,9 +65,13 @@ function steem_plugin_settings_page() {
 */
 function steem_plugin( $atts ) {
     $shortcode_replace_content = '<div class="steemContainer" data-steemtag="'.get_option('steem_tag').'">';
-    $shortcode_replace_content .= '<div class="tagLabel">TAG: </div><div class="tagName"></div>';
-    $shortcode_replace_content .= '<div class="steemAccount"></div>';
-    $shortcode_replace_content .= '<div class="discussions"></div>';
+    $shortcode_replace_content .= ' <div class="tagLabel">TAG: </div><div class="tagName"></div>';
+    $shortcode_replace_content .= ' <div class="steemAccount"></div>';
+    $shortcode_replace_content .= ' <div class="discussions">';
+    $shortcode_replace_content .= '  <table class="table"><tbody><tr><th width="*">Title</th><th width="80">Author</th><th width="40">Vote</th><th width="55">Reward</th><th width="80">Created</th></tr></tbody></table>';
+    $shortcode_replace_content .= '  <div class="loaderSpace"><div class="loader"><svg class="circular" viewBox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4" stroke-miterlimit="10"/></svg></div></div>';
+    $shortcode_replace_content .= ' </div>';
+    $shortcode_replace_content .= ' <button class="more button">Load More</div>';
     $shortcode_replace_content .= '</div>';
     return $shortcode_replace_content;
 }
@@ -82,11 +86,8 @@ function steem_plugin_frontend_js() {
     wp_register_script('steemconnect.js', 'https://cdn.steemjs.com/lib/latest/steemconnect.min.js');
     wp_enqueue_script('steemconnect.js');
 
-
     wp_register_script('steem.min.js', 'https://cdn.steemjs.com/lib/latest/steem.min.js');
     wp_enqueue_script('steem.min.js');
-
-
 
     wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
     wp_enqueue_script('steem.plugin.js');

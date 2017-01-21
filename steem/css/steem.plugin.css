@@ -8,8 +8,33 @@
 .steemPost:before{content:' ';display:table}
 .steemPost:after{content:' ';display:table}
 .steemPost>div{display:table-cell;vertical-align:middle;zoom:1;letter-spacing:normal;word-spacing:normal;padding:5px}
-.steemPost .title{width:60%;}
-.steemPost .vote{width:70px;text-align:center;}
-.steemPost .author{width:70px;}
-.steemPost .created{width:10%;max-width:65px;overflow:hidden;white-space:nowrap;}
-.steemPost .vote span iframe{margin:0;}
+.steemContainer .table tbody tr:nth-child(even){background-color:#fcfcfc;}
+.steemContainer .table thead, .steemContainer .table tbody, .steemContainer .table tfoot{border:none}
+.steemContainer .table th, .steemContainer .table td{text-align:center;}
+.steemContainer .table th:first-child, .steemContainer .table td:first-child{text-align:left;}
+.steemContainer .table tbody th, .steemContainer .table tbody td{padding:3px 7px;}
+.steemContainer .table tbody th{border-top:1px solid #c2c2c2;}
+.steemContainer .table tbody td{border-top:1px solid #ccc}
+.steemContainer .loaderSpace{min-height:50px;}
+.steemContainer .more{display:none;}
+
+.loader {position: relative;margin: 0 auto;width: 30px;}
+.loader:before {content: '';display: block;padding-top: 100%;}
+.circular {animation: rotate 2s linear infinite;height: 100%;transform-origin: center center;width: 100%;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;}
+.path {stroke-dasharray: 1, 200;stroke-dashoffset: 0;animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
+stroke-linecap: round;}
+@keyframes rotate {
+100% {transform: rotate(360deg);}
+}
+@keyframes dash {
+0% {stroke-dasharray: 1, 200;stroke-dashoffset: 0;}
+50% {stroke-dasharray: 89, 200;stroke-dashoffset: -35px;}
+100% {stroke-dasharray: 89, 200;stroke-dashoffset: -124px;}
+}
+@keyframes color {
+100%,
+0% {stroke: #d62d20;}
+40% {stroke: #0057e7;}
+66% {stroke: #008744;}
+80%,90% {stroke: #ffa700;}
+}
