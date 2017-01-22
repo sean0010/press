@@ -113,7 +113,7 @@ function renderPostsList(tag, limit) {
 *	Constant
 ***********/
 var perPage = 20;
-
+var steemconnectApp = 'wp-steem-plugin-dev-gce';
 
 /**********
 *	DOM manipulation
@@ -134,7 +134,7 @@ ready(function() {
 	
 	// Draw login
 	steemconnect.init({
-		app: 'wp-steem-plugin-dev-gce',
+		app: steemconnectApp,
 		callbackURL: window.location.href
 	});
 	var isAuth = false;
