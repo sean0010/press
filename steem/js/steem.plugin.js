@@ -62,7 +62,7 @@ function getPayout(discussion) {
 	return result;
 }
 
-function renderPostsList(tag, limit, startPermLink) {
+function renderPostsList(tag, limit) {
 	var tbody = document.querySelector('tbody');
 	var loader = document.querySelector('.loaderSpace');
 	var more = document.querySelector('.steemContainer .more');
@@ -71,16 +71,24 @@ function renderPostsList(tag, limit, startPermLink) {
 		"tag": tag,
 		"limit": limit
 	};
-	if (startPermLink !== undefined && startPermLink !== '' && startPermLink !== null) {
-		params.start_permlink = startPermLink;
-	}
-	loader.style.display = 'display';
+	if (lastPost.permlink !== '') {
 
+		params.start_permlink = lastPost.permlink;
+		params.start_author = lastPost.author;
+	}
+	loader.style.display = 'block';
+	console.log("get_discussions_by_created", params);
 	steem.api.getDiscussionsByCreated(params, function(err, result) {
 		if (err === null) {
 			var i, len = result.length;
 			for (i = 0; i < len; i++) {
 				var discussion = result[i];
+				if (discussion.permlink == lastPost.permlink && discussion.author == lastPost.author) {
+					console.log("CONTINUE");
+					// skip, redundant post
+					continue;
+				}
+
 				var link = createLink(discussion.title, '#' + discussion.permlink);
 				var date = new Date(discussion.created);
 				var payout = getPayout(discussion);
@@ -88,13 +96,15 @@ function renderPostsList(tag, limit, startPermLink) {
 				tbody.append(tr);
 
 				if (i == len - 1) {
-					lastPermLink = discussion.permlink;
+					lastPost.permlink = discussion.permlink;
+					lastPost.author = discussion.author;
 				}
 			}
 			loader.style.display = 'none';
 			more.style.display = 'block';
+			more.disabled = false;
 		} else {
-			console.log('ERROR:', error);
+			console.log('ERROR:', err);
 		}
 	});
 }
@@ -108,7 +118,7 @@ var perPage = 20;
 /**********
 *	DOM manipulation
 ***********/
-var lastPermLink = '';
+var lastPost = {'permlink': '', 'author': ''};
 
 ready(function() {
 	var steemContainer = document.querySelector('.steemContainer');
@@ -145,6 +155,7 @@ ready(function() {
 
 	more.addEventListener('click', function() {
 		more.style.display = 'block';
-		renderPostsList(steemTag, perPage, lastPermLink);
+		more.disabled = true;
+		renderPostsList(steemTag, perPage);
 	});
 });
