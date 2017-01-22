@@ -14,24 +14,21 @@ function createDiv(cssClass, textNode) {
 	el.textContent = textNode;
 	return el;
 }
-function createTr(link, comment, author, vote, reward, created) {
+function createTr(link, comment, author, vote, created) {
 	var tr = document.createElement('tr'); // 
 	var td = document.createElement('td'); // title and commentCount
 	var td1 = document.createElement('td'); // Author
 	var td2 = document.createElement('td'); // Vote
-	var td3 = document.createElement('td'); // Reward
-	var td4 = document.createElement('td'); // Created
+	var td3 = document.createElement('td'); // Created
 	td.appendChild(link);
 	td.innerHTML = td.innerHTML + ' [' + comment + ']';
 	td1.innerHTML = author;
 	td2.innerHTML = vote;
-	td3.innerHTML = reward;
-	td4.innerHTML = created;
+	td3.innerHTML = created;
 	tr.appendChild(td);
 	tr.appendChild(td1);
 	tr.appendChild(td2);
 	tr.appendChild(td3);
-	tr.appendChild(td4);
 	return tr;
 }
 function createLink(title, url) {
@@ -84,7 +81,6 @@ function renderPostsList(tag, limit) {
 			for (i = 0; i < len; i++) {
 				var discussion = result[i];
 				if (discussion.permlink == lastPost.permlink && discussion.author == lastPost.author) {
-					console.log("CONTINUE");
 					// skip, redundant post
 					continue;
 				}
@@ -92,7 +88,7 @@ function renderPostsList(tag, limit) {
 				var link = createLink(discussion.title, '#' + discussion.permlink);
 				var date = new Date(discussion.created);
 				var payout = getPayout(discussion);
-				var tr = createTr(link, discussion.children, discussion.author, discussion.net_votes, payout, date.yyyymmdd());
+				var tr = createTr(link, discussion.children, discussion.author, discussion.net_votes, date.yyyymmdd());
 				tbody.appendChild(tr);
 
 				if (i == len - 1) {
