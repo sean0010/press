@@ -21,17 +21,17 @@ function createTr(link, comment, author, vote, reward, created) {
 	var td2 = document.createElement('td'); // Vote
 	var td3 = document.createElement('td'); // Reward
 	var td4 = document.createElement('td'); // Created
-	td.append(link);
-	td.append(' [' + comment + ']');
+	td.appendChild(link);
+	td.innerHTML = td.innerHTML + ' [' + comment + ']';
 	td1.innerHTML = author;
 	td2.innerHTML = vote;
 	td3.innerHTML = reward;
 	td4.innerHTML = created;
-	tr.append(td);
-	tr.append(td1);
-	tr.append(td2);
-	tr.append(td3);
-	tr.append(td4);
+	tr.appendChild(td);
+	tr.appendChild(td1);
+	tr.appendChild(td2);
+	tr.appendChild(td3);
+	tr.appendChild(td4);
 	return tr;
 }
 function createLink(title, url) {
@@ -93,7 +93,7 @@ function renderPostsList(tag, limit) {
 				var date = new Date(discussion.created);
 				var payout = getPayout(discussion);
 				var tr = createTr(link, discussion.children, discussion.author, discussion.net_votes, payout, date.yyyymmdd());
-				tbody.append(tr);
+				tbody.appendChild(tr);
 
 				if (i == len - 1) {
 					lastPost.permlink = discussion.permlink;
@@ -134,7 +134,7 @@ ready(function() {
 	
 	// Draw login
 	steemconnect.init({
-		app: 'wp-steem-plugin-dev-local001',
+		app: 'wp-steem-plugin-dev-gce',
 		callbackURL: window.location.href
 	});
 	var isAuth = false;
@@ -145,11 +145,11 @@ ready(function() {
 			var username = result.username;
 			var accBtn = createLink(username, '#');
 			var createPostBtn = createLink('Submit a Story', '#');
-			acc.append(createPostBtn);
-			acc.append(accBtn);
+			acc.appendChild(createPostBtn);
+			acc.appendChild(accBtn);
 		} else {
 			var loginBtn = createLink('Login', loginURL);
-			acc.append(loginBtn);
+			acc.appendChild(loginBtn);
 		}
 	});
 
