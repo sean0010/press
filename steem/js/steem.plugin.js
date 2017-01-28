@@ -16,12 +16,13 @@ function createDiv(cssClass, textNode) {
 }
 function createTr(link, comment, author, vote, created) {
 	var tr = document.createElement('tr'); // 
-	var td = document.createElement('td'); // title and commentCount
+	var td = document.createElement('td'); // title
 	var td1 = document.createElement('td'); // Author
 	var td2 = document.createElement('td'); // Vote
 	var td3 = document.createElement('td'); // Created
+	var co = createLink('[' + comment + ']', '#'); // Comment
 	td.appendChild(link);
-	td.innerHTML = td.innerHTML + ' [' + comment + ']';
+	td.appendChild(co);
 	td1.innerHTML = author;
 	td2.innerHTML = vote;
 	td3.innerHTML = created;
@@ -59,6 +60,14 @@ function getPayout(discussion) {
 	return result;
 }
 
+function renderPost(hash, callback) {
+	var args = hash.split('/', 3);
+	steem.api.getContent(args[1], args[2], function(err, result) {
+		console.log(err, result);
+		
+	});
+}
+
 function renderPostsList(tag, limit) {
 	var tbody = document.querySelector('tbody');
 	var loader = document.querySelector('.loaderSpace');
@@ -85,7 +94,7 @@ function renderPostsList(tag, limit) {
 					continue;
 				}
 
-				var link = createLink(discussion.title, '#' + discussion.permlink);
+				var link = createLink(discussion.title, '#' + discussion.category + '/@' + discussion.author + '/' + discussion.permlink);
 				var date = new Date(discussion.created);
 				var payout = getPayout(discussion);
 				var tr = createTr(link, discussion.children, discussion.author, discussion.net_votes, date.yyyymmdd());
@@ -95,6 +104,11 @@ function renderPostsList(tag, limit) {
 					lastPost.permlink = discussion.permlink;
 					lastPost.author = discussion.author;
 				}
+
+				posts[discussion.permlink] = {
+					body: discussion.body
+				};
+				link.setAttribute('data-id', discussion.id);
 			}
 			loader.style.display = 'none';
 			more.style.display = 'block';
@@ -108,13 +122,14 @@ function renderPostsList(tag, limit) {
 /**********
 *	Constant
 ***********/
-var perPage = 20;
+var perPage = 1;
 var steemconnectApp = 'wp-steem-plugin-dev-gce';
 
 /**********
 *	DOM manipulation
 ***********/
 var lastPost = {'permlink': '', 'author': ''};
+var posts = {};
 
 ready(function() {
 	var steemContainer = document.querySelector('.steemContainer');
@@ -126,7 +141,15 @@ ready(function() {
 
 	tagName.innerHTML = steemTag;
 
-	renderPostsList(steemTag, perPage);
+	var hash = window.location.hash;
+	if (hash.length > 1) {
+		// get details
+		renderPost(hash, function() {
+			renderPostsList(steemTag, perPage);
+		});
+	} else {
+		renderPostsList(steemTag, perPage);
+	}
 	
 	// Draw login
 	steemconnect.init({
@@ -155,3 +178,15 @@ ready(function() {
 		renderPostsList(steemTag, perPage);
 	});
 });
+
+window.addEventListener('hashchange', onHashChange, false);
+
+function onHashChange() {
+	var hash = window.location.hash;
+	var args = hash.split('/', 3);
+	var permlink = args[2];
+	var detail = document.querySelector('.postDetails');
+	detail.style.display = 'block';
+	detail.innerHTML = posts[permlink].body;
+}
+

@@ -17,6 +17,7 @@
 .steemContainer .table tbody td{border-top:1px solid #ccc}
 .steemContainer .loaderSpace{min-height:50px;}
 .steemContainer .more{display:none;}
+.steemContainer .postDetails{display:none;border:1px solid red;}
 
 .loader {position: relative;margin: 0 auto;width: 30px;}
 .loader:before {content: '';display: block;padding-top: 100%;}
