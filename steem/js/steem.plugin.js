@@ -62,9 +62,20 @@ function getPayout(discussion) {
 
 function renderPost(hash, callback) {
 	var args = hash.split('/', 3);
-	steem.api.getContent(args[1], args[2], function(err, result) {
+	console.log('ARGS:', args);
+	var category = args[1].replace('#', '');
+	var author = args[1].replace('@', '');
+	var permlink = args[2];
+	steem.api.getContent(author, permlink, function(err, result) {
 		console.log(err, result);
-		
+		if (err === null) {
+			var detail = document.querySelector('.postDetails');
+			detail.style.display = 'block';
+			detail.innerHTML = result.body;
+			callback();
+		} else {
+			console.error('some error', err);
+		}
 	});
 }
 
