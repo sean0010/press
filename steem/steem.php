@@ -67,9 +67,16 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content = '<div class="steemContainer" data-steemtag="'.get_option('steem_tag').'">';
     $shortcode_replace_content .= ' <div class="tagLabel">TAG: </div><div class="tagName"></div>';
     $shortcode_replace_content .= ' <div class="steemAccount"></div>';
-    $shortcode_replace_content .= ' <div class="postDetails"></div>';
+    $shortcode_replace_content .= ' <div class="postDetails">';
+    $shortcode_replace_content .= '  <div class="postHeader">';
+    $shortcode_replace_content .= '   <div class="postTitle"></div>';
+    $shortcode_replace_content .= '   <div class="postAuthor"></div>';
+    $shortcode_replace_content .= '   <div class="postCreated"></div>';
+    $shortcode_replace_content .= '  </div>';
+    $shortcode_replace_content .= '  <div class="postBody"></div>';
+    $shortcode_replace_content .= ' </div>';
     $shortcode_replace_content .= ' <div class="discussions">';
-    $shortcode_replace_content .= '  <table class="table"><tbody><tr><th width="*">Title</th><th width="80">Author</th><th width="40">Vote</th><th width="80">Created</th></tr></tbody></table>';
+    $shortcode_replace_content .= '  <table class="table"><tbody><tr><th width="*">Title</th><th width="85">Author</th><th width="45">Vote</th><th width="85">Created</th></tr></tbody></table>';
     $shortcode_replace_content .= '  <div class="loaderSpace"><div class="loader"><svg class="circular" viewBox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4" stroke-miterlimit="10"/></svg></div></div>';
     $shortcode_replace_content .= ' </div>';
     $shortcode_replace_content .= ' <button class="more button">Load More</div>';
@@ -92,6 +99,9 @@ function steem_plugin_frontend_js() {
 
     wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
     wp_enqueue_script('steem.plugin.js');
+
+    wp_register_script('showdown.js', plugin_dir_url( __FILE__ ) . 'js/showdown.min.js');
+    wp_enqueue_script('showdown.js');
 
     wp_register_style('steem.plugin.css', plugin_dir_url( __FILE__ ) . 'css/steem.plugin.css');
     wp_enqueue_style('steem.plugin.css');

@@ -1,4 +1,4 @@
-.steemContainer{font-size:12px;font-family:Dotum,sans-serif;}
+.steemContainer{font-size:13px;font-family: '굴림',Gulim, sans-serif;}
 .entry-content .steemContainer a, .entry-summary .steemContainer a, .page-content .steemContainer a, .comment-content .steemContainer a, .pingback .steemContainer .comment-body > a,
 .steemContainer a, .steemContainer a:hover{text-decoration:none;border:none;}
 .steemContainer .tagLabel,.steemContainer .tagName{font-weight:bold;font-size:15px;display:inline-block;}
@@ -9,6 +9,7 @@
 .steemPost:after{content:' ';display:table}
 .steemPost>div{display:table-cell;vertical-align:middle;zoom:1;letter-spacing:normal;word-spacing:normal;padding:5px}
 .steemContainer .table tbody tr:nth-child(even){background-color:#fcfcfc;}
+.steemContainer .table tbody tr:hover{background:#eae9f7;}
 .steemContainer .table thead, .steemContainer .table tbody, .steemContainer .table tfoot{border:none}
 .steemContainer .table th, .steemContainer .table td{text-align:center;}
 .steemContainer .table th:first-child, .steemContainer .table td:first-child{text-align:left;}
@@ -17,7 +18,18 @@
 .steemContainer .table tbody td{border-top:1px solid #ccc}
 .steemContainer .loaderSpace{min-height:50px;}
 .steemContainer .more{display:none;}
-.steemContainer .postDetails{display:none;border:1px solid red;}
+.steemContainer .postDetails{display:none;}
+.steemContainer .postDetails .postHeader{display:block;background:#f0f0f0;padding:5px 10px;margin-bottom:15px;}
+.steemContainer .postDetails .postHeader:after{content:' ';width:100%;display:block;}
+.steemContainer .postDetails .postTitle{display:block;}
+.steemContainer .postDetails .postAuthor{display:inline-block;}
+.steemContainer .postDetails .postCreated{display:inline-block;float:right;}
+.steemContainer .postDetails .postBody{display:block;padding:5px 10px;}
+.steemContainer .postDetails .postBody p{margin-bottom:15px;font-size:13px;line-height:1.6;}
+.steemContainer img{border:none!important;}
+.steemContainer a{font-weight:normal;}
+.steemContainer .postLink{}
+.steemContainer .commentLink{margin-left:5px;color:#6e6e6e;font-size:11px;}
 
 .loader {position: relative;margin: 0 auto;width: 30px;}
 .loader:before {content: '';display: block;padding-top: 100%;}

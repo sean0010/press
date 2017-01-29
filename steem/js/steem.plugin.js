@@ -30,6 +30,8 @@ function createTr(link, comment, author, vote, created) {
 	tr.appendChild(td1);
 	tr.appendChild(td2);
 	tr.appendChild(td3);
+	link.classList.add('postLink');		
+	co.classList.add('commentLink');
 	return tr;
 }
 function createLink(title, url) {
@@ -52,6 +54,17 @@ Date.prototype.yyyymmdd = function() {
 	return [this.getFullYear(), '-', (mm > 9 ? '' : '0') + mm, '-', (dd > 9 ? '' : '0') + dd].join('');
 };
 
+Date.prototype.datetime = function() {
+	var mm = this.getMonth() + 1; // getMonth() is zero-based
+	var dd = this.getDate();
+	var hour = this.getHours(); if (hour < 9) { hour = "0" + hour; }
+	var minute = this.getMinutes(); if (minute < 9) { minute = "0" + minute; }
+	var second = this.getSeconds(); if (second < 9) { second = "0" + second; }
+
+	return [this.getFullYear(), '-', (mm > 9 ? '' : '0') + mm, '-', (dd > 9 ? '' : '0') + dd, ' ', hour, ':', minute, ':', second].join('');
+};
+
+
 function getPayout(discussion) {
 	var totalPendingPayout = parseFloat(discussion.total_pending_payout_value.split(' ')[0]);
 	var totalPayoutValue = parseFloat(discussion.total_payout_value.split(' ')[0]);
@@ -70,8 +83,7 @@ function renderPost(hash, callback) {
 		console.log(err, result);
 		if (err === null) {
 			var detail = document.querySelector('.postDetails');
-			detail.style.display = 'block';
-			detail.innerHTML = result.body;
+			showPostDetails(detail, result.body, result.title, result.author, result.created);
 			callback();
 		} else {
 			console.error('some error', err);
@@ -117,6 +129,9 @@ function renderPostsList(tag, limit) {
 				}
 
 				posts[discussion.permlink] = {
+					title: discussion.title,
+					author: discussion.author,
+					created: discussion.created,
 					body: discussion.body
 				};
 				link.setAttribute('data-id', discussion.id);
@@ -133,7 +148,7 @@ function renderPostsList(tag, limit) {
 /**********
 *	Constant
 ***********/
-var perPage = 1;
+var perPage = 20;
 var steemconnectApp = 'wp-steem-plugin-dev-gce';
 
 /**********
@@ -197,7 +212,32 @@ function onHashChange() {
 	var args = hash.split('/', 3);
 	var permlink = args[2];
 	var detail = document.querySelector('.postDetails');
-	detail.style.display = 'block';
-	detail.innerHTML = posts[permlink].body;
+	
+    showPostDetails(detail, posts[permlink].body, posts[permlink].title, posts[permlink].author, posts[permlink].created);
 }
+
+function showPostDetails(container, markdown, title, author, created) {
+	var converter = new showdown.Converter();
+	var postBody = container.querySelector('.postBody');
+	var postAuthor = container.querySelector('.postAuthor');
+	var postTitle = container.querySelector('.postTitle');
+	var postCreated = container.querySelector('.postCreated');
+
+	container.style.display = 'block';
+
+	postBody.innerHTML = converter.makeHtml(markdown);
+	postBody.innerHTML = replaceUrlWithImg(postBody.innerHTML);
+	postTitle.innerHTML = '<b>' + title + '</b>';
+	postAuthor.innerHTML = author;
+
+	var date = new Date(created);
+	postCreated.innerHTML = date.datetime();
+}
+
+function replaceUrlWithImg(htmlText) {
+    var urlRegex = /<p>(https?:\/\/.*\.(?:png|jpg|gif))/g;
+    var result = htmlText.replace(urlRegex, '<p><img src="$1" alt="">');
+    return result;
+}
+
 
