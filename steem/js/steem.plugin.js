@@ -89,6 +89,13 @@ function renderPost(hash, callback) {
 			console.error('some error', err);
 		}
 	});
+
+	Render.replies(author, permlink, function(result) {
+		if (result.err === null) {
+			var replyContainer = document.querySelector('.postDetails .replyContainer');
+			replyContainer.appendChild(result.el);
+		}
+	}); 
 }
 
 function renderPostsList(tag, limit) {
@@ -239,5 +246,4 @@ function replaceUrlWithImg(htmlText) {
     var result = htmlText.replace(urlRegex, '<p><img src="$1" alt="">');
     return result;
 }
-
 

@@ -25,11 +25,18 @@
 .steemContainer .postDetails .postAuthor{display:inline-block;}
 .steemContainer .postDetails .postCreated{display:inline-block;float:right;}
 .steemContainer .postDetails .postBody{display:block;padding:5px 10px;}
-.steemContainer .postDetails .postBody p{margin-bottom:15px;font-size:13px;line-height:1.6;}
+.steemContainer p{margin-bottom:15px;font-size:13px;line-height:1.6;}
 .steemContainer img{border:none!important;}
 .steemContainer a{font-weight:normal;}
 .steemContainer .postLink{}
 .steemContainer .commentLink{margin-left:5px;color:#6e6e6e;font-size:11px;}
+.steemContainer .replyContainer{margin:15px 0;}
+.steemContainer .reply{padding:5px 10px;border-bottom:1px solid #eee;}
+.steemContainer .replyAuthor{display:inline-block;font-weight:bold;}
+.steemContainer .replyCreated{display:inline-block;margin-left:10px;}
+.steemContainer .replyBody{display:block;}
+
+
 
 .loader {position: relative;margin: 0 auto;width: 30px;}
 .loader:before {content: '';display: block;padding-top: 100%;}

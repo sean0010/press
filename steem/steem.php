@@ -74,6 +74,7 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content .= '   <div class="postCreated"></div>';
     $shortcode_replace_content .= '  </div>';
     $shortcode_replace_content .= '  <div class="postBody"></div>';
+    $shortcode_replace_content .= '  <div class="replyContainer"></div>';
     $shortcode_replace_content .= ' </div>';
     $shortcode_replace_content .= ' <div class="discussions">';
     $shortcode_replace_content .= '  <table class="table"><tbody><tr><th width="*">Title</th><th width="85">Author</th><th width="45">Vote</th><th width="85">Created</th></tr></tbody></table>';
@@ -97,11 +98,14 @@ function steem_plugin_frontend_js() {
     wp_register_script('steem.min.js', 'https://cdn.steemjs.com/lib/latest/steem.min.js');
     wp_enqueue_script('steem.min.js');
 
-    wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
-    wp_enqueue_script('steem.plugin.js');
-
     wp_register_script('showdown.js', plugin_dir_url( __FILE__ ) . 'js/showdown.min.js');
     wp_enqueue_script('showdown.js');
+
+    wp_register_script('render.js', plugin_dir_url( __FILE__ ) . 'js/render.js');
+    wp_enqueue_script('render.js');
+
+    wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
+    wp_enqueue_script('steem.plugin.js');
 
     wp_register_style('steem.plugin.css', plugin_dir_url( __FILE__ ) . 'css/steem.plugin.css');
     wp_enqueue_style('steem.plugin.css');
