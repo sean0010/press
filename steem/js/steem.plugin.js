@@ -244,7 +244,7 @@ function renderPostsList(tag, limit) {
 *	Constant
 ***********/
 var perPage = 20;
-var steemconnectApp = 'wp-steem-plugin-dev-gce';
+var steemconnectApp = 'morning';
 
 /**********
 *	DOM manipulation
