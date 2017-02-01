@@ -321,7 +321,7 @@ function onHashChange() {
 	}
 }
 
-function showPostDetails(container, markdown, title, author, created) {
+function markdown2html(markdown) {
 	var remarkable = new Remarkable({
 		html: true, // remarkable renders first then sanitize runs...
 		breaks: true,
@@ -329,13 +329,6 @@ function showPostDetails(container, markdown, title, author, created) {
 		typographer: false, // https://github.com/jonschlinkert/remarkable/issues/142#issuecomment-221546793
 		quotes: '“”‘’'
 	});
-
-	var postBody = container.querySelector('.postBody');
-	var postAuthor = container.querySelector('.postAuthor');
-	var postTitle = container.querySelector('.postTitle');
-	var postCreated = container.querySelector('.postCreated');
-
-	container.style.display = 'block';
 
 	var jsonMetadata = {};
 	jsonMetadata.image = jsonMetadata.image || [];
@@ -375,7 +368,18 @@ function showPostDetails(container, markdown, title, author, created) {
 		}
 	});
 
-	postBody.innerHTML = markdown;
+	return markdown;
+}
+
+function showPostDetails(container, markdown, title, author, created) {
+	var postBody = container.querySelector('.postBody');
+	var postAuthor = container.querySelector('.postAuthor');
+	var postTitle = container.querySelector('.postTitle');
+	var postCreated = container.querySelector('.postCreated');
+
+	container.style.display = 'block';
+
+	postBody.innerHTML = markdown2html(markdown);
 	postTitle.innerHTML = '<b>' + title + '</b>';
 	postAuthor.innerHTML = author;
 
