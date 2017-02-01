@@ -1,6 +1,95 @@
 /**********
 *	Library
 ***********/
+
+function validateAccountName(value) {
+  var i,
+    label,
+    len,
+    length,
+    ref,
+    suffix;
+
+  suffix = 'Account name should ';
+  if (!value) {
+    return `${suffix}not be empty.`;
+  }
+  length = value.length;
+  if (length < 3) {
+    return `${suffix}be longer.`;
+  }
+  if (length > 16) {
+    return `${suffix}be shorter.`;
+  }
+  if (/\./.test(value)) {
+    suffix = 'Each account segment should ';
+  }
+  ref = value.split('.');
+  for (i = 0, len = ref.length; i < len; i++) {
+    label = ref[i];
+    if (!/^[a-z]/.test(label)) {
+      return `${suffix}start with a letter.`;
+    }
+    if (!/^[a-z0-9-]*$/.test(label)) {
+      return `${suffix}have only letters, digits, or dashes.`;
+    }
+    if (/--/.test(label)) {
+      return `${suffix}have only one dash in a row.`;
+    }
+    if (!/[a-z0-9]$/.test(label)) {
+      return `${suffix}end with a letter or digit.`;
+    }
+    if (!(label.length >= 3)) {
+      return `${suffix}be longer`;
+    }
+  }
+  return null;
+}
+
+function escapeRegExp(str) {
+  return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
+}
+
+function replaceAll(str, find, replace) {
+  return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+}
+
+const imageRegex = /https?:\/\/(?:[-a-zA-Z0-9._]*[-a-zA-Z0-9])(?::\d{2,5})?(?:[/?#](?:[^\s"'<>\][()]*[^\s"'<>\][().,])?(?:(?:\.(?:tiff?|jpe?g|gif|png|svg|ico)|ipfs\/[a-z\d]{40,})))/ig;
+
+function linkify(content) {
+  // hashtag
+  content = content.replace(/(^|\s)(#[-a-z\d]+)/ig, (tag) => {
+    if (/#[\d]+$/.test(tag)) return tag; // Don't allow numbers to be tags
+    const space = /^\s/.test(tag) ? tag[0] : '';
+    const tag2 = tag.trim().substring(1);
+    const tagLower = tag2.toLowerCase();
+    return `${space}<a href="/trending/${tagLower}">${tag}</a>`;
+  });
+
+  // usertag (mention)
+  content = content.replace(/(^|\s)(@[a-z][-\.a-z\d]+[a-z\d])/ig, (user) => {
+    const space = /^\s/.test(user) ? user[0] : '';
+    const user2 = user.trim().substring(1);
+    const userLower = user2.toLowerCase();
+    const valid = validateAccountName(userLower) == null;
+    return space + (valid ?
+      `<a href="/@${userLower}">@${user2}</a>` :
+      `@${user2}`
+    );
+  });
+
+  // content = content.replace(linksRe.any, (ln) => {
+  //   if (linksRe.image.test(ln)) {
+  //     if (images) images.add(ln);
+  //     return `<img src="${ipfsPrefix(ln)}" />`;
+  //   }
+  //   if (links) links.add(ln);
+  //   return `<a href="${ipfsPrefix(ln)}">${ln}</a>`;
+  // });
+  return content;
+}
+
+
 function ready(fn) {
 	if (document.readyState != 'loading'){
 		fn();
@@ -89,7 +178,6 @@ function renderPost(hash, callback) {
 			console.error('some error', err);
 		}
 	});
-
 	Render.replies(author, permlink, function(result) {
 		if (result.err === null) {
 			var replyContainer = document.querySelector('.postDetails .replyContainer');
@@ -219,12 +307,29 @@ function onHashChange() {
 	var args = hash.split('/', 3);
 	var permlink = args[2];
 	var detail = document.querySelector('.postDetails');
-	
-    showPostDetails(detail, posts[permlink].body, posts[permlink].title, posts[permlink].author, posts[permlink].created);
+	var replyContainer = detail.querySelector('.replyContainer');
+	replyContainer.innerHTML = '';
+	if (args.length === 3) {
+		showPostDetails(detail, posts[permlink].body, posts[permlink].title, posts[permlink].author, posts[permlink].created);
+		Render.replies(posts[permlink].author, permlink, function(result) {
+			if (result.err === null) {
+				replyContainer.appendChild(result.el);
+			}
+		}); 
+	} else {
+
+	}
 }
 
 function showPostDetails(container, markdown, title, author, created) {
-	var converter = new showdown.Converter();
+	var remarkable = new Remarkable({
+		html: true, // remarkable renders first then sanitize runs...
+		breaks: true,
+		linkify: true, // linkify is done locally
+		typographer: false, // https://github.com/jonschlinkert/remarkable/issues/142#issuecomment-221546793
+		quotes: '“”‘’'
+	});
+
 	var postBody = container.querySelector('.postBody');
 	var postAuthor = container.querySelector('.postAuthor');
 	var postTitle = container.querySelector('.postTitle');
@@ -232,18 +337,49 @@ function showPostDetails(container, markdown, title, author, created) {
 
 	container.style.display = 'block';
 
-	postBody.innerHTML = converter.makeHtml(markdown);
-	postBody.innerHTML = replaceUrlWithImg(postBody.innerHTML);
+	var jsonMetadata = {};
+	jsonMetadata.image = jsonMetadata.image || [];
+
+	markdown = markdown.replace(/<!--([\s\S]+?)(-->|$)/g, '(html comment removed: $1)');
+
+	markdown.replace(imageRegex, function(img) {
+		if (_.filter(jsonMetadata.image, i => i.indexOf(img) !== -1).length === 0) {
+			jsonMetadata.image.push(img);
+		}
+	});
+
+	markdown = linkify(markdown);
+
+	//if (_.has(embeds, '[0].embed')) {
+	//	embeds.forEach((embed) => { markdown = markdown.replace(embed.url, embed.embed); });
+	//}
+	markdown = remarkable.render(markdown);
+
+	if (_.has(jsonMetadata, 'image[0]')) {
+		jsonMetadata.image.forEach(function(image) {
+			var newUrl = image;
+			if (/^\/\//.test(image)) { newUrl = `https:${image}`; }
+
+			markdown = replaceAll(markdown, `<a href="${image}">${image}</a>`, `<img src="${newUrl}">`);
+			// not in img tag
+			if (markdown.search(`<img[^>]+src=["']${escapeRegExp(image)}["']`) === -1) {
+				markdown = replaceAll(markdown, image, `<img src="${newUrl}">`);
+			}
+		});
+	}
+
+	markdown.replace(/<img[^>]+src="([^">]+)"/ig, function(img, ...rest) {
+		if (rest.length && rest[0] && rest[0].indexOf('https://steemitimages.com/0x0/') !== 0) {
+			const newUrl = `https://steemitimages.com/0x0/${rest[0]}`;
+			markdown = replaceAll(markdown, rest[0], newUrl);
+		}
+	});
+
+	postBody.innerHTML = markdown;
 	postTitle.innerHTML = '<b>' + title + '</b>';
 	postAuthor.innerHTML = author;
 
 	var date = new Date(created);
 	postCreated.innerHTML = date.datetime();
-}
-
-function replaceUrlWithImg(htmlText) {
-    var urlRegex = /<p>(https?:\/\/.*\.(?:png|jpg|gif))/g;
-    var result = htmlText.replace(urlRegex, '<p><img src="$1" alt="">');
-    return result;
 }
 

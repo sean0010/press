@@ -1,6 +1,5 @@
 var Render = (function() {
 	/* Private */
-	var _converter = new showdown.Converter();
 	var _div = function(cssClass, textNode) {
 		var el = document.createElement('div');
 		el.classList.add(cssClass);
@@ -22,8 +21,7 @@ var Render = (function() {
 						var container = _div('reply', '');
 						var author = _div('replyAuthor', reply.author);
 						var created = _div('replyCreated', (new Date(reply.created)).datetime());
-						var body = _div('replyBody', '');
-						body.innerHTML = _converter.makeHtml(reply.body);
+						var body = _div('replyBody', reply.body);
 						container.appendChild(author);
 						container.appendChild(created);
 						container.appendChild(body);
