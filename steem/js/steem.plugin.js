@@ -385,5 +385,7 @@ function showPostDetails(container, markdown, title, author, created) {
 
 	var date = new Date(created);
 	postCreated.innerHTML = date.datetime();
+
+	window.scrollTo(0, document.querySelector('.steemContainer').offsetTop);
 }
 
