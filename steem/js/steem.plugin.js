@@ -186,60 +186,6 @@ function renderPost(hash, callback) {
 	}); 
 }
 
-function renderPostsList(tag, limit) {
-	var tbody = document.querySelector('tbody');
-	var loader = document.querySelector('.loaderSpace');
-	var more = document.querySelector('.steemContainer .more');
-
-	var params = {
-		"tag": tag,
-		"limit": limit
-	};
-	if (lastPost.permlink !== '') {
-
-		params.start_permlink = lastPost.permlink;
-		params.start_author = lastPost.author;
-	}
-	loader.style.display = 'block';
-	console.log("get_discussions_by_created", params);
-	steem.api.getDiscussionsByCreated(params, function(err, result) {
-		if (err === null) {
-			var i, len = result.length;
-			for (i = 0; i < len; i++) {
-				var discussion = result[i];
-				if (discussion.permlink == lastPost.permlink && discussion.author == lastPost.author) {
-					// skip, redundant post
-					continue;
-				}
-
-				var link = createLink(discussion.title, '#' + discussion.category + '/@' + discussion.author + '/' + discussion.permlink);
-				var date = new Date(discussion.created);
-				var payout = getPayout(discussion);
-				var tr = createTr(link, discussion.children, discussion.author, discussion.net_votes, date.yyyymmdd());
-				tbody.appendChild(tr);
-
-				if (i == len - 1) {
-					lastPost.permlink = discussion.permlink;
-					lastPost.author = discussion.author;
-				}
-
-				posts[discussion.permlink] = {
-					title: discussion.title,
-					author: discussion.author,
-					created: discussion.created,
-					body: discussion.body
-				};
-				link.setAttribute('data-id', discussion.id);
-			}
-			loader.style.display = 'none';
-			more.style.display = 'block';
-			more.disabled = false;
-		} else {
-			console.log('ERROR:', err);
-		}
-	});
-}
-
 /**********
 *	Constant
 ***********/
@@ -259,6 +205,7 @@ ready(function() {
 	var discussions = steemContainer.querySelector('.discussions');
 	var acc = steemContainer.querySelector('.steemAccount');
 	var more = steemContainer.querySelector('.steemContainer .more');
+	var tbody = steemContainer.querySelector('tbody');
 
 	tagName.innerHTML = steemTag;
 
@@ -266,10 +213,28 @@ ready(function() {
 	if (hash.length > 1) {
 		// get details
 		renderPost(hash, function() {
-			renderPostsList(steemTag, perPage);
+			Render.posts(steemTag, perPage, function(result) {
+				if (result.err === null) {
+					var trs = result.el;
+					trs.forEach(function(tr) {
+						tbody.appendChild(tr.cloneNode(true));
+					});
+				} else {
+					console.log('Render.posts error:', err);
+				}
+			});
 		});
 	} else {
-		renderPostsList(steemTag, perPage);
+		Render.posts(steemTag, perPage, function(result) {
+			if (result.err === null) {
+				var trs = result.el;
+				trs.forEach(function(tr) {
+					tbody.appendChild(tr.cloneNode(true));
+				});
+			} else {
+				console.log('Render.posts error:', err);
+			}
+		});
 	}
 	
 	// Draw login
@@ -296,7 +261,16 @@ ready(function() {
 	more.addEventListener('click', function() {
 		more.style.display = 'block';
 		more.disabled = true;
-		renderPostsList(steemTag, perPage);
+		Render.posts(steemTag, perPage, function(result) {
+			if (result.err === null) {
+				var trs = result.el;
+				trs.forEach(function(tr) {
+					tbody.appendChild(tr.cloneNode(true));
+				});
+			} else {
+				console.log('Render.posts error:', err);
+			}
+		});
 	});
 });
 
