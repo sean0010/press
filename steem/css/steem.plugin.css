@@ -35,8 +35,23 @@
 .steemContainer .replyAuthor{display:inline-block;font-weight:bold;}
 .steemContainer .replyCreated{display:inline-block;margin-left:10px;}
 .steemContainer .replyBody{display:block;}
-
-
+.steemContainer .postFooter{text-align:center;}
+.steemContainer button:focus{outline:0;}
+.steemContainer .vote{display: inline-block;
+text-align: center;line-height: 1;cursor: pointer;
+-webkit-appearance: none;
+vertical-align: middle;
+border: 1px solid transparent;
+border-radius: 0;
+padding: 0.85em 1em;
+width: 100px;
+margin: 0 0 1rem 0;
+background-color: #2199e8;
+color: #fefefe;}
+.steemContainer .upvote{margin-right:15px;}
+.steemContainer .downvote{margin-left:15px;}
+.steemContainer .voteText{display:block;}
+.steemContainer .voteCount{display:block;font-size:24px;margin-top:5px;}
 
 .loader {position: relative;margin: 0 auto;width: 30px;}
 .loader:before {content: '';display: block;padding-top: 100%;}

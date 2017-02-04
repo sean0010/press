@@ -97,32 +97,6 @@ function ready(fn) {
 		document.addEventListener('DOMContentLoaded', fn);
 	}
 }
-function createDiv(cssClass, textNode) {
-	var el = document.createElement('div');
-	el.classList.add(cssClass);
-	el.textContent = textNode;
-	return el;
-}
-function createTr(link, comment, author, vote, created) {
-	var tr = document.createElement('tr'); // 
-	var td = document.createElement('td'); // title
-	var td1 = document.createElement('td'); // Author
-	var td2 = document.createElement('td'); // Vote
-	var td3 = document.createElement('td'); // Created
-	var co = createLink('[' + comment + ']', '#'); // Comment
-	td.appendChild(link);
-	td.appendChild(co);
-	td1.innerHTML = author;
-	td2.innerHTML = vote;
-	td3.innerHTML = created;
-	tr.appendChild(td);
-	tr.appendChild(td1);
-	tr.appendChild(td2);
-	tr.appendChild(td3);
-	link.classList.add('postLink');		
-	co.classList.add('commentLink');
-	return tr;
-}
 function createLink(title, url) {
 	var el = document.createElement('a');
 	el.textContent = title;
@@ -172,7 +146,8 @@ function renderPost(hash, callback) {
 		console.log(err, result);
 		if (err === null) {
 			var detail = document.querySelector('.postDetails');
-			showPostDetails(detail, result.body, result.title, result.author, result.created);
+			var v = countVotes(result.active_votes);
+			showPostDetails(detail, result.body, result.title, result.author, result.created, v.up, v.down);
 			callback();
 		} else {
 			console.error('some error', err);
@@ -185,6 +160,22 @@ function renderPost(hash, callback) {
 		}
 	}); 
 }
+
+function countVotes(votes) {
+	var result = {up: 0, down: 0};
+
+	votes.forEach(function(vote) {
+		if (vote.percent < 0) {
+			result.down -= 1;
+		} else {
+			result.up += 1;
+		}
+	});
+
+	return result;
+}
+
+
 
 /**********
 *	Constant
@@ -284,8 +275,9 @@ function onHashChange() {
 	var replyContainer = detail.querySelector('.replyContainer');
 	replyContainer.innerHTML = '';
 	if (args.length === 3) {
-		showPostDetails(detail, posts[permlink].body, posts[permlink].title, posts[permlink].author, posts[permlink].created);
-		Render.replies(posts[permlink].author, permlink, function(result) {
+		var post = posts[permlink];
+		showPostDetails(detail, post.body, post.title, post.author, post.created, post.upvotes, post.downvotes);
+		Render.replies(post.author, permlink, function(result) {
 			if (result.err === null) {
 				replyContainer.appendChild(result.el);
 			}
@@ -345,11 +337,13 @@ function markdown2html(markdown) {
 	return markdown;
 }
 
-function showPostDetails(container, markdown, title, author, created) {
+function showPostDetails(container, markdown, title, author, created, upvotes, downvotes) {
 	var postBody = container.querySelector('.postBody');
 	var postAuthor = container.querySelector('.postAuthor');
 	var postTitle = container.querySelector('.postTitle');
 	var postCreated = container.querySelector('.postCreated');
+	var upvoteCount = container.querySelector('.upvote .voteCount');
+	var downvoteCount = container.querySelector('.downvote .voteCount');
 
 	container.style.display = 'block';
 
@@ -359,6 +353,9 @@ function showPostDetails(container, markdown, title, author, created) {
 
 	var date = new Date(created);
 	postCreated.innerHTML = date.datetime();
+
+	upvoteCount.innerHTML = upvotes;
+	downvoteCount.innerHTML = downvotes;
 
 	window.scrollTo(0, document.querySelector('.steemContainer').offsetTop);
 }

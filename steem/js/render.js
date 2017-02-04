@@ -6,6 +6,26 @@ var Render = (function() {
 		el.textContent = textNode;
 		return el;
 	};
+	var _createTr = function(link, comment, author, vote, created) {
+		var tr = document.createElement('tr'); // 
+		var td = document.createElement('td'); // title
+		var td1 = document.createElement('td'); // Author
+		var td2 = document.createElement('td'); // Vote
+		var td3 = document.createElement('td'); // Created
+		var co = createLink('[' + comment + ']', '#'); // Comment
+		td.appendChild(link);
+		td.appendChild(co);
+		td1.innerHTML = author;
+		td2.innerHTML = vote;
+		td3.innerHTML = created;
+		tr.appendChild(td);
+		tr.appendChild(td1);
+		tr.appendChild(td2);
+		tr.appendChild(td3);
+		link.classList.add('postLink');		
+		co.classList.add('commentLink');
+		return tr;
+	};
 	var _lastPost = {'permlink': '', 'author': ''};
 
 	/* Public */
@@ -37,7 +57,7 @@ var Render = (function() {
 						var link = createLink(discussion.title, '#' + discussion.category + '/@' + discussion.author + '/' + discussion.permlink);
 						var date = new Date(discussion.created);
 						var payout = getPayout(discussion);
-						var tr = createTr(link, discussion.children, discussion.author, discussion.net_votes, date.yyyymmdd());
+						var tr = _createTr(link, discussion.children, discussion.author, discussion.net_votes, date.yyyymmdd());
 						temp.appendChild(tr);
 
 						if (i == len - 1) {
@@ -45,11 +65,14 @@ var Render = (function() {
 							_lastPost.author = discussion.author;
 						}
 
+						var v = countVotes(discussion.active_votes);
 						posts[discussion.permlink] = {
 							title: discussion.title,
 							author: discussion.author,
 							created: discussion.created,
-							body: discussion.body
+							body: discussion.body,
+							upvotes: v.up,
+							downvotes: v.down
 						};
 					}
 					loader.style.display = 'none';
