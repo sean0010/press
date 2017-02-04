@@ -75,8 +75,8 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content .= '  </div>';
     $shortcode_replace_content .= '  <div class="postBody"></div>';
     $shortcode_replace_content .= '  <div class="postFooter">';
-    $shortcode_replace_content .= '   <button class="vote upvote"><span class="voteText">추천</span><span class="voteCount">0</span></button>';
-    $shortcode_replace_content .= '   <button class="vote downvote"><span class="voteText">깃발</span><span class="voteCount">0</span></button>';
+    $shortcode_replace_content .= '   <button class="vote upvote"><span class="voteText">😊</span><span class="voteCount">0</span></button>';
+    $shortcode_replace_content .= '   <button class="vote downvote"><span class="voteText">😩</span><span class="voteCount">0</span></button>';
     $shortcode_replace_content .= '  </div>';
     $shortcode_replace_content .= '  <div class="replyContainer"></div>';
     $shortcode_replace_content .= ' </div>';
