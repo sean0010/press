@@ -76,6 +76,16 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content .= '  <div class="postBody"></div>';
     $shortcode_replace_content .= '  <div class="postFooter">';
     $shortcode_replace_content .= '   <button class="vote upvote"><span class="voteText">😊</span><span class="voteCount">0</span></button>';
+    $shortcode_replace_content .= '   <div class="upvoteLoader"><div class="loader"><svg class="circular" viewBox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4" stroke-miterlimit="10"/></svg></div></div>';
+    $shortcode_replace_content .= '   <div class="votePower">';
+    $shortcode_replace_content .= '    <button data-percent="cancel">X</button>';
+    $shortcode_replace_content .= '    <button data-percent="100">100%</button>';
+    $shortcode_replace_content .= '    <button data-percent="75">75%</button>';
+    $shortcode_replace_content .= '    <button data-percent="66">66%</button>';
+    $shortcode_replace_content .= '    <button data-percent="50">50%</button>';
+    $shortcode_replace_content .= '    <button data-percent="33">33%</button>';
+    $shortcode_replace_content .= '    <button data-percent="25">25%</button>';
+    $shortcode_replace_content .= '   </div>';
     $shortcode_replace_content .= '   <button class="vote downvote"><span class="voteText">😩</span><span class="voteCount">0</span></button>';
     $shortcode_replace_content .= '  </div>';
     $shortcode_replace_content .= '  <div class="replyContainer"></div>';
@@ -112,6 +122,10 @@ function steem_plugin_frontend_js() {
 
     wp_register_script('render.js', plugin_dir_url( __FILE__ ) . 'js/render.js');
     wp_enqueue_script('render.js');
+
+
+    wp_register_script('vote.js', plugin_dir_url( __FILE__ ) . 'js/vote.js');
+    wp_enqueue_script('vote.js');
 
     wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
     wp_enqueue_script('steem.plugin.js');

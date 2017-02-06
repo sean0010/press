@@ -147,7 +147,7 @@ function renderPost(hash, callback) {
 		if (err === null) {
 			var detail = document.querySelector('.postDetails');
 			var v = countVotes(result.active_votes);
-			showPostDetails(detail, result.body, result.title, result.author, result.created, v.up, v.down);
+			showPostDetails(detail, result.body, result.title, result.author, permlink, result.created, v.up, v.down);
 			callback();
 		} else {
 			console.error('some error', err);
@@ -188,6 +188,8 @@ var steemconnectApp = 'morning';
 ***********/
 var lastPost = {'permlink': '', 'author': ''};
 var posts = {};
+var username = '';
+window.isAuth = false;
 
 ready(function() {
 	var steemContainer = document.querySelector('.steemContainer');
@@ -197,6 +199,10 @@ ready(function() {
 	var acc = steemContainer.querySelector('.steemAccount');
 	var more = steemContainer.querySelector('.steemContainer .more');
 	var tbody = steemContainer.querySelector('tbody');
+	var upvote = steemContainer.querySelector('.upvote');
+	var downvote = steemContainer.querySelector('.downvote');
+	var votePower = steemContainer.querySelector('.votePower');
+	var upvoteLoader = steemContainer.querySelector('.upvoteLoader');
 
 	tagName.innerHTML = steemTag;
 
@@ -233,12 +239,11 @@ ready(function() {
 		app: steemconnectApp,
 		callbackURL: window.location.href
 	});
-	var isAuth = false;
 	var loginURL = steemconnect.getLoginURL();
 	steemconnect.isAuthenticated(function(err, result) {
 		if (!err && result.isAuthenticated) {
-			isAuth = true;
-			var username = result.username;
+			window.isAuth = true;
+			username = result.username;
 			var accBtn = createLink(username, '#');
 			var createPostBtn = createLink('Submit a Story', '#');
 			acc.appendChild(createPostBtn);
@@ -248,6 +253,9 @@ ready(function() {
 			acc.appendChild(loginBtn);
 		}
 	});
+
+	// Vote button
+	Vote.init(votePower, upvoteLoader, upvote)
 
 	more.addEventListener('click', function() {
 		more.style.display = 'block';
@@ -265,6 +273,15 @@ ready(function() {
 	});
 });
 
+function voteIt(author, permlink, weight, callback) {
+	//steemconnect.vote(username, author, permlink, weight, function(err, result) {
+	//	console.log('steemconnect vote result:', err, result);
+	//});
+	setTimeout(function() {
+		callback();
+	}, 1000);
+}
+
 window.addEventListener('hashchange', onHashChange, false);
 
 function onHashChange() {
@@ -276,7 +293,7 @@ function onHashChange() {
 	replyContainer.innerHTML = '';
 	if (args.length === 3) {
 		var post = posts[permlink];
-		showPostDetails(detail, post.body, post.title, post.author, post.created, post.upvotes, post.downvotes);
+		showPostDetails(detail, post.body, post.title, post.author, permlink, post.created, post.upvotes, post.downvotes);
 		Render.replies(post.author, permlink, function(result) {
 			if (result.err === null) {
 				replyContainer.appendChild(result.el);
@@ -337,7 +354,7 @@ function markdown2html(markdown) {
 	return markdown;
 }
 
-function showPostDetails(container, markdown, title, author, created, upvotes, downvotes) {
+function showPostDetails(container, markdown, title, author, permlink, created, upvotes, downvotes) {
 	var postBody = container.querySelector('.postBody');
 	var postAuthor = container.querySelector('.postAuthor');
 	var postTitle = container.querySelector('.postTitle');
@@ -356,6 +373,8 @@ function showPostDetails(container, markdown, title, author, created, upvotes, d
 
 	upvoteCount.innerHTML = upvotes;
 	downvoteCount.innerHTML = downvotes;
+
+	Vote.set(author, permlink);
 
 	window.scrollTo(0, document.querySelector('.steemContainer').offsetTop);
 }
