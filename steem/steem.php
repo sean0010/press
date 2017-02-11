@@ -77,7 +77,7 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content .= '  <div class="postFooter">';
     $shortcode_replace_content .= '   <button class="vote upvote"><span class="voteText">😊</span><span class="voteCount">0</span></button>';
     $shortcode_replace_content .= '   <div class="upvoteLoader"><div class="loader"><svg class="circular" viewBox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4" stroke-miterlimit="10"/></svg></div></div>';
-    $shortcode_replace_content .= '   <div class="votePower">';
+    $shortcode_replace_content .= '   <div class="up votePower">';
     $shortcode_replace_content .= '    <button data-percent="cancel">X</button>';
     $shortcode_replace_content .= '    <button data-percent="100">100%</button>';
     $shortcode_replace_content .= '    <button data-percent="75">75%</button>';
@@ -87,6 +87,15 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content .= '    <button data-percent="25">25%</button>';
     $shortcode_replace_content .= '   </div>';
     $shortcode_replace_content .= '   <button class="vote downvote"><span class="voteText">😩</span><span class="voteCount">0</span></button>';
+    $shortcode_replace_content .= '   <div class="downvoteLoader"><div class="loader"><svg class="circular" viewBox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4" stroke-miterlimit="10"/></svg></div></div>';
+    $shortcode_replace_content .= '   <div class="down votePower">';
+    $shortcode_replace_content .= '    <button data-percent="cancel">X</button>';
+    $shortcode_replace_content .= '    <button data-percent="-100">100%</button>';
+    $shortcode_replace_content .= '    <button data-percent="-50">50%</button>';
+    $shortcode_replace_content .= '    <button data-percent="-20">20%</button>';
+    $shortcode_replace_content .= '    <button data-percent="-10">10%</button>';
+    $shortcode_replace_content .= '    <button data-percent="-1">1%</button>';
+    $shortcode_replace_content .= '   </div>';
     $shortcode_replace_content .= '  </div>';
     $shortcode_replace_content .= '  <div class="replyContainer"></div>';
     $shortcode_replace_content .= ' </div>';

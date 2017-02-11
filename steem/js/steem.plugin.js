@@ -165,9 +165,10 @@ function countVotes(votes) {
 	var result = {up: 0, down: 0};
 
 	votes.forEach(function(vote) {
-		if (vote.percent < 0) {
-			result.down -= 1;
-		} else {
+		var percent = parseInt(vote.percent);
+		if (percent < 0) {
+			result.down += 1;
+		} else if (percent > 0) {
 			result.up += 1;
 		}
 	});
@@ -200,9 +201,11 @@ ready(function() {
 	var more = steemContainer.querySelector('.steemContainer .more');
 	var tbody = steemContainer.querySelector('tbody');
 	var upvote = steemContainer.querySelector('.upvote');
-	var downvote = steemContainer.querySelector('.downvote');
-	var votePower = steemContainer.querySelector('.votePower');
+	var upvotePower = steemContainer.querySelector('.up.votePower');
 	var upvoteLoader = steemContainer.querySelector('.upvoteLoader');
+	var downvote = steemContainer.querySelector('.downvote');
+	var downvotePower = steemContainer.querySelector('.down.votePower');
+	var downvoteLoader = steemContainer.querySelector('.downvoteLoader');
 
 	tagName.innerHTML = steemTag;
 
@@ -255,7 +258,7 @@ ready(function() {
 	});
 
 	// Vote button
-	Vote.init(votePower, upvoteLoader, upvote)
+	Vote.init(upvotePower, upvoteLoader, upvote, downvotePower, downvoteLoader, downvote);
 
 	more.addEventListener('click', function() {
 		more.style.display = 'block';
@@ -273,34 +276,27 @@ ready(function() {
 	});
 });
 
-function voteIt(author, permlink, weight, callback) {
-	//steemconnect.vote(username, author, permlink, weight, function(err, result) {
-	//	console.log('steemconnect vote result:', err, result);
-	//});
-	setTimeout(function() {
-		callback();
-	}, 1000);
-}
-
 window.addEventListener('hashchange', onHashChange, false);
 
 function onHashChange() {
 	var hash = window.location.hash;
 	var args = hash.split('/', 3);
-	var permlink = args[2];
-	var detail = document.querySelector('.postDetails');
-	var replyContainer = detail.querySelector('.replyContainer');
-	replyContainer.innerHTML = '';
-	if (args.length === 3) {
-		var post = posts[permlink];
-		showPostDetails(detail, post.body, post.title, post.author, permlink, post.created, post.upvotes, post.downvotes);
-		Render.replies(post.author, permlink, function(result) {
-			if (result.err === null) {
-				replyContainer.appendChild(result.el);
-			}
-		}); 
-	} else {
+	if (args.length == 3) {
+		var permlink = args[2];
+		var detail = document.querySelector('.postDetails');
+		var replyContainer = detail.querySelector('.replyContainer');
+		replyContainer.innerHTML = '';
+		if (args.length === 3) {
+			var post = posts[permlink];
+			showPostDetails(detail, post.body, post.title, post.author, permlink, post.created, post.upvotes, post.downvotes);
+			Render.replies(post.author, permlink, function(result) {
+				if (result.err === null) {
+					replyContainer.appendChild(result.el);
+				}
+			}); 
+		} else {
 
+		}
 	}
 }
 
@@ -359,7 +355,9 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 	var postAuthor = container.querySelector('.postAuthor');
 	var postTitle = container.querySelector('.postTitle');
 	var postCreated = container.querySelector('.postCreated');
+	var upvoteButton = container.querySelector('.upvote');
 	var upvoteCount = container.querySelector('.upvote .voteCount');
+	var downvoteButton = container.querySelector('.downvote');
 	var downvoteCount = container.querySelector('.downvote .voteCount');
 
 	container.style.display = 'block';
@@ -371,11 +369,20 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 	var date = new Date(created);
 	postCreated.innerHTML = date.datetime();
 
+	window.scrollTo(0, document.querySelector('.steemContainer').offsetTop);
+
+	upvoteButton.classList.remove('voted');
 	upvoteCount.innerHTML = upvotes;
+	downvoteButton.classList.remove('voted');
 	downvoteCount.innerHTML = downvotes;
 
 	Vote.set(author, permlink);
 
-	window.scrollTo(0, document.querySelector('.steemContainer').offsetTop);
+	if (window.isAuth) {
+		steem.api.getActiveVotes(author, permlink, function(err, result) {
+			if (err === null) {
+				Vote.hasVoted(result, username)
+			}
+		});
+	}
 }
-
