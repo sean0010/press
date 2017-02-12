@@ -98,6 +98,10 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content .= '   </div>';
     $shortcode_replace_content .= '  </div>';
     $shortcode_replace_content .= '  <div class="replyContainer"></div>';
+    $shortcode_replace_content .= '  <div class="replyForm">';
+    $shortcode_replace_content .= '   <input type="text" class="replyInput" placeholder="Input Comment">';
+    $shortcode_replace_content .= '   <button class="replyButton button">Submit</button>';
+    $shortcode_replace_content .= '  </div>';
     $shortcode_replace_content .= ' </div>';
     $shortcode_replace_content .= ' <div class="discussions">';
     $shortcode_replace_content .= '  <table class="table"><tbody><tr><th width="*">Title</th><th width="85">Author</th><th width="45">Vote</th><th width="85">Created</th></tr></tbody></table>';

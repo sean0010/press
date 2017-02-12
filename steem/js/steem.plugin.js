@@ -206,6 +206,8 @@ ready(function() {
 	var downvote = steemContainer.querySelector('.downvote');
 	var downvotePower = steemContainer.querySelector('.down.votePower');
 	var downvoteLoader = steemContainer.querySelector('.downvoteLoader');
+	var replyInput = document.querySelector('.replyInput');
+	var replyButton = document.querySelector('.replyButton');
 
 	tagName.innerHTML = steemTag;
 
@@ -273,6 +275,34 @@ ready(function() {
 				console.log('Render.posts error:', err);
 			}
 		});
+	});
+	replyButton.addEventListener('click', function(e) {
+		var inputString = replyInput.value.trim();
+		var parentAuthor = replyInput.getAttribute('data-author');
+		var parentPermlink = replyInput.getAttribute('data-permlink');
+		var replyContainer = document.querySelector('.replyContainer');
+
+		if (inputString === '') {
+			alert('Empty comment');
+		} else {
+			console.log(inputString, parentAuthor, parentPermlink);
+			var permlink = 're-' + parentPermlink + '-' + Math.floor(Date.now() / 1000);
+			replyButton.setAttribute('disabled', true);
+			steemconnect.comment(parentAuthor, parentPermlink, username, permlink, '', inputString, '', function(err, result) {
+				console.log(err, result);
+
+				Render.replies(parentAuthor, parentPermlink, function(result) {
+					if (result.err === null) {
+						replyContainer.innerHTML = '';
+						replyContainer.appendChild(result.el);
+					}
+				}); 
+
+				replyButton.setAttribute('disabled', false);
+				replyButton.removeAttribute('disabled');
+				replyInput.value = '';
+			});
+		}
 	});
 });
 
@@ -359,6 +389,7 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 	var upvoteCount = container.querySelector('.upvote .voteCount');
 	var downvoteButton = container.querySelector('.downvote');
 	var downvoteCount = container.querySelector('.downvote .voteCount');
+	var replyInput = container.querySelector('.replyInput');
 
 	container.style.display = 'block';
 
@@ -377,6 +408,9 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 	downvoteCount.innerHTML = downvotes;
 
 	Vote.set(author, permlink);
+
+	replyInput.setAttribute('data-author', author);
+	replyInput.setAttribute('data-permlink', permlink);
 
 	if (window.isAuth) {
 		steem.api.getActiveVotes(author, permlink, function(err, result) {

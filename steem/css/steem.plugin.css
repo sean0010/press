@@ -50,6 +50,10 @@
 .steemContainer .votePower button:hover{background:#4BA2F2;}
 .steemContainer .upvoteLoader{position:absolute;display:none;text-align:center;width:100px;padding-top:20px;}
 .steemContainer .downvoteLoader{position:absolute;display:none;text-align:center;width:100px;padding-top:20px;}
+.steemContainer .replyForm{width:100%;display:table;position:relative;}
+.steemContainer .replyForm .replyInput{width:100%;display:table-cell;}
+.steemContainer .replyForm .replyButton{display:table-cell;}
+
 .loader {position: relative;margin: 0 auto;width: 30px;}
 .loader:before {content: '';display: block;padding-top: 100%;}
 .circular {animation: rotate 2s linear infinite;height: 100%;transform-origin: center center;width: 100%;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;}
