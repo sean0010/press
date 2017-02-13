@@ -287,6 +287,7 @@ ready(function() {
 		} else {
 			console.log(inputString, parentAuthor, parentPermlink);
 			var permlink = 're-' + parentPermlink + '-' + Math.floor(Date.now() / 1000);
+			replyInput.setAttribute('disabled', true);
 			replyButton.setAttribute('disabled', true);
 			steemconnect.comment(parentAuthor, parentPermlink, username, permlink, '', inputString, '', function(err, result) {
 				console.log(err, result);
@@ -296,11 +297,12 @@ ready(function() {
 						replyContainer.innerHTML = '';
 						replyContainer.appendChild(result.el);
 					}
-				}); 
-
-				replyButton.setAttribute('disabled', false);
-				replyButton.removeAttribute('disabled');
-				replyInput.value = '';
+					replyInput.setAttribute('disabled', false);
+					replyInput.removeAttribute('disabled');
+					replyButton.setAttribute('disabled', false);
+					replyButton.removeAttribute('disabled');
+					replyInput.value = '';
+				}); 				
 			});
 		}
 	});
