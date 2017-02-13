@@ -6,6 +6,16 @@ var Render = (function() {
 		el.textContent = textNode;
 		return el;
 	};
+	var _btn = function(cssClass, text) {
+		var b = document.createElement('button');
+		var t = _div('btnIcon', text);
+		var c = _div('btnCount', '0');
+		t.innerHTML = text;
+		b.appendChild(t);
+		b.appendChild(c);
+		b.classList.add(cssClass);
+		return b;
+	};
 	var _createTr = function(link, comment, author, vote, created) {
 		var tr = document.createElement('tr'); // 
 		var td = document.createElement('td'); // title
@@ -98,10 +108,36 @@ var Render = (function() {
 						var author = _div('replyAuthor', reply.author);
 						var created = _div('replyCreated', (new Date(reply.created)).datetime());
 						var body = _div('replyBody', reply.body);
+						var upvoteComment = _btn('upvoteComment', '😊');
+						var downvoteComment = _btn('downvoteComment', '😩');
+						Vote.commentVoteBind(upvoteComment);
+						Vote.commentVoteBind(downvoteComment);
+						container.setAttribute('data-author', reply.author);
+						container.setAttribute('data-permlink', reply.permlink);
 						container.appendChild(author);
 						container.appendChild(created);
+						container.appendChild(upvoteComment);
+						container.appendChild(downvoteComment);
 						container.appendChild(body);
 						r.appendChild(container);
+
+						steem.api.getActiveVotes(reply.author, reply.permlink, function(err, votes) {
+							if (err === null) {
+								var v = countVotes(votes);
+								upvoteComment.querySelector('.btnCount').innerHTML = v.up;
+								downvoteComment.querySelector('.btnCount').innerHTML = v.down;
+
+								// Logged In User Already Voted Mark
+								if (window.isAuth) {
+									var voted = Vote.hasVoted(votes, username);
+									if (voted === 1) {
+										upvoteComment.classList.add('voted');
+									} else if (voted === -1) {
+										downvoteComment.classList.add('voted');
+									}
+								}
+							}
+						});
 					}
 					callback({err: null, el: r});
 				} else {

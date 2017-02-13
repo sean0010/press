@@ -102,25 +102,6 @@ var Vote = (function() {
 		_downvotePower.disabled = true;
 	};
 
-	// 0: Not Voted, 1: Upvoted, -1: Downvoted
-	var _hasVoted = function(votes, voter) {
-			var result = 0;
-			var i = votes.length;
-			while(i--) {
-				if (votes[i].voter === voter) {
-					if (votes[i].percent < 0) {
-						result = -1;
-					} else if (votes[i].percent == 0) {
-						result = 0;
-					} else {
-						result = 1;
-					}
-					break;
-				}
-			}
-			return result;
-	};
-
 	return {
 		init: function(upvotePower, upvoteLoader, upvote, downvotePower, downvoteLoader, downvote) {
 			_upvotePower = upvotePower;
@@ -135,13 +116,43 @@ var Vote = (function() {
 			_author = author;
 			_permlink = permlink;
 		},
+
+		// 0: Not Voted, 1: Upvoted, -1: Downvoted
 		hasVoted: function(votes, voter) {
-			var voted = _hasVoted(votes, voter);
-			if (voted === 1) {
-				_upvoteButton.classList.add('voted');
-			} else if (voted === -1) {
-				_downvoteButton.classList.add('voted');
+			var result = 0;
+			var i = votes.length;
+			while(i--) {
+				if (votes[i].voter === voter) {
+					if (votes[i].percent < 0) {
+						result = -1;
+					} else if (votes[i].percent == 0) {
+						result = 0;
+					} else {
+						result = 1;
+					}
+					break;
+				}
 			}
+			return result;			
+		},
+		commentVoteBind: function(btn) {
+			btn.addEventListener('click', function(e) {
+				var isUpvote = btn.classList.contains('upvoteComment');
+				var commentAuthor = btn.parentNode.getAttribute('data-author');
+				var commentPermlink = btn.parentNode.getAttribute('data-permlink');
+				var weight = 200;
+
+				btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', true);
+				btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', true);
+				steemconnect.vote(username, commentAuthor, commentPermlink, weight, function(err, result) {
+					console.log('Comment vote:', err, result);
+
+					btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', false);
+					btn.parentNode.querySelector('.upvoteComment').removeAttribute('disabled');
+					btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', false);
+					btn.parentNode.querySelector('.downvoteComment').removeAttribute('disabled');
+				});
+			});
 		}
 	}
 })();

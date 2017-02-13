@@ -35,6 +35,10 @@
 .steemContainer .replyAuthor{display:inline-block;font-weight:bold;}
 .steemContainer .replyCreated{display:inline-block;margin-left:10px;}
 .steemContainer .replyBody{display:block;}
+.steemContainer .reply button{position:relative;padding:4px;border:1px solid #283A8E;color:#283A8E;margin-left:5px;border-radius:4px;}
+.steemContainer .reply button .btnIcon{position:absolute;}
+.steemContainer .reply button .btnCount{padding-left:20px;}
+.steemContainer .reply .voted{background:#283A8E;color:#fff;}
 .steemContainer .postFooter{text-align:center;position:relative;}
 .steemContainer button:focus{outline:0;}
 .steemContainer button.vote:hover{background-color:#1A5099;}

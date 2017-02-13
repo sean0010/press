@@ -416,8 +416,13 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 
 	if (window.isAuth) {
 		steem.api.getActiveVotes(author, permlink, function(err, result) {
-			if (err === null) {
-				Vote.hasVoted(result, username)
+			if (err === null) {				
+				var voted = Vote.hasVoted(result, username);
+				if (voted === 1) {
+					upvoteButton.classList.add('voted');
+				} else if (voted === -1) {
+					downvoteButton.classList.add('voted');
+				}
 			}
 		});
 	}
