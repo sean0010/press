@@ -64,7 +64,12 @@ function steem_plugin_settings_page() {
 * Short Code
 */
 function steem_plugin( $atts ) {
-    $shortcode_replace_content = '<div class="steemContainer" data-steemtag="'.get_option('steem_tag').'">';
+    $a = shortcode_atts( array(
+        'tag' => get_option('steem_tag'),
+    ), $atts );
+    
+    //$shortcode_replace_content = '<div class="steemContainer" data-steemtag="'.get_option('steem_tag').'">';
+    $shortcode_replace_content = '<div class="steemContainer" data-steemtag="'.esc_html__($a['tag']).'">';
     $shortcode_replace_content .= ' <div class="tagLabel">TAG: </div><div class="tagName"></div>';
     $shortcode_replace_content .= ' <div class="steemAccount"></div>';
     $shortcode_replace_content .= ' <div class="postDetails">';
@@ -113,6 +118,37 @@ function steem_plugin( $atts ) {
 }
 
 add_shortcode('steemplugin', 'steem_plugin');
+
+
+
+function wporg_shortcode($atts = [], $content = null, $tag = ''){
+    // normalize attribute keys, lowercase
+    $atts = array_change_key_case((array)$atts, CASE_LOWER);
+    // override default attributes with user attributes
+        $wporg_atts = shortcode_atts([
+                                     'title' => 'WordPress.org',
+                                 ], $atts, $tag); 
+    $o = ''; 
+    $o .= '<div class="wporg-box">'; 
+    $o .= '<h2>' . esc_html__($wporg_atts['title'], 'wporg') . '</h2>';
+ 
+    // enclosing tags
+    if (!is_null($content)) {
+        // secure output by executing the_content filter hook on $content
+        $o .= apply_filters('the_content', $content);
+        // run shortcode parser recursively
+        $o .= do_shortcode($content);
+    }
+    $o .= '</div>';
+    return $o;
+}
+ 
+function wporg_shortcodes_init()
+{
+    add_shortcode('wporg', 'wporg_shortcode');
+}
+ 
+add_action('init', 'wporg_shortcodes_init');
 
 
 /**
