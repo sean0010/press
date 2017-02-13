@@ -140,13 +140,17 @@ var Vote = (function() {
 				var isUpvote = btn.classList.contains('upvoteComment');
 				var commentAuthor = btn.parentNode.getAttribute('data-author');
 				var commentPermlink = btn.parentNode.getAttribute('data-permlink');
-				var weight = 200;
+				var weight = 10000;
 
 				btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', true);
 				btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', true);
 				steemconnect.vote(username, commentAuthor, commentPermlink, weight, function(err, result) {
 					console.log('Comment vote:', err, result);
 
+					var prevCount = parseInt(btn.querySelector('.btnCount').innerHTML);
+					prevCount += 1;
+					btn.querySelector('.btnCount').innerHTML = prevCount;
+					btn.classList.add('voted');
 					btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', false);
 					btn.parentNode.querySelector('.upvoteComment').removeAttribute('disabled');
 					btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', false);

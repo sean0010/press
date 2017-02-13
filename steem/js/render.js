@@ -37,6 +37,25 @@ var Render = (function() {
 		return tr;
 	};
 	var _lastPost = {'permlink': '', 'author': ''};
+	var _commentVote = function(commentAuthor, commentPermlink, upvoteComment, downvoteComment) {
+		steem.api.getActiveVotes(commentAuthor, commentPermlink, function(err, votes) {
+			if (err === null) {
+				var v = countVotes(votes);
+				upvoteComment.querySelector('.btnCount').innerHTML = v.up;
+				downvoteComment.querySelector('.btnCount').innerHTML = v.down;
+
+				// Logged In User Already Voted Mark
+				if (window.isAuth) {
+					var voted = Vote.hasVoted(votes, username);
+					if (voted === 1) {
+						upvoteComment.classList.add('voted');
+					} else if (voted === -1) {
+						downvoteComment.classList.add('voted');
+					}
+				}
+			}
+		});
+	};
 
 	/* Public */
 	return {
@@ -121,23 +140,7 @@ var Render = (function() {
 						container.appendChild(body);
 						r.appendChild(container);
 
-						steem.api.getActiveVotes(reply.author, reply.permlink, function(err, votes) {
-							if (err === null) {
-								var v = countVotes(votes);
-								upvoteComment.querySelector('.btnCount').innerHTML = v.up;
-								downvoteComment.querySelector('.btnCount').innerHTML = v.down;
-
-								// Logged In User Already Voted Mark
-								if (window.isAuth) {
-									var voted = Vote.hasVoted(votes, username);
-									if (voted === 1) {
-										upvoteComment.classList.add('voted');
-									} else if (voted === -1) {
-										downvoteComment.classList.add('voted');
-									}
-								}
-							}
-						});
+						_commentVote(reply.author, reply.permlink, upvoteComment, downvoteComment);
 					}
 					callback({err: null, el: r});
 				} else {
