@@ -153,7 +153,7 @@ function renderPost(hash, callback) {
 			console.error('some error', err);
 		}
 	});
-	Render.replies(author, permlink, function(result) {
+	Render.replies(author, permlink, 0, function(result) {
 		if (result.err === null) {
 			var replyContainer = document.querySelector('.postDetails .replyContainer');
 			replyContainer.appendChild(result.el);
@@ -294,7 +294,7 @@ ready(function() {
 			steemconnect.comment(parentAuthor, parentPermlink, username, permlink, '', inputString, '', function(err, result) {
 				console.log(err, result);
 
-				Render.replies(parentAuthor, parentPermlink, function(result) {
+				Render.replies(parentAuthor, parentPermlink, 0, function(result) {
 					if (result.err === null) {
 						replyContainer.innerHTML = '';
 						replyContainer.appendChild(result.el);
@@ -323,7 +323,7 @@ function onHashChange() {
 		if (args.length === 3) {
 			var post = posts[permlink];
 			showPostDetails(detail, post.body, post.title, post.author, permlink, post.created, post.upvotes, post.downvotes);
-			Render.replies(post.author, permlink, function(result) {
+			Render.replies(post.author, permlink, 0, function(result) {
 				if (result.err === null) {
 					replyContainer.appendChild(result.el);
 				}

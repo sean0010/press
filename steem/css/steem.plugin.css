@@ -57,6 +57,7 @@
 .steemContainer .replyForm{width:100%;display:table;position:relative;}
 .steemContainer .replyForm .replyInput{width:100%;display:table-cell;}
 .steemContainer .replyForm .replyButton{display:table-cell;}
+.steemContainer code{padding:3px;}
 
 .loader {position: relative;margin: 0 auto;width: 30px;}
 .loader:before {content: '';display: block;padding-top: 100%;}

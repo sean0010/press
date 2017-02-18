@@ -56,6 +56,78 @@ var Render = (function() {
 			}
 		});
 	};
+	var _replies = function(parentAuthor, parentPermlink, parentDepth, callback) {
+//		if (parentDepth > 0) {
+//			console.log("DEPTH bigger than 0:", parentAuthor, parentPermlink, parentDepth);
+//			steem.api.getContentReplies(parentAuthor, parentPermlink, function(err, result) {
+//				console.log("LOOK!", result);
+//				callback({err: null, el: null});
+//			});
+//		} else {
+			steem.api.getContentReplies(parentAuthor, parentPermlink, function(err, result) {
+				if (err === null) {
+					var r = _div('replies', '');
+					var i, len = result.length;
+					for (i = 0; i < len; i++) {
+						var reply = result[i];
+						var container = _div('reply', '');
+						var author = _div('replyAuthor', reply.author);
+						var created = _div('replyCreated', (new Date(reply.created)).datetime());
+						var body = _div('replyBody', reply.body);
+						var upvoteComment = _btn('upvoteComment', '😊');
+						var downvoteComment = _btn('downvoteComment', '😩');
+						Vote.commentVoteBind(upvoteComment);
+						Vote.commentVoteBind(downvoteComment);
+						container.setAttribute('data-author', reply.author);
+						container.setAttribute('data-permlink', reply.permlink);					
+						container.appendChild(author);
+						container.appendChild(created);
+						container.appendChild(upvoteComment);
+						container.appendChild(downvoteComment);
+						container.appendChild(body);
+						r.appendChild(container);
+
+						_commentVote(reply.author, reply.permlink, upvoteComment, downvoteComment);
+
+						if (reply.children > 0) {
+							var child = _btn('child', '⊕');
+							var childrenWrap = _div('childrenWrap', '');
+							child.querySelector('.btnCount').innerHTML = reply.children;
+							childrenWrap.setAttribute('data-author', reply.author);
+							childrenWrap.setAttribute('data-permlink', reply.permlink);
+							childrenWrap.setAttribute('data-depth', reply.depth);
+							container.appendChild(child);
+							container.appendChild(childrenWrap);
+							_openChildren(child, childrenWrap);
+						}
+					}
+					callback({err: null, el: r});
+				} else {
+					console.error('getContentReplies ERROR:', err);
+					callback({err: err, el: null});
+				}
+			});
+//		}
+	};
+	var _openChildren = function(expandButton, childrenWrap) {
+		expandButton.addEventListener('click', function(e) {
+			var parentAuthor = childrenWrap.getAttribute('data-author');
+			var parentPermlink = childrenWrap.getAttribute('data-permlink');
+			var parentDepth = childrenWrap.getAttribute('data-depth');
+
+			expandButton.setAttribute('disabled', true);
+			_replies(parentAuthor, parentPermlink, parentDepth, function(result) {
+				if (result.err === null) {
+					expandButton.style.display = 'none';
+					if (result.el != null) {
+						childrenWrap.appendChild(result.el);
+					}
+				} else {
+					expandButton.removeAttribute('disabled');
+				}
+			}); 
+		});
+	};
 
 	/* Public */
 	return {
@@ -114,39 +186,9 @@ var Render = (function() {
 				}
 			});
 		},
-		replies: function(parentAuthor, parentPermlink, callback) {
-			var self = this;
-			steem.api.getContentReplies(parentAuthor, parentPermlink, function(err, result) {
-				console.log(err, result);
-				if (err === null) {
-					var r = _div('replies', '');
-					var i, len = result.length;
-					for (i = 0; i < len; i++) {
-						var reply = result[i];
-						var container = _div('reply', '');
-						var author = _div('replyAuthor', reply.author);
-						var created = _div('replyCreated', (new Date(reply.created)).datetime());
-						var body = _div('replyBody', reply.body);
-						var upvoteComment = _btn('upvoteComment', '😊');
-						var downvoteComment = _btn('downvoteComment', '😩');
-						Vote.commentVoteBind(upvoteComment);
-						Vote.commentVoteBind(downvoteComment);
-						container.setAttribute('data-author', reply.author);
-						container.setAttribute('data-permlink', reply.permlink);
-						container.appendChild(author);
-						container.appendChild(created);
-						container.appendChild(upvoteComment);
-						container.appendChild(downvoteComment);
-						container.appendChild(body);
-						r.appendChild(container);
-
-						_commentVote(reply.author, reply.permlink, upvoteComment, downvoteComment);
-					}
-					callback({err: null, el: r});
-				} else {
-					console.error('getContentReplies ERROR:', err);
-					callback({err: err, el: null});
-				}
+		replies: function(parentAuthor, parentPermlink, parentDepth, callback) {
+			_replies(parentAuthor, parentPermlink, parentDepth, function(result) {
+				callback(result);
 			});
 		}
 	};
