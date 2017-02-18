@@ -158,7 +158,7 @@ function steem_plugin_frontend_js() {
     wp_register_script('steemconnect.js', 'https://cdn.steemjs.com/lib/latest/steemconnect.min.js');
     wp_enqueue_script('steemconnect.js');
 
-    wp_register_script('steem.min.js', 'https://cdn.steemjs.com/lib/latest/steem.min.js');
+    wp_register_script('steem.min.js', plugin_dir_url( __FILE__ ) . 'js/steem.min.js');
     wp_enqueue_script('steem.min.js');
 
     wp_register_script('lodash.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js');

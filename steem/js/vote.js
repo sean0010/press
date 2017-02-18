@@ -61,7 +61,7 @@ var Vote = (function() {
 					_showUpvoteOptions();
 				}
 			} else {
-
+				alert('Login required');
 			}
 		});
 		var i, len = _upvotePower.children.length;
@@ -78,7 +78,7 @@ var Vote = (function() {
 					_showDownvoteOptions();
 				}
 			} else {
-
+				alert('Login required');
 			}
 		});
 		var j, len2 = _downvotePower.children.length;
@@ -133,10 +133,14 @@ var Vote = (function() {
 					break;
 				}
 			}
-			return result;			
+			return result;
 		},
 		commentVoteBind: function(btn) {
 			btn.addEventListener('click', function(e) {
+				if (window.isAuth !== true) {
+					alert('Login required');
+					return;
+				}
 				var isUpvote = btn.classList.contains('upvoteComment');
 				var commentAuthor = btn.parentNode.getAttribute('data-author');
 				var commentPermlink = btn.parentNode.getAttribute('data-permlink');

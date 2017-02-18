@@ -282,7 +282,9 @@ ready(function() {
 		var parentPermlink = replyInput.getAttribute('data-permlink');
 		var replyContainer = document.querySelector('.replyContainer');
 
-		if (inputString === '') {
+		if (window.isAuth !== true) {
+			alert('Login required');
+		} else if (inputString === '') {
 			alert('Empty comment');
 		} else {
 			console.log(inputString, parentAuthor, parentPermlink);
