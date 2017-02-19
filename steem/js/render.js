@@ -90,7 +90,7 @@ var Render = (function() {
 						_commentVote(reply.author, reply.permlink, upvoteComment, downvoteComment);
 
 						if (reply.children > 0) {
-							var child = _btn('child', '⊕');
+							var child = _btn('child', '⨁');
 							var childrenWrap = _div('childrenWrap', '');
 							child.querySelector('.btnCount').innerHTML = reply.children;
 							childrenWrap.setAttribute('data-author', reply.author);

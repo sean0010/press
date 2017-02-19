@@ -58,6 +58,10 @@
 .steemContainer .replyForm .replyInput{width:100%;display:table-cell;}
 .steemContainer .replyForm .replyButton{display:table-cell;}
 .steemContainer code{padding:3px;}
+.steemContainer .childrenWrap .reply{border-bottom:0;border-top:1px solid #eee;}
+.steemContainer .childrenWrap .reply:before{content:'└';width:17px;display:inline-block;color:#999;}
+.steemContainer .childrenWrap .reply .replyBody{margin-left:17px;}
+.steemContainer .childrenWrap .reply button.child{margin-left:17px;}
 
 .loader {position: relative;margin: 0 auto;width: 30px;}
 .loader:before {content: '';display: block;padding-top: 100%;}
