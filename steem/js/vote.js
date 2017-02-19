@@ -145,6 +145,7 @@ var Vote = (function() {
 				var commentAuthor = btn.parentNode.getAttribute('data-author');
 				var commentPermlink = btn.parentNode.getAttribute('data-permlink');
 				var weight = 10000;
+				if (!isUpvote) weight = -10000;
 
 				btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', true);
 				btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', true);
