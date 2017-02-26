@@ -62,6 +62,8 @@
 .steemContainer .childrenWrap .reply:before{content:'└';width:17px;display:inline-block;color:#999;}
 .steemContainer .childrenWrap .reply .replyBody{margin-left:17px;}
 .steemContainer .childrenWrap .reply button.child{margin-left:17px;}
+.steemContainer .postWrite{display:none;}
+.steemContainer .postWrite textarea.editor{min-height:320px;}
 
 .loader {position: relative;margin: 0 auto;width: 30px;}
 .loader:before {content: '';display: block;padding-top: 100%;}

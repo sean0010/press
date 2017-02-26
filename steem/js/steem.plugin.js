@@ -2,6 +2,10 @@
 *	Library
 ***********/
 
+const kebabCase = function(string) {
+  return string.replace(/\s+/g, '-').toLowerCase();
+};
+
 function validateAccountName(value) {
   var i,
     label,
@@ -136,6 +140,21 @@ function getPayout(discussion) {
 	return result;
 }
 
+function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+};
+
 function renderPost(hash, callback) {
 	var args = hash.split('/', 3);
 	console.log('ARGS:', args);
@@ -212,7 +231,19 @@ ready(function() {
 	tagName.innerHTML = steemTag;
 
 	var hash = window.location.hash;
-	if (hash.length > 1) {
+	if (hash === 'write' || hash === '#write') {
+		showEditor();
+		Render.posts(steemTag, perPage, function(result) {
+			if (result.err === null) {
+				var trs = result.el;
+				trs.forEach(function(tr) {
+					tbody.appendChild(tr.cloneNode(true));
+				});
+			} else {
+				console.log('Render.posts error:', err);
+			}
+		});
+	} else if (hash.length > 1) {
 		// get details
 		renderPost(hash, function() {
 			Render.posts(steemTag, perPage, function(result) {
@@ -250,7 +281,7 @@ ready(function() {
 			window.isAuth = true;
 			username = result.username;
 			var accBtn = createLink(username, '#');
-			var createPostBtn = createLink('Submit a Story', '#');
+			var createPostBtn = createLink('Write', '#write');
 			acc.appendChild(createPostBtn);
 			acc.appendChild(accBtn);
 		} else {
@@ -312,8 +343,49 @@ ready(function() {
 
 window.addEventListener('hashchange', onHashChange, false);
 
+function showEditor() {
+	var w = document.querySelector('.steemContainer .postWrite');
+	var editor = w.querySelector('.editor');
+	var titleField = w.querySelector('.postTitle');
+	var tagsField = w.querySelector('.postTags');
+	var preview = w.querySelector('.preview');
+	var publish = w.querySelector('.publish');
+	var cancel = w.querySelector('.cancelWrite');
+	var markdownPreview = debounce(function() {
+		preview.innerHTML = markdown2html(editor.value);
+	}, 400);
+	var publishClick = function() {
+		var permlink = _.kebabCase(titleField.value);
+		var metaData = {
+			"tags": ["wpcommunity"],
+			"app": "steemit/0.1",
+			"format": "markdown"
+		};
+		steemconnect.comment('', '', username, permlink, titleField.value, editor.value, metaData, function(err, result) {
+			console.log('steemconnect.post result:', err, result);
+		});
+	};
+	var cancelClick = function() {
+		editor.value = '';
+		preview.innerHTML = '';
+		history.pushState('', document.title, window.location.pathname);
+		w.style.display = 'none';
+		editor.removeEventListener('click', markdownPreview);
+		publish.removeEventListener('click', publishClick);
+		cancel.removeEventListener('click', cancelClick);
+	};
+	w.style.display = 'block';
+	editor.addEventListener('keyup', markdownPreview);
+	publish.addEventListener('click', publishClick);
+	cancel.addEventListener('click', cancelClick);
+}
+
 function onHashChange() {
 	var hash = window.location.hash;
+	if (hash === 'write' || hash === '#write') {
+		showEditor();
+		return;
+	}
 	var args = hash.split('/', 3);
 	if (args.length == 3) {
 		var permlink = args[2];
@@ -334,15 +406,15 @@ function onHashChange() {
 	}
 }
 
-function markdown2html(markdown) {
-	var remarkable = new Remarkable({
-		html: true, // remarkable renders first then sanitize runs...
-		breaks: true,
-		linkify: true, // linkify is done locally
-		typographer: false, // https://github.com/jonschlinkert/remarkable/issues/142#issuecomment-221546793
-		quotes: '“”‘’'
-	});
+var remarkable = new Remarkable({
+	html: true, // remarkable renders first then sanitize runs...
+	breaks: true,
+	linkify: true, // linkify is done locally
+	typographer: false, // https://github.com/jonschlinkert/remarkable/issues/142#issuecomment-221546793
+	quotes: '“”‘’'
+});
 
+function markdown2html(markdown) {
 	var jsonMetadata = {};
 	jsonMetadata.image = jsonMetadata.image || [];
 

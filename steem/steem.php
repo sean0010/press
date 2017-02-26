@@ -72,6 +72,14 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content = '<div class="steemContainer" data-steemtag="'.esc_html__($a['tag']).'">';
     $shortcode_replace_content .= ' <div class="tagLabel">TAG: </div><div class="tagName"></div>';
     $shortcode_replace_content .= ' <div class="steemAccount"></div>';
+    $shortcode_replace_content .= ' <div class="postWrite">';
+    $shortcode_replace_content .= '  <input type="text" class="postTitle" placeholder="Title">';
+    $shortcode_replace_content .= '  <textarea class="editor"></textarea>';
+    $shortcode_replace_content .= '  <input type="text" class="postTags" placeholder="Tags">';
+    $shortcode_replace_content .= '  <button class="cancelWrite button">Cancel</button>';
+    $shortcode_replace_content .= '  <button class="publish button">Publish</button>';
+    $shortcode_replace_content .= '  <div class="preview"></div>';
+    $shortcode_replace_content .= ' </div>';
     $shortcode_replace_content .= ' <div class="postDetails">';
     $shortcode_replace_content .= '  <div class="postHeader">';
     $shortcode_replace_content .= '   <div class="postTitle"></div>';
