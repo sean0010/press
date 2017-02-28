@@ -344,6 +344,7 @@ ready(function() {
 window.addEventListener('hashchange', onHashChange, false);
 
 function showEditor() {
+	var tag = document.querySelector('.tagName').innerHTML;
 	var w = document.querySelector('.steemContainer .postWrite');
 	var editor = w.querySelector('.editor');
 	var titleField = w.querySelector('.postTitle');
@@ -355,14 +356,41 @@ function showEditor() {
 		preview.innerHTML = markdown2html(editor.value);
 	}, 400);
 	var publishClick = function() {
+		var titleValue = titleField.value.trim();
+		var bodyValue = editor.value.trim();
+
+		if (titleValue === '') {
+			alert('Title is required');
+			return;
+		}
+		if (bodyValue === '') {
+			alert('Content is required');
+			return;
+		}
 		var permlink = _.kebabCase(titleField.value);
 		var metaData = {
-			"tags": ["wpcommunity"],
+			"tags": [tag],
 			"app": "steemit/0.1",
 			"format": "markdown"
 		};
-		steemconnect.comment('', '', username, permlink, titleField.value, editor.value, metaData, function(err, result) {
-			console.log('steemconnect.post result:', err, result);
+
+		titleField.setAttribute('disabled', true);
+		editor.setAttribute('disabled', true);
+		publish.setAttribute('disabled', true);
+		cancel.setAttribute('disabled', true);
+
+		steemconnect.comment('', tag, username, permlink, titleValue, bodyValue, JSON.stringify(metaData), function(err, result) {
+			titleField.removeAttribute('disabled');
+			editor.removeAttribute('disabled');
+			publish.removeAttribute('disabled');
+			cancel.removeAttribute('disabled');
+			
+			if (err === null) {
+				cancelClick();
+			} else {
+				console.error('SteemConnect CreatePost Error:', err);
+				alert('Posting failed');
+			}
 		});
 	};
 	var cancelClick = function() {

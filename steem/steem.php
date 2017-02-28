@@ -75,9 +75,8 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content .= ' <div class="postWrite">';
     $shortcode_replace_content .= '  <input type="text" class="postTitle" placeholder="Title">';
     $shortcode_replace_content .= '  <textarea class="editor"></textarea>';
-    $shortcode_replace_content .= '  <input type="text" class="postTags" placeholder="Tags">';
-    $shortcode_replace_content .= '  <button class="cancelWrite button">Cancel</button>';
     $shortcode_replace_content .= '  <button class="publish button">Publish</button>';
+    $shortcode_replace_content .= '  <button class="cancelWrite button">Cancel</button>';
     $shortcode_replace_content .= '  <div class="preview"></div>';
     $shortcode_replace_content .= ' </div>';
     $shortcode_replace_content .= ' <div class="postDetails">';
