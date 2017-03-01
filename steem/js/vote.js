@@ -56,7 +56,25 @@ var Vote = (function() {
 		_upvoteButton.addEventListener('click', function() {
 			if (window.isAuth) {
 				if (_upvoteButton.classList.contains('voted')) {
+					if (confirm('Cancel?')) {
+						_upvoteLoader.style.display = 'block';
+						_upvoteLoader.style.left = isNaN(_upvoteButton.offsetLeft) ? _upvoteButton.offsetLeft : _upvoteButton.offsetLeft + 'px';
+						_upvoteLoader.style.top = isNaN(_upvoteButton.offsetTop) ? _upvoteButton.offsetTop : _upvoteButton.offsetTop + 'px';
 
+						steemconnect.vote(username, _author, _permlink, 0, function(err, result) {
+							console.log('Vote cancel result:', err, result);
+							if (err === null) {
+								_upvoteLoader.style.display = 'none';
+								_upvoteButton.disabled = false;
+								_upvoteButton.classList.remove('voted');
+								var prevCount = _upvoteButton.querySelector('.voteCount').textContent;
+								_upvoteButton.querySelector('.voteCount').innerHTML = parseInt(prevCount) - 1;
+
+							} else {
+								console.error('Steemconnect Vote Error:', err);
+							}
+						});
+					}
 				} else {
 					_showUpvoteOptions();
 				}
@@ -73,7 +91,25 @@ var Vote = (function() {
 		_downvoteButton.addEventListener('click', function() {
 			if (window.isAuth) {
 				if (_downvoteButton.classList.contains('voted')) {
+					if (confirm('Cancel?')) {
+						_downvoteLoader.style.display = 'block';
+						_downvoteLoader.style.left = isNaN(_downvoteButton.offsetLeft) ? _downvoteButton.offsetLeft : _downvoteButton.offsetLeft + 'px';
+						_downvoteLoader.style.top = isNaN(_downvoteButton.offsetTop) ? _downvoteButton.offsetTop : _downvoteButton.offsetTop + 'px';
 
+						steemconnect.vote(username, _author, _permlink, 0, function(err, result) {
+							console.log('Vote cancel result:', err, result);
+							if (err === null) {
+								_downvoteLoader.style.display = 'none';
+								_downvoteButton.disabled = false;
+								_downvoteButton.classList.remove('voted');
+								var prevCount = _downvoteButton.querySelector('.voteCount').textContent;
+								_downvoteButton.querySelector('.voteCount').innerHTML = parseInt(prevCount) - 1;
+
+							} else {
+								console.error('Steemconnect Vote Error:', err);
+							}
+						});
+					}
 				} else {
 					_showDownvoteOptions();
 				}
