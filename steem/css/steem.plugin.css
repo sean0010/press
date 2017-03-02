@@ -49,7 +49,7 @@
 .steemContainer .downvote{margin-left:15px;}
 .steemContainer .voteText{display:block;font-size:15px;}
 .steemContainer .voteCount{display:block;font-size:24px;margin-top:5px;font-weight:bold;}
-.steemContainer .votePower{display:none;position:absolute;border:2px solid #283A8E;width:100px;background:#fff;}
+.steemContainer .votePower{display:none;position:absolute;border:2px solid #283A8E;width:100px;background:#fff;z-index:10;}
 .steemContainer .votePower button{display:block;width:100%;padding:10px 0;border:1px solid #4BA2F2;}
 .steemContainer .votePower button:hover{background:#4BA2F2;}
 .steemContainer .upvoteLoader{position:absolute;display:none;text-align:center;width:100px;padding-top:20px;}

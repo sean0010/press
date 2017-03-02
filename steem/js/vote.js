@@ -91,7 +91,7 @@ var Vote = (function() {
 		_downvoteButton.addEventListener('click', function() {
 			if (window.isAuth) {
 				if (_downvoteButton.classList.contains('voted')) {
-					if (confirm('Cancel?')) {
+					if (confirm('Are you sure to un-vote?')) {
 						_downvoteLoader.style.display = 'block';
 						_downvoteLoader.style.left = isNaN(_downvoteButton.offsetLeft) ? _downvoteButton.offsetLeft : _downvoteButton.offsetLeft + 'px';
 						_downvoteLoader.style.top = isNaN(_downvoteButton.offsetTop) ? _downvoteButton.offsetTop : _downvoteButton.offsetTop + 'px';
@@ -177,26 +177,40 @@ var Vote = (function() {
 					alert('Login required');
 					return;
 				}
+				var isVoted = btn.classList.contains('voted');
 				var isUpvote = btn.classList.contains('upvoteComment');
 				var commentAuthor = btn.parentNode.getAttribute('data-author');
 				var commentPermlink = btn.parentNode.getAttribute('data-permlink');
-				var weight = 10000;
-				if (!isUpvote) weight = -10000;
 
-				btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', true);
-				btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', true);
-				steemconnect.vote(username, commentAuthor, commentPermlink, weight, function(err, result) {
-					console.log('Comment vote:', err, result);
+				if (isVoted) {
+					if (confirm('Are you sure to un-vote?')) {
+						btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', true);
+						btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', true);
+						steemconnect.vote(username, commentAuthor, commentPermlink, 0, function(err, result) {
+							var prevCount = parseInt(btn.querySelector('.btnCount').innerHTML);
+							prevCount -= 1;
+							btn.querySelector('.btnCount').innerHTML = prevCount;
+							btn.classList.remove('voted');
+							btn.parentNode.querySelector('.upvoteComment').removeAttribute('disabled');
+							btn.parentNode.querySelector('.downvoteComment').removeAttribute('disabled');
+						});
+					}
+				} else {
+					var weight = 10000;
+					if (!isUpvote) weight = -10000;
 
-					var prevCount = parseInt(btn.querySelector('.btnCount').innerHTML);
-					prevCount += 1;
-					btn.querySelector('.btnCount').innerHTML = prevCount;
-					btn.classList.add('voted');
-					btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', false);
-					btn.parentNode.querySelector('.upvoteComment').removeAttribute('disabled');
-					btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', false);
-					btn.parentNode.querySelector('.downvoteComment').removeAttribute('disabled');
-				});
+					btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', true);
+					btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', true);
+					steemconnect.vote(username, commentAuthor, commentPermlink, weight, function(err, result) {
+						var prevCount = parseInt(btn.querySelector('.btnCount').innerHTML);
+						prevCount += 1;
+						btn.querySelector('.btnCount').innerHTML = prevCount;
+						btn.classList.add('voted');
+						btn.parentNode.querySelector('.upvoteComment').removeAttribute('disabled');
+						btn.parentNode.querySelector('.downvoteComment').removeAttribute('disabled');
+					});
+
+				}
 			});
 		}
 	}
