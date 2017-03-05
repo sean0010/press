@@ -111,7 +111,7 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content .= '  </div>';
     $shortcode_replace_content .= '  <div class="replyContainer"></div>';
     $shortcode_replace_content .= '  <div class="replyForm">';
-    $shortcode_replace_content .= '   <input type="text" class="replyInput" placeholder="Input Comment">';
+    $shortcode_replace_content .= '   <textarea class="replyInput" placeholder="Input Comment"></textarea>';
     $shortcode_replace_content .= '   <button class="replyButton button">Submit</button>';
     $shortcode_replace_content .= '  </div>';
     $shortcode_replace_content .= ' </div>';

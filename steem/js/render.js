@@ -152,6 +152,8 @@ var Render = (function() {
 			replySubmit.textContent = 'Submit';
 			replyCancel.classList.add('button');
 			replyCancel.textContent = 'Cancel';
+			replyTextArea.setAttribute('placeholder', 'Input Comment');
+			replyTextArea.classList.add('replyInput');
 
 			replyContainer.appendChild(replyTextArea);
 			replyContainer.appendChild(replySubmit);

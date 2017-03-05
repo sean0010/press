@@ -55,7 +55,7 @@
 .steemContainer .upvoteLoader{position:absolute;display:none;text-align:center;width:100px;padding-top:20px;}
 .steemContainer .downvoteLoader{position:absolute;display:none;text-align:center;width:100px;padding-top:20px;}
 .steemContainer .replyForm{width:100%;display:table;position:relative;}
-.steemContainer .replyForm .replyInput{width:100%;display:table-cell;}
+.steemContainer .replyInput{width:100%;display:table-cell;min-height:75px;font-size:13px;padding:5px;}
 .steemContainer .replyForm .replyButton{display:table-cell;}
 .steemContainer code{padding:3px;}
 .steemContainer .childrenWrap .reply{border-bottom:0;border-top:1px solid #eee;}
