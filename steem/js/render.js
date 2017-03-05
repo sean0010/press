@@ -16,6 +16,12 @@ var Render = (function() {
 		b.classList.add(cssClass);
 		return b;
 	};
+	var _replyBtn = function(cssClass, text) {
+		var b = document.createElement('button');
+		b.innerHTML = text;
+		b.classList.add(cssClass);
+		return b;
+	};
 	var _createTr = function(link, comment, author, vote, created) {
 		var tr = document.createElement('tr'); // 
 		var td = document.createElement('td'); // title
@@ -57,57 +63,53 @@ var Render = (function() {
 		});
 	};
 	var _replies = function(parentAuthor, parentPermlink, parentDepth, callback) {
-//		if (parentDepth > 0) {
-//			console.log("DEPTH bigger than 0:", parentAuthor, parentPermlink, parentDepth);
-//			steem.api.getContentReplies(parentAuthor, parentPermlink, function(err, result) {
-//				console.log("LOOK!", result);
-//				callback({err: null, el: null});
-//			});
-//		} else {
-			steem.api.getContentReplies(parentAuthor, parentPermlink, function(err, result) {
-				if (err === null) {
-					var r = _div('replies', '');
-					var i, len = result.length;
-					for (i = 0; i < len; i++) {
-						var reply = result[i];
-						var container = _div('reply', '');
-						var author = _div('replyAuthor', reply.author);
-						var created = _div('replyCreated', (new Date(reply.created)).datetime());
-						var body = _div('replyBody', reply.body);
-						var upvoteComment = _btn('upvoteComment', '😊');
-						var downvoteComment = _btn('downvoteComment', '😩');
-						Vote.commentVoteBind(upvoteComment);
-						Vote.commentVoteBind(downvoteComment);
-						container.setAttribute('data-author', reply.author);
-						container.setAttribute('data-permlink', reply.permlink);					
-						container.appendChild(author);
-						container.appendChild(created);
-						container.appendChild(upvoteComment);
-						container.appendChild(downvoteComment);
-						container.appendChild(body);
-						r.appendChild(container);
+		steem.api.getContentReplies(parentAuthor, parentPermlink, function(err, result) {
+			if (err === null) {
+				var r = _div('replies', '');
+				var i, len = result.length;
+				for (i = 0; i < len; i++) {
+					var reply = result[i];
+					var container = _div('reply', '');
+					var author = _div('replyAuthor', reply.author);
+					var created = _div('replyCreated', (new Date(reply.created)).datetime());
+					var upvoteComment = _btn('upvoteComment', '😊');
+					var downvoteComment = _btn('downvoteComment', '😩');
+					var replyComment = _replyBtn('replyButton', 'Reply');
+					var body = _div('replyBody', reply.body);
+					var childrenWrap = _div('childrenWrap', '');
+					Vote.commentVoteBind(upvoteComment);
+					Vote.commentVoteBind(downvoteComment);
+					container.setAttribute('data-author', reply.author);
+					container.setAttribute('data-permlink', reply.permlink);					
+					container.appendChild(author);
+					container.appendChild(created);
+					container.appendChild(upvoteComment);
+					container.appendChild(downvoteComment);
+					container.appendChild(replyComment);
+					container.appendChild(body);
+					container.appendChild(childrenWrap);
+					r.appendChild(container);
 
-						_commentVote(reply.author, reply.permlink, upvoteComment, downvoteComment);
+					_commentVote(reply.author, reply.permlink, upvoteComment, downvoteComment);
+					_openReplyCommentForm(replyComment, reply.author, reply.permlink);
 
-						if (reply.children > 0) {
-							var child = _btn('child', '⨁');
-							var childrenWrap = _div('childrenWrap', '');
-							child.querySelector('.btnCount').innerHTML = reply.children;
-							childrenWrap.setAttribute('data-author', reply.author);
-							childrenWrap.setAttribute('data-permlink', reply.permlink);
-							childrenWrap.setAttribute('data-depth', reply.depth);
-							container.appendChild(child);
-							container.appendChild(childrenWrap);
-							_openChildren(child, childrenWrap);
-						}
+					if (reply.children > 0) {
+						var child = _btn('child', '⨁');
+						var childrenWrap = container.querySelector('.childrenWrap');
+						child.querySelector('.btnCount').innerHTML = reply.children;
+						childrenWrap.setAttribute('data-author', reply.author);
+						childrenWrap.setAttribute('data-permlink', reply.permlink);
+						childrenWrap.setAttribute('data-depth', reply.depth);
+						container.appendChild(child);							
+						_openChildren(child, childrenWrap);
 					}
-					callback({err: null, el: r});
-				} else {
-					console.error('getContentReplies ERROR:', err);
-					callback({err: err, el: null});
 				}
-			});
-//		}
+				callback({err: null, el: r});
+			} else {
+				console.error('getContentReplies ERROR:', err);
+				callback({err: err, el: null});
+			}
+		});
 	};
 	var _openChildren = function(expandButton, childrenWrap) {
 		expandButton.addEventListener('click', function(e) {
@@ -126,6 +128,87 @@ var Render = (function() {
 					expandButton.removeAttribute('disabled');
 				}
 			}); 
+		});
+	};
+
+	var _openReplyCommentForm = function(btn, author, permlink) {
+		btn.setAttribute('data-author', author);
+		btn.setAttribute('data-permlink', permlink);
+		var btnClick = btn.addEventListener('click', function() {
+			if (window.isAuth !== true) {
+				alert('Login required');
+				return;
+			}
+			btn.setAttribute('disabled', true);
+			btn.removeEventListener('click', btnClick);
+			var author = btn.getAttribute('data-author');
+			var permlink = btn.getAttribute('data-permlink');
+			var replyContainer = _div('replyContainer', '');
+			var replyTextArea = document.createElement('textarea');
+			var replySubmit = document.createElement('button');
+			var replyCancel = document.createElement('button');
+
+			replySubmit.classList.add('button');
+			replySubmit.textContent = 'Submit';
+			replyCancel.classList.add('button');
+			replyCancel.textContent = 'Cancel';
+
+			replyContainer.appendChild(replyTextArea);
+			replyContainer.appendChild(replySubmit);
+			replyContainer.appendChild(replyCancel);
+			btn.parentNode.appendChild(replyContainer);
+
+			var cancelClick = replyCancel.addEventListener('click', function() {
+				btn.removeAttribute('disabled');
+				replyContainer.parentNode.removeChild(replyContainer);
+			});
+			var submitClick = replySubmit.addEventListener('click', function() {
+				var parentReply = replySubmit.parentNode.parentNode;
+				var parentAuthor = parentReply.getAttribute('data-author');
+				var parentPermlink = parentReply.getAttribute('data-permlink');				
+				var rePermlink = 're-' + parentPermlink + '-' + Math.floor(Date.now() / 1000);
+				var inputString = replyTextArea.value.trim();
+
+				if (inputString === '') {
+					alert('Empty comment');
+				} else {
+					replyTextArea.setAttribute('disabled', true);
+					replyCancel.setAttribute('disabled', true);
+					replySubmit.setAttribute('disabled', true);
+
+					steemconnect.comment(parentAuthor, parentPermlink, username, rePermlink, '', inputString, '', function(err, result) {
+						console.log(err, result);
+						btn.removeAttribute('disabled');
+						replyContainer.parentNode.removeChild(replyContainer);
+
+						var replyElement = btn.parentNode.parentNode;
+						var parentChildrenWrap = replyElement.querySelector('.childrenWrap');
+						var container = _div('reply', '');
+						var author = _div('replyAuthor', username);
+						var created = _div('replyCreated', (new Date()).datetime());
+						var upvoteComment = _btn('upvoteComment', '😊');
+						var downvoteComment = _btn('downvoteComment', '😩');
+						var replyComment = _replyBtn('replyButton', 'Reply');
+						var body = _div('replyBody', inputString);
+						var childrenWrap = _div('childrenWrap', '');
+
+						Vote.commentVoteBind(upvoteComment);
+						Vote.commentVoteBind(downvoteComment);
+						container.setAttribute('data-author', username);
+						container.setAttribute('data-permlink', rePermlink);					
+						container.appendChild(author);
+						container.appendChild(created);
+						container.appendChild(upvoteComment);
+						container.appendChild(downvoteComment);
+						container.appendChild(replyComment);
+						container.appendChild(body);
+						container.appendChild(childrenWrap);
+						parentChildrenWrap.appendChild(container);
+
+						_openReplyCommentForm(replyComment, username, rePermlink);
+					});
+				}
+			});
 		});
 	};
 

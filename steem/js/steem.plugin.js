@@ -335,7 +335,7 @@ ready(function() {
 					replyButton.setAttribute('disabled', false);
 					replyButton.removeAttribute('disabled');
 					replyInput.value = '';
-				}); 				
+				});
 			});
 		}
 	});
