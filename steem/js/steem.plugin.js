@@ -282,8 +282,10 @@ ready(function() {
 			username = result.username;
 			var accBtn = createLink(username, '#');
 			var createPostBtn = createLink('Write', '#write');
+			var logoutBtn = createLink('Logout', 'https://steemconnect.com/logout?redirect_url=' + window.location.href);
 			acc.appendChild(createPostBtn);
 			acc.appendChild(accBtn);
+			acc.appendChild(logoutBtn);
 		} else {
 			var loginBtn = createLink('Login', loginURL);
 			acc.appendChild(loginBtn);
