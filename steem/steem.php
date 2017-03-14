@@ -17,13 +17,40 @@ if (!function_exists('add_action')) {
     exit;
 }
 
-//register_activation_hook( __FILE__, array( 'Steem', 'plugin_activation' ) );
-//register_deactivation_hook( __FILE__, array( 'Steem', 'plugin_deactivation' ) );
+function plugin_activation() {
+    global $table_prefix;
+    global $wpdb;
 
-//if (is_admin()) {
-    // create custom plugin settings menu
-    add_action('admin_menu', 'steem_plugin_menu');
-//}
+    $table_name = 'steem_kr_article';
+
+    # Check The Table Existance. If Not, Create It.
+    if ($wpdb->get_var("SHOW TABLES LIKE '$wp_track_table'") != $wp_track_table) {
+        $sql = "CREATE TABLE `". $table_prefix . $table_name . "` ( ";
+        $sql .= "  `id`  INT(11)   NOT NULL auto_increment, ";
+        $sql .= "  `title`  VARCHAR(128) NOT NULL, ";
+        $sql .= "  `author`  VARCHAR(16) NOT NULL, ";
+        $sql .= "  `permlink`  VARCHAR(128) NOT NULL, ";
+        $sql .= "  `children`  INT(11) NOT NULL, ";
+        $sql .= "  `upvote`  INT(11) NOT NULL, ";
+        $sql .= "  `downvote`  INT(11) NOT NULL, ";
+        $sql .= "  `created`  DATETIME NOT NULL, ";
+        $sql .= "  PRIMARY KEY (`id`) "; 
+        $sql .= ") ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ; ";
+
+        require_once(ABSPATH . '/wp-admin/upgrade-functions.php');
+        dbDelta($sql);
+    }
+}
+
+function plugin_uninstall() {
+    global $wpdb;
+    $table_name = "steem_kr_article";
+    $sql = "DROP TABLE IF EXISTS $table_name;";
+    $wpdb->query($sql);
+    delete_option("my_plugin_db_version");
+}
+
+
 
 function steem_plugin_menu() {
     //create new top-level menu
@@ -56,6 +83,9 @@ function steem_plugin_settings_page() {
         </table>    
         <?php submit_button(); ?>
     </form>
+    <hr>
+    <label>Get Discussions Recursively Above Tag</label>
+    <button id="getDisscussionsRecursively">Start</button>
 </div>
 <?php
 }
@@ -124,17 +154,11 @@ function steem_plugin( $atts ) {
     return $shortcode_replace_content;
 }
 
-add_shortcode('steemplugin', 'steem_plugin');
-
-
-
-function wporg_shortcode($atts = [], $content = null, $tag = ''){
+function wporg_shortcode($atts = [], $content = null, $tag = '') {
     // normalize attribute keys, lowercase
     $atts = array_change_key_case((array)$atts, CASE_LOWER);
     // override default attributes with user attributes
-        $wporg_atts = shortcode_atts([
-                                     'title' => 'WordPress.org',
-                                 ], $atts, $tag); 
+    $wporg_atts = shortcode_atts(['title' => 'WordPress.org'], $atts, $tag); 
     $o = ''; 
     $o .= '<div class="wporg-box">'; 
     $o .= '<h2>' . esc_html__($wporg_atts['title'], 'wporg') . '</h2>';
@@ -150,12 +174,10 @@ function wporg_shortcode($atts = [], $content = null, $tag = ''){
     return $o;
 }
  
-function wporg_shortcodes_init()
-{
+function wporg_shortcodes_init() {
     add_shortcode('wporg', 'wporg_shortcode');
 }
  
-add_action('init', 'wporg_shortcodes_init');
 
 
 /**
@@ -171,8 +193,6 @@ function steem_plugin_frontend_js() {
     wp_register_script('lodash.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js');
     wp_enqueue_script('lodash.min.js');
 
-    //wp_register_script('showdown.js', plugin_dir_url( __FILE__ ) . 'js/showdown.min.js');
-    //wp_enqueue_script('showdown.js');
     wp_register_script('remarkable.js', plugin_dir_url( __FILE__ ) . 'js/remarkable.min.js');
     wp_enqueue_script('remarkable.js');
 
@@ -191,8 +211,26 @@ function steem_plugin_frontend_js() {
 }
 
 
-add_action('steem_plugin_frontend_js', 'steem_plugin_frontend_js');
-do_action('steem_plugin_frontend_js');
 
 
+function steem_plugin_backend_js() {
+    wp_enqueue_script('steem.min.js', plugin_dir_url( __FILE__ ) . 'js/steem.min.js');
+    wp_enqueue_script('admin', plugin_dir_url( __FILE__ ) . 'js/admin.js');
+}
+
+
+
+if (is_admin()) {
+    // Back-end
+    register_activation_hook( __FILE__, 'plugin_activation');
+    register_uninstall_hook( __FILE__, 'plugin_uninstall');
+    add_action('admin_menu', 'steem_plugin_menu');
+    add_action('admin_enqueue_scripts', 'steem_plugin_backend_js');
+} else {
+    // Front-end
+    add_action('init', 'wporg_shortcodes_init');
+    add_shortcode('steemplugin', 'steem_plugin');
+    add_action('steem_plugin_frontend_js', 'steem_plugin_frontend_js');
+    do_action('steem_plugin_frontend_js');
+}
 
