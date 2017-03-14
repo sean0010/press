@@ -183,7 +183,7 @@ var Render = (function() {
 						btn.removeAttribute('disabled');
 						replyContainer.parentNode.removeChild(replyContainer);
 
-						var replyElement = btn.parentNode.parentNode;
+						var replyElement = btn.parentNode;
 						var parentChildrenWrap = replyElement.querySelector('.childrenWrap');
 						var container = _div('reply', '');
 						var author = _div('replyAuthor', username);
