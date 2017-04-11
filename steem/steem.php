@@ -33,7 +33,7 @@ function plugin_activation() {
         $sql .= "  `children`  INT(11) NOT NULL, ";
         $sql .= "  `upvote`  INT(11) NOT NULL, ";
         $sql .= "  `downvote`  INT(11) NOT NULL, ";
-        $sql .= "  `created`  DATETIME NOT NULL, ";
+        $sql .= "  `created`  TIMESTAMP NOT NULL, ";
         $sql .= "  PRIMARY KEY (`id`) "; 
         $sql .= ") ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ; ";
 
@@ -86,6 +86,12 @@ function steem_plugin_settings_page() {
     <hr>
     <label>Get Discussions Recursively Above Tag</label>
     <button id="getDisscussionsRecursively">Start</button>
+    <hr>
+
+    <form id="accumulate" method="POST" action="<?php echo admin_url( 'admin.php' ); ?>">
+        <input type="hidden" name="action" value="wpse10500" />
+        <input type="submit" value="Do it!" />
+    </form>
 </div>
 <?php
 }
@@ -218,7 +224,27 @@ function steem_plugin_backend_js() {
     wp_enqueue_script('admin', plugin_dir_url( __FILE__ ) . 'js/admin.js');
 }
 
+function wpse10500_admin_action() {
+    // Do your stuff here
+    global $table_prefix;
+    global $wpdb;
 
+    $wpdb->insert( 
+        $table_prefix . 'steem_kr_article', 
+        array( 
+            'title' => 'testtitle',
+            'author' => 'testauthor',
+            'permlink' => 'testpermlink',
+            'children' => 0,
+            'upvote' => 0,
+            'downvote' => 0,
+            'created' => current_time('timestamp'),
+        ) 
+    );
+
+    wp_redirect( $_SERVER['HTTP_REFERER'] );
+    exit();
+}
 
 if (is_admin()) {
     // Back-end
@@ -226,6 +252,7 @@ if (is_admin()) {
     register_uninstall_hook( __FILE__, 'plugin_uninstall');
     add_action('admin_menu', 'steem_plugin_menu');
     add_action('admin_enqueue_scripts', 'steem_plugin_backend_js');
+    add_action('admin_action_wpse10500', 'wpse10500_admin_action');
 } else {
     // Front-end
     add_action('init', 'wporg_shortcodes_init');
