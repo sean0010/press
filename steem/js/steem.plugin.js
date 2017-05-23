@@ -219,6 +219,7 @@ ready(function() {
 	var acc = steemContainer.querySelector('.steemAccount');
 	var more = steemContainer.querySelector('.steemContainer .more');
 	var tbody = steemContainer.querySelector('tbody');
+	var thead = tbody.querySelector('tr');
 	var upvote = steemContainer.querySelector('.upvote');
 	var upvotePower = steemContainer.querySelector('.up.votePower');
 	var upvoteLoader = steemContainer.querySelector('.upvoteLoader');
@@ -372,7 +373,7 @@ function showEditor() {
 		var permlink = _.kebabCase(titleField.value);
 		var metaData = {
 			"tags": [tag],
-			"app": "steemit/0.1",
+			"app": "press/0.1",
 			"format": "markdown"
 		};
 
@@ -381,7 +382,7 @@ function showEditor() {
 		publish.setAttribute('disabled', true);
 		cancel.setAttribute('disabled', true);
 
-		steemconnect.comment('', tag, username, permlink, titleValue, bodyValue, JSON.stringify(metaData), function(err, result) {
+		steemconnect.comment('', tag, username, permlink, titleValue, bodyValue, metaData, function(err, result) {
 			titleField.removeAttribute('disabled');
 			editor.removeAttribute('disabled');
 			publish.removeAttribute('disabled');
@@ -389,6 +390,22 @@ function showEditor() {
 			
 			if (err === null) {
 				cancelClick();
+				Render.posts(tag, perPage, function(result) {
+					if (result.err === null) {
+
+						// Clean up discussions table and give table header
+						var th = thead.cloneNode(true);
+						tbody.innerHTML = '';
+						tbody.appendChild(th);
+
+						var trs = result.el;
+						trs.forEach(function(tr) {
+							tbody.appendChild(tr.cloneNode(true));
+						});
+					} else {
+						console.log('Render.posts error:', err);
+					}
+				});
 			} else {
 				console.error('SteemConnect CreatePost Error:', err);
 				alert('Posting failed');
@@ -396,6 +413,7 @@ function showEditor() {
 		});
 	};
 	var cancelClick = function() {
+		titleField.value = '';
 		editor.value = '';
 		preview.innerHTML = '';
 		history.pushState('', document.title, window.location.pathname);
