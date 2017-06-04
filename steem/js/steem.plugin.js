@@ -200,7 +200,7 @@ function countVotes(votes) {
 /**********
 *	Constant
 ***********/
-var perPage = 5;
+var perPage = 25;
 var steemconnectApp = 'morning';
 
 /**********
