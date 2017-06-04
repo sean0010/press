@@ -275,6 +275,10 @@ var Render = (function() {
 			_replies(parentAuthor, parentPermlink, parentDepth, function(result) {
 				callback(result);
 			});
+		},
+		reset: function() {
+			_lastPost.permlink = '';
+			_lastPost.author = '';
 		}
 	};
 })();

@@ -17,85 +17,6 @@ if (!function_exists('add_action')) {
     exit;
 }
 
-function plugin_activation() {
-    global $table_prefix;
-    global $wpdb;
-
-    $table_name = 'steem_kr_article';
-
-    # Check The Table Existance. If Not, Create It.
-    if ($wpdb->get_var("SHOW TABLES LIKE '$wp_track_table'") != $wp_track_table) {
-        $sql = "CREATE TABLE `". $table_prefix . $table_name . "` ( ";
-        $sql .= "  `id`  INT(11)   NOT NULL auto_increment, ";
-        $sql .= "  `title`  VARCHAR(128) NOT NULL, ";
-        $sql .= "  `author`  VARCHAR(16) NOT NULL, ";
-        $sql .= "  `permlink`  VARCHAR(128) NOT NULL, ";
-        $sql .= "  `children`  INT(11) NOT NULL, ";
-        $sql .= "  `upvote`  INT(11) NOT NULL, ";
-        $sql .= "  `downvote`  INT(11) NOT NULL, ";
-        $sql .= "  `created`  TIMESTAMP NOT NULL, ";
-        $sql .= "  PRIMARY KEY (`id`) "; 
-        $sql .= ") ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ; ";
-
-        require_once(ABSPATH . '/wp-admin/upgrade-functions.php');
-        dbDelta($sql);
-    }
-}
-
-function plugin_uninstall() {
-    global $wpdb;
-    $table_name = "steem_kr_article";
-    $sql = "DROP TABLE IF EXISTS $table_name;";
-    $wpdb->query($sql);
-    delete_option("my_plugin_db_version");
-}
-
-
-
-function steem_plugin_menu() {
-    //create new top-level menu
-    add_menu_page('Steem Plugin Settings', 'Steem', 'administrator', __FILE__, 'steem_plugin_settings_page' , null );
-
-    //call register settings function
-    add_action('admin_init', 'register_steem_plugin_settings' );
-
-    add_option('steem_tag');
-}
-
-function register_steem_plugin_settings() {
-    //register our settings
-    register_setting( 'steem-plugin-settings-group', 'steem_tag' );
-}
-
-function steem_plugin_settings_page() {
-?>
-<div class="wrap">
-    <h1>Steem</h1>
-
-    <form method="post" action="options.php">
-        <?php settings_fields( 'steem-plugin-settings-group' ); ?>
-        <?php do_settings_sections( 'steem-plugin-settings-group' ); ?>
-        <table class="form-table">
-            <tr valign="top">
-                <th scope="row">Tag</th>
-                <td><input type="text" name="steem_tag" value="<?php echo esc_attr( get_option('steem_tag') ); ?>" /></td>
-            </tr>
-        </table>    
-        <?php submit_button(); ?>
-    </form>
-    <hr>
-    <label>Get Discussions Recursively Above Tag</label>
-    <button id="getDisscussionsRecursively">Start</button>
-    <hr>
-
-    <form id="accumulate" method="POST" action="<?php echo admin_url( 'admin.php' ); ?>">
-        <input type="hidden" name="action" value="wpse10500" />
-        <input type="submit" value="Do it!" />
-    </form>
-</div>
-<?php
-}
-
 /**
 * Short Code
 */
@@ -116,6 +37,9 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content .= '  <div class="preview"></div>';
     $shortcode_replace_content .= ' </div>';
     $shortcode_replace_content .= ' <div class="postDetails">';
+    $shortcode_replace_content .= ' <div class="postDetailsCloseContainer">';
+    $shortcode_replace_content .= '   <button class="postDetailsCloseButton button">Close</button>';
+    $shortcode_replace_content .= ' </div>';
     $shortcode_replace_content .= '  <div class="postHeader">';
     $shortcode_replace_content .= '   <div class="postTitle"></div>';
     $shortcode_replace_content .= '   <div class="postAuthor"></div>';
@@ -150,6 +74,9 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content .= '   <textarea class="replyInput" placeholder="Input Comment"></textarea>';
     $shortcode_replace_content .= '   <button class="replyButton button">Submit</button>';
     $shortcode_replace_content .= '  </div>';
+    $shortcode_replace_content .= ' </div>';
+    $shortcode_replace_content .= ' <div class="refreshButtonContainer">';
+    $shortcode_replace_content .= '   <button class="refreshButton button">Refresh</button>';
     $shortcode_replace_content .= ' </div>';
     $shortcode_replace_content .= ' <div class="discussions">';
     $shortcode_replace_content .= '  <table class="table"><tbody><tr><th width="*">Title</th><th width="85">Author</th><th width="45">Vote</th><th width="85">Created</th></tr></tbody></table>';
@@ -193,7 +120,8 @@ function steem_plugin_frontend_js() {
     wp_register_script('steemconnect.js', 'https://cdn.steemjs.com/lib/latest/steemconnect.min.js');
     wp_enqueue_script('steemconnect.js');
 
-    wp_register_script('steem.min.js', plugin_dir_url( __FILE__ ) . 'js/steem.min.js');
+    wp_register_script('steem.min.js', 'https://cdn.steemjs.com/lib/latest/steem.min.js');
+    //wp_register_script('steem.min.js', plugin_dir_url( __FILE__ ) . 'js/steem.min.js');
     wp_enqueue_script('steem.min.js');
 
     wp_register_script('lodash.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js');
@@ -203,47 +131,17 @@ function steem_plugin_frontend_js() {
     wp_enqueue_script('remarkable.js');
 
     wp_register_script('render.js', plugin_dir_url( __FILE__ ) . 'js/render.js');
-    wp_enqueue_script('render.js');
+    wp_enqueue_script('render.js?v=2');
 
 
     wp_register_script('vote.js', plugin_dir_url( __FILE__ ) . 'js/vote.js');
-    wp_enqueue_script('vote.js');
+    wp_enqueue_script('vote.js?v=2');
 
     wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
-    wp_enqueue_script('steem.plugin.js');
+    wp_enqueue_script('steem.plugin.js?v=2');
 
     wp_register_style('steem.plugin.css', plugin_dir_url( __FILE__ ) . 'css/steem.plugin.css');
-    wp_enqueue_style('steem.plugin.css');
-}
-
-
-
-
-function steem_plugin_backend_js() {
-    wp_enqueue_script('steem.min.js', plugin_dir_url( __FILE__ ) . 'js/steem.min.js');
-    wp_enqueue_script('admin', plugin_dir_url( __FILE__ ) . 'js/admin.js');
-}
-
-function wpse10500_admin_action() {
-    // Do your stuff here
-    global $table_prefix;
-    global $wpdb;
-
-    $wpdb->insert( 
-        $table_prefix . 'steem_kr_article', 
-        array( 
-            'title' => 'testtitle',
-            'author' => 'testauthor',
-            'permlink' => 'testpermlink',
-            'children' => 0,
-            'upvote' => 0,
-            'downvote' => 0,
-            'created' => current_time('timestamp'),
-        ) 
-    );
-
-    wp_redirect( $_SERVER['HTTP_REFERER'] );
-    exit();
+    wp_enqueue_style('steem.plugin.css?v=2');
 }
 
 if (is_admin()) {

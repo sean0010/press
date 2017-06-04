@@ -200,7 +200,7 @@ function countVotes(votes) {
 /**********
 *	Constant
 ***********/
-var perPage = 20;
+var perPage = 5;
 var steemconnectApp = 'morning';
 
 /**********
@@ -210,6 +210,7 @@ var lastPost = {'permlink': '', 'author': ''};
 var posts = {};
 var username = '';
 window.isAuth = false;
+//steem.config.set('websocket','wss://node.steem.ws');
 
 ready(function() {
 	var steemContainer = document.querySelector('.steemContainer');
@@ -228,47 +229,22 @@ ready(function() {
 	var downvoteLoader = steemContainer.querySelector('.downvoteLoader');
 	var replyInput = document.querySelector('.replyInput');
 	var replyButton = document.querySelector('.replyButton');
+	var refresh = steemContainer.querySelector('.refreshButton');
+	var close = steemContainer.querySelector('.postDetailsCloseButton');
 
 	tagName.innerHTML = steemTag;
 
 	var hash = window.location.hash;
 	if (hash === 'write' || hash === '#write') {
 		showEditor();
-		Render.posts(steemTag, perPage, function(result) {
-			if (result.err === null) {
-				var trs = result.el;
-				trs.forEach(function(tr) {
-					tbody.appendChild(tr.cloneNode(true));
-				});
-			} else {
-				console.log('Render.posts error:', err);
-			}
-		});
+		renderPosts(steemTag, perPage, false);
 	} else if (hash.length > 1) {
 		// get details
 		renderPost(hash, function() {
-			Render.posts(steemTag, perPage, function(result) {
-				if (result.err === null) {
-					var trs = result.el;
-					trs.forEach(function(tr) {
-						tbody.appendChild(tr.cloneNode(true));
-					});
-				} else {
-					console.log('Render.posts error:', err);
-				}
-			});
+			renderPosts(steemTag, perPage, false);
 		});
 	} else {
-		Render.posts(steemTag, perPage, function(result) {
-			if (result.err === null) {
-				var trs = result.el;
-				trs.forEach(function(tr) {
-					tbody.appendChild(tr.cloneNode(true));
-				});
-			} else {
-				console.log('Render.posts error:', err);
-			}
-		});
+		renderPosts(steemTag, perPage, false);
 	}
 	
 	// Draw login
@@ -296,19 +272,22 @@ ready(function() {
 	// Vote button
 	Vote.init(upvotePower, upvoteLoader, upvote, downvotePower, downvoteLoader, downvote);
 
+	close.addEventListener('click', function() {
+		console.log('close it');
+	});
+
+	refresh.addEventListener('click', function() {
+		refresh.setAttribute('disabled', 'disabled');
+		
+		renderPosts(steemTag, perPage, true, function() {
+			refresh.removeAttribute('disabled');
+		});
+	});
+
 	more.addEventListener('click', function() {
 		more.style.display = 'block';
 		more.disabled = true;
-		Render.posts(steemTag, perPage, function(result) {
-			if (result.err === null) {
-				var trs = result.el;
-				trs.forEach(function(tr) {
-					tbody.appendChild(tr.cloneNode(true));
-				});
-			} else {
-				console.log('Render.posts error:', err);
-			}
-		});
+		renderPosts(steemTag, perPage, false);
 	});
 	replyButton.addEventListener('click', function(e) {
 		var inputString = replyInput.value.trim();
@@ -342,6 +321,34 @@ ready(function() {
 			});
 		}
 	});
+
+	function renderPosts(tag, limit, refresh, callback) {
+		if (refresh) {
+			Render.reset();
+
+			// Clean up discussions table and give table header
+			var th = thead.cloneNode(true);
+			tbody.innerHTML = '';
+			tbody.appendChild(th);
+		}
+		Render.posts(tag, limit, function(result) {
+			if (result.err === null) {
+				var trs = result.el;
+				trs.forEach(function(tr) {
+					tbody.appendChild(tr.cloneNode(true));
+				});
+				if (callback !== undefined) {
+					callback();
+				}
+			} else {
+				console.log('Render.posts error:', result.err);
+				if (callback !== undefined) {
+					callback();
+				}
+			}
+		});
+	}
+
 });
 
 window.addEventListener('hashchange', onHashChange, false);
@@ -390,22 +397,7 @@ function showEditor() {
 			
 			if (err === null) {
 				cancelClick();
-				Render.posts(tag, perPage, function(result) {
-					if (result.err === null) {
-
-						// Clean up discussions table and give table header
-						var th = thead.cloneNode(true);
-						tbody.innerHTML = '';
-						tbody.appendChild(th);
-
-						var trs = result.el;
-						trs.forEach(function(tr) {
-							tbody.appendChild(tr.cloneNode(true));
-						});
-					} else {
-						console.log('Render.posts error:', err);
-					}
-				});
+				renderPosts(tag, perPage, true);
 			} else {
 				console.error('SteemConnect CreatePost Error:', err);
 				alert('Posting failed');
