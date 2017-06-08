@@ -155,7 +155,7 @@ function debounce(func, wait, immediate) {
 	};
 };
 
-function renderPost(hash, callback) {
+function renderPost(container, hash, callback) {
 	var args = hash.split('/', 3);
 	console.log('ARGS:', args);
 	var category = args[1].replace('#', '');
@@ -163,10 +163,9 @@ function renderPost(hash, callback) {
 	var permlink = args[2];
 	steem.api.getContent(author, permlink, function(err, result) {
 		console.log(err, result);
-		if (err === null) {
-			var detail = document.querySelector('.postDetails');
+		if (err === null) {			
 			var v = countVotes(result.active_votes);
-			showPostDetails(detail, result.body, result.title, result.author, permlink, result.created, v.up, v.down);
+			showPostDetails(container, result.body, result.title, result.author, permlink, result.created, v.up, v.down);
 			callback();
 		} else {
 			console.error('some error', err);
@@ -231,16 +230,19 @@ ready(function() {
 	var replyButton = document.querySelector('.replyButton');
 	var refresh = steemContainer.querySelector('.refreshButton');
 	var close = steemContainer.querySelector('.postDetailsCloseButton');
+	var detail = document.querySelector('.postDetails');
 
 	tagName.innerHTML = steemTag;
 
 	var hash = window.location.hash;
 	if (hash === 'write' || hash === '#write') {
 		showEditor();
-		renderPosts(steemTag, perPage, false);
+		if (discussions.style.display === 'block') {
+			renderPosts(steemTag, perPage, false);
+		}
 	} else if (hash.length > 1) {
 		// get details
-		renderPost(hash, function() {
+		renderPost(detail, hash, function() {
 			renderPosts(steemTag, perPage, false);
 		});
 	} else {
@@ -273,7 +275,9 @@ ready(function() {
 	Vote.init(upvotePower, upvoteLoader, upvote, downvotePower, downvoteLoader, downvote);
 
 	close.addEventListener('click', function() {
-		console.log('close it');
+		var detail = document.querySelector('.postDetails');
+		detail.style.display = 'none';
+		history.pushState('', document.title, window.location.pathname);
 	});
 
 	refresh.addEventListener('click', function() {
@@ -348,103 +352,115 @@ ready(function() {
 			}
 		});
 	}
+	function showEditor() {
+		var tag = document.querySelector('.tagName').innerHTML;
+		var w = document.querySelector('.steemContainer .postWrite');
+		var editor = w.querySelector('.editor');
+		var titleField = w.querySelector('.postTitle');
+		var tagsField = w.querySelector('.postTags');
+		var preview = w.querySelector('.preview');
+		var publish = w.querySelector('.publish');
+		var cancel = w.querySelector('.cancelWrite');
 
+		var markdownPreview = debounce(function() {
+			preview.innerHTML = markdown2html(editor.value);
+		}, 400);
+		var publishClick = function() {
+			var titleValue = titleField.value.trim();
+			var bodyValue = editor.value.trim();
+
+			if (titleValue === '') {
+				alert('Title is required');
+				return;
+			}
+			if (bodyValue === '') {
+				alert('Content is required');
+				return;
+			}
+			var permlink = _.kebabCase(titleField.value);
+			var metaData = {
+				"tags": [tag],
+				"app": "press/0.1",
+				"format": "markdown"
+			};
+
+			titleField.setAttribute('disabled', true);
+			editor.setAttribute('disabled', true);
+			publish.setAttribute('disabled', true);
+			cancel.setAttribute('disabled', true);
+
+			steemconnect.comment('', tag, username, permlink, titleValue, bodyValue, metaData, function(err, result) {
+				titleField.removeAttribute('disabled');
+				editor.removeAttribute('disabled');
+				publish.removeAttribute('disabled');
+				cancel.removeAttribute('disabled');
+				
+				if (err === null) {
+					cancelClick();
+					renderPosts(tag, perPage, true);
+				} else {
+					console.error('SteemConnect CreatePost Error:', err);
+					alert('Posting failed');
+				}
+			});
+		};
+		var cancelClick = function() {
+			titleField.value = '';
+			editor.value = '';
+			preview.innerHTML = '';
+			history.pushState('', document.title, window.location.pathname);
+			w.style.display = 'none';
+			discussions.style.display = 'block';
+			renderPosts(steemTag, perPage, true, function() {
+				more.style.display = 'block';
+				refresh.style.display = 'block';
+			});
+			//detail.style.display = 'block';
+			//refresh.style.display = 'block';
+			editor.removeEventListener('click', markdownPreview);
+			publish.removeEventListener('click', publishClick);
+			cancel.removeEventListener('click', cancelClick);
+		};
+		w.style.display = 'block';
+		detail.style.display = 'none';
+		refresh.style.display = 'none';
+		discussions.style.display = 'none';
+		more.style.display = 'none';
+		editor.addEventListener('keyup', markdownPreview);
+		publish.addEventListener('click', publishClick);
+		cancel.addEventListener('click', cancelClick);
+	}
+
+	window.addEventListener('hashchange', onHashChange, false);
+
+	function onHashChange() {
+		var hash = window.location.hash;
+		if (hash === 'write' || hash === '#write') {
+			showEditor();
+			return;
+		}
+		var args = hash.split('/', 3);
+		if (args.length == 3) {
+			var permlink = args[2];
+			var detail = document.querySelector('.postDetails');
+			var replyContainer = detail.querySelector('.replyContainer');
+			replyContainer.innerHTML = '';
+			if (args.length === 3) {
+				var post = posts[permlink];
+				showPostDetails(detail, post.body, post.title, post.author, permlink, post.created, post.upvotes, post.downvotes);
+				Render.replies(post.author, permlink, 0, function(result) {
+					if (result.err === null) {
+						replyContainer.appendChild(result.el);
+					}
+				}); 
+			} else {
+
+			}
+		}
+	}
 });
 
-window.addEventListener('hashchange', onHashChange, false);
 
-function showEditor() {
-	var tag = document.querySelector('.tagName').innerHTML;
-	var w = document.querySelector('.steemContainer .postWrite');
-	var editor = w.querySelector('.editor');
-	var titleField = w.querySelector('.postTitle');
-	var tagsField = w.querySelector('.postTags');
-	var preview = w.querySelector('.preview');
-	var publish = w.querySelector('.publish');
-	var cancel = w.querySelector('.cancelWrite');
-	var markdownPreview = debounce(function() {
-		preview.innerHTML = markdown2html(editor.value);
-	}, 400);
-	var publishClick = function() {
-		var titleValue = titleField.value.trim();
-		var bodyValue = editor.value.trim();
-
-		if (titleValue === '') {
-			alert('Title is required');
-			return;
-		}
-		if (bodyValue === '') {
-			alert('Content is required');
-			return;
-		}
-		var permlink = _.kebabCase(titleField.value);
-		var metaData = {
-			"tags": [tag],
-			"app": "press/0.1",
-			"format": "markdown"
-		};
-
-		titleField.setAttribute('disabled', true);
-		editor.setAttribute('disabled', true);
-		publish.setAttribute('disabled', true);
-		cancel.setAttribute('disabled', true);
-
-		steemconnect.comment('', tag, username, permlink, titleValue, bodyValue, metaData, function(err, result) {
-			titleField.removeAttribute('disabled');
-			editor.removeAttribute('disabled');
-			publish.removeAttribute('disabled');
-			cancel.removeAttribute('disabled');
-			
-			if (err === null) {
-				cancelClick();
-				renderPosts(tag, perPage, true);
-			} else {
-				console.error('SteemConnect CreatePost Error:', err);
-				alert('Posting failed');
-			}
-		});
-	};
-	var cancelClick = function() {
-		titleField.value = '';
-		editor.value = '';
-		preview.innerHTML = '';
-		history.pushState('', document.title, window.location.pathname);
-		w.style.display = 'none';
-		editor.removeEventListener('click', markdownPreview);
-		publish.removeEventListener('click', publishClick);
-		cancel.removeEventListener('click', cancelClick);
-	};
-	w.style.display = 'block';
-	editor.addEventListener('keyup', markdownPreview);
-	publish.addEventListener('click', publishClick);
-	cancel.addEventListener('click', cancelClick);
-}
-
-function onHashChange() {
-	var hash = window.location.hash;
-	if (hash === 'write' || hash === '#write') {
-		showEditor();
-		return;
-	}
-	var args = hash.split('/', 3);
-	if (args.length == 3) {
-		var permlink = args[2];
-		var detail = document.querySelector('.postDetails');
-		var replyContainer = detail.querySelector('.replyContainer');
-		replyContainer.innerHTML = '';
-		if (args.length === 3) {
-			var post = posts[permlink];
-			showPostDetails(detail, post.body, post.title, post.author, permlink, post.created, post.upvotes, post.downvotes);
-			Render.replies(post.author, permlink, 0, function(result) {
-				if (result.err === null) {
-					replyContainer.appendChild(result.el);
-				}
-			}); 
-		} else {
-
-		}
-	}
-}
 
 var remarkable = new Remarkable({
 	html: true, // remarkable renders first then sanitize runs...
