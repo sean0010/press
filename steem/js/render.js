@@ -1,9 +1,9 @@
 var Render = (function() {
 	/* Private */
-	var _div = function(cssClass, textNode) {
+	var _div = function(cssClass, html) {
 		var el = document.createElement('div');
 		el.classList.add(cssClass);
-		el.textContent = textNode;
+		el.innerHTML = html;
 		return el;
 	};
 	var _btn = function(cssClass, text) {
@@ -75,7 +75,7 @@ var Render = (function() {
 					var upvoteComment = _btn('upvoteComment', '😊');
 					var downvoteComment = _btn('downvoteComment', '😩');
 					var replyComment = _replyBtn('replyButton', 'Reply');
-					var body = _div('replyBody', reply.body);
+					var body = _div('replyBody', markdown2html(reply.body));
 					var childrenWrap = _div('childrenWrap', '');
 					Vote.commentVoteBind(upvoteComment);
 					Vote.commentVoteBind(downvoteComment);
