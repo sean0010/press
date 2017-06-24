@@ -1,6 +1,7 @@
 .steemContainer{font-size:13px;font-family: '굴림',Gulim, sans-serif;}
 .entry-content .steemContainer a, .entry-summary .steemContainer a, .page-content .steemContainer a, .comment-content .steemContainer a, .pingback .steemContainer .comment-body > a,
 .steemContainer a, .steemContainer a:hover{text-decoration:none;border:none;}
+.steemContainer img{max-width:100%;height:auto;}
 .steemContainer .tagLabel,.steemContainer .tagName{font-weight:bold;font-size:15px;display:inline-block;}
 .steemContainer .steemAccount{float:right;display:inline-block;}
 .steemContainer .steemAccount a{padding:4px;}
@@ -37,6 +38,7 @@
 .steemContainer .replyAuthor{display:inline-block;font-weight:bold;}
 .steemContainer .replyCreated{display:inline-block;margin-left:10px;}
 .steemContainer .replyBody{display:block;}
+.steemContainer .replyBody img{max-width:400px;max-height:400px;}
 .steemContainer .reply button{position:relative;padding:4px;border:1px solid #283A8E;color:#283A8E;margin-left:5px;border-radius:4px;}
 .steemContainer .reply button .btnIcon{position:absolute;}
 .steemContainer .reply button .btnCount{padding-left:20px;}
