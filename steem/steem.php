@@ -127,21 +127,21 @@ function steem_plugin_frontend_js() {
     wp_register_script('lodash.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js');
     wp_enqueue_script('lodash.min.js');
 
-    wp_register_script('remarkable.js', plugin_dir_url( __FILE__ ) . 'js/remarkable.min.js');
+    wp_register_script('remarkable.js', 'https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.7.1/remarkable.min.js');
     wp_enqueue_script('remarkable.js');
 
     wp_register_script('render.js', plugin_dir_url( __FILE__ ) . 'js/render.js');
-    wp_enqueue_script('render.js?v=4');
+    wp_enqueue_script('render.js?v=5');
 
 
     wp_register_script('vote.js', plugin_dir_url( __FILE__ ) . 'js/vote.js');
-    wp_enqueue_script('vote.js?v=4');
+    wp_enqueue_script('vote.js?v=5');
 
     wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
-    wp_enqueue_script('steem.plugin.js?v=4');
+    wp_enqueue_script('steem.plugin.js?v=5');
 
     wp_register_style('steem.plugin.css', plugin_dir_url( __FILE__ ) . 'css/steem.plugin.css');
-    wp_enqueue_style('steem.plugin.css?v=4');
+    wp_enqueue_style('steem.plugin.css?v=5');
 }
 
 if (is_admin()) {
