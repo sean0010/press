@@ -163,7 +163,7 @@ function renderPost(container, hash, callback) {
 	var permlink = args[2];
 	steem.api.getContent(author, permlink, function(err, result) {
 		console.log(err, result);
-		if (err === null) {			
+		if (err === null) {
 			var v = countVotes(result.active_votes);
 			showPostDetails(container, result.body, result.title, result.author, permlink, result.created, v.up, v.down);
 			callback();
