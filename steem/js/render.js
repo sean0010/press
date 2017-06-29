@@ -112,7 +112,7 @@ var Render = (function() {
 		});
 	};
 	var _openChildren = function(expandButton, childrenWrap) {
-		expandButton.addEventListener('click', function(e) {
+		//expandButton.addEventListener('click', function(e) {
 			var parentAuthor = childrenWrap.getAttribute('data-author');
 			var parentPermlink = childrenWrap.getAttribute('data-permlink');
 			var parentDepth = childrenWrap.getAttribute('data-depth');
@@ -128,7 +128,7 @@ var Render = (function() {
 					expandButton.removeAttribute('disabled');
 				}
 			}); 
-		});
+		//});
 	};
 
 	var _openReplyCommentForm = function(btn, author, permlink) {
