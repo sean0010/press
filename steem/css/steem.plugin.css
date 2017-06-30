@@ -2,7 +2,16 @@
 .entry-content .steemContainer a, .entry-summary .steemContainer a, .page-content .steemContainer a, .comment-content .steemContainer a, .pingback .steemContainer .comment-body > a,
 .steemContainer a, .steemContainer a:hover{text-decoration:none;border:none;}
 .steemContainer a:link, .steemContainer a:visited, .steemContainer a:active, .steemContainer a:hover{font-weight:normal}
+.steemContainer h1{margin:0.3em 0}
+.steemContainer h2, .steemContainer h3, .steemContainer h4{margin:0.2em 0}
+.steemContainer h5, .steemContainer h6{margin:0.1em 0}
+.steemContainer hr{height:1px}
+.steemContainer li{margin:0.75em 0}
 .steemContainer img{max-width:100%;height:auto;}
+.steemContainer blockquote{padding:5px;border:none;margin:0;}
+.steemContainer blockquote > p{margin:0!important;}
+.steemContainer .postBody > p{margin:0;}
+.steemContainer .postReply > p{margin:0;}
 .steemContainer .tagLabel,.steemContainer .tagName{font-weight:bold;font-size:120%;display:inline-block;}
 .steemContainer .steemAccount{float:right;display:inline-block;}
 .steemContainer .steemAccount a{padding:4px;}
