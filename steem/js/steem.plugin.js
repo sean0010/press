@@ -199,8 +199,22 @@ function countVotes(votes) {
 /**********
 *	Constant
 ***********/
-var perPage = 25;
 var steemconnectApp = 'morning';
+var Config = (function() {
+	var o = {};
+	o.perPage = 25;
+	o.steemTag = '';
+	o.init = function(config) {
+		o.steemTag = config.steemTag;
+		if (config.perPage !== undefined || config.perPage !== '') {
+			var limit = parseInt(config.perPage);
+			if (limit > 0 && limit <= 100) {
+				o.perPage = limit;
+			}
+		}
+	};
+	return o;
+})();
 
 /**********
 *	DOM manipulation
@@ -213,7 +227,15 @@ window.isAuth = false;
 
 ready(function() {
 	var steemContainer = document.querySelector('.steemContainer');
-	var steemTag = steemContainer.getAttribute('data-steemtag');
+
+	// Config from shortcode attribute value
+	var tag = steemContainer.getAttribute('data-steemtag');
+	var limit = steemContainer.getAttribute('data-limit');
+	Config.init({
+		perPage: limit,
+		steemTag: tag
+	});
+
 	var tagName = steemContainer.querySelector('.tagName');
 	var discussions = steemContainer.querySelector('.discussions');
 	var acc = steemContainer.querySelector('.steemAccount');
@@ -231,22 +253,21 @@ ready(function() {
 	var refresh = steemContainer.querySelector('.refreshButton');
 	var close = steemContainer.querySelector('.postDetailsCloseButton');
 	var detail = document.querySelector('.postDetails');
-
-	tagName.innerHTML = steemTag;
+	tagName.innerHTML = Config.steemTag;
 
 	var hash = window.location.hash;
 	if (hash === 'write' || hash === '#write') {
 		showEditor();
 		if (discussions.style.display === 'block') {
-			renderPosts(steemTag, perPage, false);
+			renderPosts(Config.steemTag, Config.perPage, false);
 		}
 	} else if (hash.length > 1) {
 		// get details
 		renderPost(detail, hash, function() {
-			renderPosts(steemTag, perPage, false);
+			renderPosts(Config.steemTag, Config.perPage, false);
 		});
 	} else {
-		renderPosts(steemTag, perPage, false);
+		renderPosts(Config.steemTag, Config.perPage, false);
 	}
 	
 	// Draw login
@@ -282,16 +303,18 @@ ready(function() {
 
 	refresh.addEventListener('click', function() {
 		refresh.setAttribute('disabled', 'disabled');
+		more.style.display = 'none';
 		
 		renderPosts(steemTag, perPage, true, function() {
 			refresh.removeAttribute('disabled');
+			more.style.display = 'block';
 		});
 	});
 
 	more.addEventListener('click', function() {
 		more.style.display = 'block';
 		more.disabled = true;
-		renderPosts(steemTag, perPage, false);
+		renderPosts(Config.steemTag, Config.perPage, false);
 	});
 	replyButton.addEventListener('click', function(e) {
 		var inputString = replyInput.value.trim();

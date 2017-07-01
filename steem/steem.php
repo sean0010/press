@@ -23,10 +23,11 @@ if (!function_exists('add_action')) {
 function steem_plugin( $atts ) {
     $a = shortcode_atts( array(
         'tag' => get_option('steem_tag'),
+        'limit' => get_option('limit')
     ), $atts );
     
     //$shortcode_replace_content = '<div class="steemContainer" data-steemtag="'.get_option('steem_tag').'">';
-    $shortcode_replace_content = '<div class="steemContainer" data-steemtag="'.esc_html__($a['tag']).'">';
+    $shortcode_replace_content = '<div class="steemContainer" data-steemtag="'.esc_html__($a['tag']).'" data-limit="'.esc_html__($a['limit']).'">';
     $shortcode_replace_content .= ' <div class="tagLabel">TAG: </div><div class="tagName"></div>';
     $shortcode_replace_content .= ' <div class="steemAccount"></div>';
     $shortcode_replace_content .= ' <div class="postWrite">';
@@ -79,7 +80,7 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content .= '   <button class="refreshButton button">Refresh</button>';
     $shortcode_replace_content .= ' </div>';
     $shortcode_replace_content .= ' <div class="discussions">';
-    $shortcode_replace_content .= '  <table class="table"><tbody><tr><th width="*">Title</th><th width="85">Author</th><th width="45">Vote</th><th width="85">Created</th></tr></tbody></table>';
+    $shortcode_replace_content .= '  <table class="table"><tbody><tr><th width="*">Title</th><th width="85">Author</th><th width="45">Vote</th><th width="90">Created</th></tr></tbody></table>';
     $shortcode_replace_content .= '  <div class="loaderSpace"><div class="loader"><svg class="circular" viewBox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4" stroke-miterlimit="10"/></svg></div></div>';
     $shortcode_replace_content .= ' </div>';
     $shortcode_replace_content .= ' <button class="more button">Load More</div>';
