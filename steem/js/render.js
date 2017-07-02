@@ -259,7 +259,7 @@ var Render = (function() {
 							body: discussion.body,
 							upvotes: v.up,
 							downvotes: v.down,
-							tags: JSON.parse(discussion.json_metadata).tags;
+							tags: JSON.parse(discussion.json_metadata).tags
 						};
 					}
 					loader.style.display = 'none';
