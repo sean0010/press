@@ -579,6 +579,7 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 	downvoteButton.classList.remove('voted');
 	downvoteCount.innerHTML = downvotes;
 
+	tagsContainer.innerHTML = '';
 	if (tags !== undefined) {
 		tagsContainer.appendChild(Render.tags(tags));
 	}
