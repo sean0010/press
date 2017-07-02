@@ -48,6 +48,7 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content .= '  </div>';
     $shortcode_replace_content .= '  <div class="postBody"></div>';
     $shortcode_replace_content .= '  <div class="postFooter">';
+    $shortcode_replace_content .= '   <div class="postTagsContainer"></div>';
     $shortcode_replace_content .= '   <button class="vote upvote"><span class="voteText">😊</span><span class="voteCount">0</span></button>';
     $shortcode_replace_content .= '   <div class="upvoteLoader"><div class="loader"><svg class="circular" viewBox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4" stroke-miterlimit="10"/></svg></div></div>';
     $shortcode_replace_content .= '   <div class="up votePower">';
@@ -132,17 +133,17 @@ function steem_plugin_frontend_js() {
     wp_enqueue_script('remarkable.js');
 
     wp_register_script('render.js', plugin_dir_url( __FILE__ ) . 'js/render.js');
-    wp_enqueue_script('render.js?v=8');
+    wp_enqueue_script('render.js?v=9');
 
 
     wp_register_script('vote.js', plugin_dir_url( __FILE__ ) . 'js/vote.js');
-    wp_enqueue_script('vote.js?v=8');
+    wp_enqueue_script('vote.js?v=9');
 
     wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
-    wp_enqueue_script('steem.plugin.js?v=8');
+    wp_enqueue_script('steem.plugin.js?v=9');
 
     wp_register_style('steem.plugin.css', plugin_dir_url( __FILE__ ) . 'css/steem.plugin.css');
-    wp_enqueue_style('steem.plugin.css?v=8');
+    wp_enqueue_style('steem.plugin.css?v=9');
 }
 
 if (is_admin()) {

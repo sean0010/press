@@ -38,6 +38,9 @@
 .steemContainer .postDetails .postCreated{display:inline-block;float:right;}
 .steemContainer .postDetails .postBody{display:block;padding:5px 10px;}
 .steemContainer .postDetails .postBody img{max-width:100%;height:auto;}
+.steemContainer .postDetails .postTags{text-align:left;}
+.steemContainer .postDetails .postTags .postTag{display:inline-block;background:#ddd;padding:4px 4px 4px 15px;margin:4px;position:relative;}
+.steemContainer .postDetails .postTags .postTag:before{position:absolute;content:' ';background:#fff;width:4px;height:4px;border-radius:2px;left:5px;top:10px;}
 .steemContainer p{margin-bottom:15px;font-size:100%;line-height:1.6;}
 .steemContainer img{border:none!important;}
 .steemContainer a{font-weight:normal;}

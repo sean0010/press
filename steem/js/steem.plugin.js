@@ -165,7 +165,8 @@ function renderPost(container, hash, callback) {
 		console.log(err, result);
 		if (err === null) {
 			var v = countVotes(result.active_votes);
-			showPostDetails(container, result.body, result.title, result.author, permlink, result.created, v.up, v.down);
+			var tags = JSON.parse(result.json_metadata).tags;
+			showPostDetails(container, result.body, result.title, result.author, permlink, result.created, v.up, v.down, tags);
 			callback();
 		} else {
 			console.error('some error', err);
@@ -550,7 +551,7 @@ function markdown2html(markdown) {
 	return markdown;
 }
 
-function showPostDetails(container, markdown, title, author, permlink, created, upvotes, downvotes) {
+function showPostDetails(container, markdown, title, author, permlink, created, upvotes, downvotes, tags) {
 	var postBody = container.querySelector('.postBody');
 	var postAuthor = container.querySelector('.postAuthor');
 	var postTitle = container.querySelector('.postTitle');
@@ -560,6 +561,7 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 	var downvoteButton = container.querySelector('.downvote');
 	var downvoteCount = container.querySelector('.downvote .voteCount');
 	var replyInput = container.querySelector('.replyInput');
+	var tagsContainer = container.querySelector('.postTagsContainer');
 
 	container.style.display = 'block';
 
@@ -576,6 +578,10 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 	upvoteCount.innerHTML = upvotes;
 	downvoteButton.classList.remove('voted');
 	downvoteCount.innerHTML = downvotes;
+
+	if (tags !== undefined) {
+		tagsContainer.appendChild(Render.tags(tags));
+	}
 
 	Vote.set(author, permlink);
 

@@ -276,6 +276,15 @@ var Render = (function() {
 				callback(result);
 			});
 		},
+		tags: function(tagsArray) {
+			var postTags = _div('postTags', '');
+			var i, len = tagsArray.length;
+			for (i = 0; i < len; i++) {
+				var postTag = _div('postTag', tagsArray[i]);
+				postTags.appendChild(postTag);
+			}
+			return postTags;
+		},
 		reset: function() {
 			_lastPost.permlink = '';
 			_lastPost.author = '';
