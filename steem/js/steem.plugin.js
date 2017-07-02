@@ -471,7 +471,7 @@ ready(function() {
 			replyContainer.innerHTML = '';
 			if (args.length === 3) {
 				var post = posts[permlink];
-				showPostDetails(detail, post.body, post.title, post.author, permlink, post.created, post.upvotes, post.downvotes);
+				showPostDetails(detail, post.body, post.title, post.author, permlink, post.created, post.upvotes, post.downvotes, post.tags);
 				Render.replies(post.author, permlink, 0, function(result) {
 					if (result.err === null) {
 						replyContainer.appendChild(result.el);

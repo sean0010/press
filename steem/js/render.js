@@ -258,7 +258,8 @@ var Render = (function() {
 							created: discussion.created,
 							body: discussion.body,
 							upvotes: v.up,
-							downvotes: v.down
+							downvotes: v.down,
+							tags: JSON.parse(discussion.json_metadata).tags;
 						};
 					}
 					loader.style.display = 'none';
