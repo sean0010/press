@@ -230,6 +230,7 @@ var Render = (function() {
 				params.start_author = _lastPost.author;
 			}
 			loader.style.display = 'block';
+			more.style.display = 'none';
 			steem.api.getDiscussionsByCreated(params, function(err, result) {
 				if (err === null) {
 					var i, len = result.length;

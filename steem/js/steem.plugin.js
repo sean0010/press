@@ -304,17 +304,13 @@ ready(function() {
 
 	refresh.addEventListener('click', function() {
 		refresh.setAttribute('disabled', 'disabled');
-		more.style.display = 'none';
-		
-		renderPosts(steemTag, perPage, true, function() {
+		renderPosts(Config.steemTag, Config.perPage, true, function() {
 			refresh.removeAttribute('disabled');
-			more.style.display = 'block';
 		});
 	});
 
 	more.addEventListener('click', function() {
-		more.style.display = 'block';
-		more.disabled = true;
+		more.style.display = 'none';
 		renderPosts(Config.steemTag, Config.perPage, false);
 	});
 	replyButton.addEventListener('click', function(e) {
@@ -377,7 +373,6 @@ ready(function() {
 		});
 	}
 	function showEditor() {
-		var tag = document.querySelector('.tagName').innerHTML;
 		var w = document.querySelector('.steemContainer .postWrite');
 		var editor = w.querySelector('.editor');
 		var titleField = w.querySelector('.postTitle');
@@ -403,7 +398,7 @@ ready(function() {
 			}
 			var permlink = _.kebabCase(titleField.value);
 			var metaData = {
-				"tags": [tag],
+				"tags": [Config.steemTag],
 				"app": "press/0.1",
 				"format": "markdown"
 			};
@@ -413,7 +408,7 @@ ready(function() {
 			publish.setAttribute('disabled', true);
 			cancel.setAttribute('disabled', true);
 
-			steemconnect.comment('', tag, username, permlink, titleValue, bodyValue, metaData, function(err, result) {
+			steemconnect.comment('', Config.steemTag, username, permlink, titleValue, bodyValue, metaData, function(err, result) {
 				titleField.removeAttribute('disabled');
 				editor.removeAttribute('disabled');
 				publish.removeAttribute('disabled');
@@ -421,7 +416,7 @@ ready(function() {
 				
 				if (err === null) {
 					cancelClick();
-					renderPosts(tag, perPage, true);
+					renderPosts(Config.steemTag, Config.perPage, true);
 				} else {
 					console.error('SteemConnect CreatePost Error:', err);
 					alert('Posting failed');
@@ -435,7 +430,7 @@ ready(function() {
 			history.pushState('', document.title, window.location.pathname);
 			w.style.display = 'none';
 			discussions.style.display = 'block';
-			renderPosts(steemTag, perPage, true, function() {
+			renderPosts(Config.steemTag, Config.perPage, true, function() {
 				more.style.display = 'block';
 				refresh.style.display = 'block';
 			});
