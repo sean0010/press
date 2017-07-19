@@ -120,6 +120,11 @@ Date.prototype.yyyymmdd = function() {
 	var dd = this.getDate();
 	return [this.getFullYear(), '-', (mm > 9 ? '' : '0') + mm, '-', (dd > 9 ? '' : '0') + dd].join('');
 };
+Date.prototype.mmdd = function() {
+	var mm = this.getMonth() + 1; // getMonth() is zero-based
+	var dd = this.getDate();
+	return [(mm > 9 ? '' : '0') + mm, '-', (dd > 9 ? '' : '0') + dd].join('');
+};
 
 Date.prototype.datetime = function() {
 	var mm = this.getMonth() + 1; // getMonth() is zero-based
@@ -243,17 +248,12 @@ ready(function() {
 	var more = steemContainer.querySelector('.steemContainer .more');
 	var tbody = steemContainer.querySelector('tbody');
 	var thead = tbody.querySelector('tr');
-	var upvote = steemContainer.querySelector('.upvote');
-	var upvotePower = steemContainer.querySelector('.up.votePower');
-	var upvoteLoader = steemContainer.querySelector('.upvoteLoader');
-	var downvote = steemContainer.querySelector('.downvote');
-	var downvotePower = steemContainer.querySelector('.down.votePower');
-	var downvoteLoader = steemContainer.querySelector('.downvoteLoader');
+	var voteContainer = steemContainer.querySelector('.voteContainer');
 	var replyInput = document.querySelector('.replyInput');
 	var replyButton = document.querySelector('.replyButton');
 	var refresh = steemContainer.querySelector('.refreshButton');
 	var close = steemContainer.querySelector('.postDetailsCloseButton');
-	var detail = document.querySelector('.postDetails');
+	var detail = document.querySelector('.postDetails');	
 	tagName.innerHTML = Config.steemTag;
 
 	var hash = window.location.hash;
@@ -294,7 +294,7 @@ ready(function() {
 	});
 
 	// Vote button
-	Vote.init(upvotePower, upvoteLoader, upvote, downvotePower, downvoteLoader, downvote);
+	Vote.init(voteContainer);
 
 	close.addEventListener('click', function() {
 		var detail = document.querySelector('.postDetails');
@@ -571,29 +571,27 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 
 	upvoteButton.classList.remove('voted');
 	upvoteCount.innerHTML = upvotes;
-	downvoteButton.classList.remove('voted');
-	downvoteCount.innerHTML = downvotes;
 
 	tagsContainer.innerHTML = '';
 	if (tags !== undefined) {
 		tagsContainer.appendChild(Render.tags(tags));
 	}
 
-	Vote.set(author, permlink);
+	Vote.set(author, permlink, username);
 
 	replyInput.setAttribute('data-author', author);
 	replyInput.setAttribute('data-permlink', permlink);
 
-	if (window.isAuth) {
-		steem.api.getActiveVotes(author, permlink, function(err, result) {
-			if (err === null) {				
-				var voted = Vote.hasVoted(result, username);
-				if (voted === 1) {
-					upvoteButton.classList.add('voted');
-				} else if (voted === -1) {
-					downvoteButton.classList.add('voted');
-				}
-			}
-		});
+	// Steemit.com link
+	var linksContainer = document.querySelector('.linksContainer');
+	var steemitBase = 'https://steemit.com/';
+	var hash = window.location.hash;
+	if (hash.charAt(0) == '#') {
+		hash = hash.substr(1);
 	}
+	var fullUrl = steemitBase + hash;
+	var a = createLink(fullUrl, fullUrl);
+	a.setAttribute('target', '_blank');
+	linksContainer.appendChild(a);
+
 }

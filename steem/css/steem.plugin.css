@@ -1,7 +1,7 @@
-.steemContainer{font-size:15px;font-family:'굴림',Gulim, sans-serif;}
+.steemContainer{font-size:15px;font-family:Gulim,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
 .entry-content .steemContainer a, .entry-summary .steemContainer a, .page-content .steemContainer a, .comment-content .steemContainer a, .pingback .steemContainer .comment-body > a,
 .steemContainer a, .steemContainer a:hover{text-decoration:none;border:none;}
-.steemContainer a:link, .steemContainer a:visited, .steemContainer a:active, .steemContainer a:hover{font-weight:normal}
+.steemContainer a:link, .steemContainer a:visited, .steemContainer a:active, .steemContainer a:hover{font-weight:normal;color:#333;}
 .steemContainer h1{margin:0.3em 0}
 .steemContainer h2, .steemContainer h3, .steemContainer h4{margin:0.2em 0}
 .steemContainer h5, .steemContainer h6{margin:0.1em 0}
@@ -10,7 +10,7 @@
 .steemContainer img{max-width:100%;height:auto;}
 .steemContainer blockquote{padding:5px;border:none;margin:0;}
 .steemContainer blockquote > p{margin:0!important;}
-.steemContainer .postBody > p{margin:0;}
+.steemContainer .postBody > p{margin:0;padding:0 0 1em 0;}
 .steemContainer .postReply > p{margin:0;}
 .steemContainer .tagLabel,.steemContainer .tagName{font-weight:bold;font-size:120%;display:inline-block;}
 .steemContainer .steemAccount{float:right;display:inline-block;}
@@ -25,7 +25,7 @@
 .steemContainer .table thead, .steemContainer .table tbody, .steemContainer .table tfoot{border:none}
 .steemContainer .table th, .steemContainer .table td{text-align:center;}
 .steemContainer .table th:first-child, .steemContainer .table td:first-child{text-align:left;}
-.steemContainer .table tbody th, .steemContainer .table tbody td{padding:3px 7px;}
+.steemContainer .table tbody th, .steemContainer .table tbody td{padding:7px;}
 .steemContainer .table tbody th{border-top:1px solid #c2c2c2;}
 .steemContainer .table tbody td{border-top:1px solid #ccc}
 .steemContainer .loaderSpace{min-height:50px;}
@@ -37,12 +37,11 @@
 .steemContainer .postDetails .postAuthor{display:inline-block;}
 .steemContainer .postDetails .postCreated{display:inline-block;float:right;}
 .steemContainer .postDetails .postBody{display:block;padding:5px 10px;}
-.steemContainer .postDetails .postBody img{max-width:100%;height:auto;}
+.steemContainer .postDetails .postBody img{max-width:100%;height:auto;padding:0!important;border:none!important;}
 .steemContainer .postDetails .postTags{text-align:left;}
-.steemContainer .postDetails .postTags .postTag{display:inline-block;background:#ddd;padding:4px 4px 4px 15px;margin:4px;position:relative;}
-.steemContainer .postDetails .postTags .postTag:before{position:absolute;content:' ';background:#fff;width:4px;height:4px;border-radius:2px;left:5px;top:10px;}
+.steemContainer .postDetails .postTags .postTag{display:inline-block;background:#ddd;padding:5px;margin:5px;position:relative;}
 .steemContainer p{margin-bottom:15px;font-size:100%;line-height:1.6;}
-.steemContainer img{border:none!important;}
+.steemContainer p img{border:none;border-radius:0;padding:0;background:none;}
 .steemContainer a{font-weight:normal;}
 .steemContainer .postLink{}
 .steemContainer .commentLink{margin-left:5px;color:#6e6e6e;font-size:80%}
@@ -60,19 +59,16 @@
 .steemContainer .replyContainer textarea{background:none;border:1px solid #bbb;}
 .steemContainer .postFooter{text-align:center;position:relative;}
 .steemContainer button:focus{outline:0;}
-.steemContainer button.vote:hover{background-color:#1A5099;}
-.steemContainer button.vote:hover .voteCount{color:#fff;}
-.steemContainer .vote{border:2px solid #283A8E;border-radius:5px;padding:0.85em 1em;width:100px;margin:0 0 1rem 0;background-color: #fff;color:#283A8E;display:inline-block;text-align:center;line-height:1;cursor:pointer;-webkit-appearance:none;vertical-align:middle;}
-.steemContainer .vote.voted{color:#fff;background-color:#283A8E;}
-.steemContainer .upvote{margin-right:15px;}
-.steemContainer .downvote{margin-left:15px;}
-.steemContainer .voteText{display:block;font-size:120%;}
-.steemContainer .voteCount{display:block;font-size:24px;margin-top:5px;font-weight:bold;}
-.steemContainer .votePower{display:none;position:absolute;border:2px solid #283A8E;width:100px;background:#fff;z-index:10;}
-.steemContainer .votePower button{display:block;width:100%;padding:10px 0;border:1px solid #4BA2F2;}
-.steemContainer .votePower button:hover{background:#4BA2F2;}
-.steemContainer .upvoteLoader{position:absolute;display:none;text-align:center;width:100px;padding-top:20px;}
-.steemContainer .downvoteLoader{position:absolute;display:none;text-align:center;width:100px;padding-top:20px;}
+.steemContainer .voteContainer{display:block;margin:15px;min-height:60px;position:relative;}
+.steemContainer .vote{border:2px solid #4ba2f2;border-radius: 50%;padding:0;margin:0 0 15px 0;width:48px;height:48px;display:inline-block;text-align:center;line-height:1;cursor:pointer;-webkit-appearance:none;vertical-align:middle;background:none;}
+.steemContainer .voteText{display:block;}
+.steemContainer .vote.voted{background:#4ba2f2;}
+.steemContainer .voted path{fill:#ffffff;}
+.steemContainer .voteCount{display:block;font-size:1.5em;margin-top:0.25em;color:#4ba2f2;font-weight:bold;}
+.steemContainer .votePower{display:none;position:absolute;border:2px solid #283A8E;width:250px;background:#fff;z-index:10;top:75px;left:50%;transform:translateX(-50%);}
+.steemContainer .voteLoader{position:absolute;top:0;left:0;display:none;width:100%;height:100%;background:#eee;opacity:0.5;}
+.steemContainer .linksContainer{margin:15px 0;padding:10px;text-align:right;}
+
 .steemContainer .replyForm{width:100%;display:table;position:relative;}
 .steemContainer .replyInput{width:100%;display:table-cell;min-height:75px;font-size:100%;padding:5px;}
 .steemContainer .replyForm .replyButton{display:table-cell;}
@@ -87,9 +83,23 @@
 
 .steemContainer .reply .replyContainer{padding-left:15px;position:relative;}
 .steemContainer .reply .replyContainer:before{content: '└';position:absolute;left:0;top:0;color:#999;}
-.steemContainer .reply .replyContainer .button{color:#fff;}
 
-.steemContainer button[disabled="disabled"]{background:#eee;}
+.steemContainer button[disabled="disabled"]{background:#eee;border-color:#999;}
+.steemContainer button[disabled="disabled"] path{fill:#999;}
+
+.steemContainer .addRow{display:block;position:relative;border:1px solid red;}
+.steemContainer .customPercentInput{width:165px;padding:4px 8px;display:block;border:1px solid #999;font-size:21px;text-align:right;}
+.steemContainer .customPercentInput:focus{outline:none;}
+.steemContainer .percentSymbol{position:absolute;top:7px;left:185px;font-size:19px;}
+.steemContainer .addVoteOption{position:absolute;top:7px;right:7px;font-size:100%;line-height:1;display:inline-block;cursor:pointer;}
+.steemContainer .plusbutton{position:relative;top:0;left:0;width:19px;height:19px;display:inline-block;border:1px solid #999;border-radius:50%;}
+.steemContainer .plusbutton:after{background-color:#999;width:17px;height:1px;position:absolute;top:9px;left:1px;content:'';}
+.steemContainer .plusbutton:before{background-color:#999;width:1px;height:17px;position:absolute;top:1px;left:9px; content:'';}
+
+.steemContainer .votePower ul{list-style:none;padding:0;}
+.steemContainer .votePower ul li{border:1px solid red;display:inline-block;position:relative;}
+.steemContainer .votePower ul li .voteBtn{display:block;border:1px solid blue;padding:0 15px 0 0;cursor:pointer;}
+.steemContainer .votePower ul li .voteBtnClear{position:absolute;top:0;right:0;width:15px;border:1px solid purple;cursor:pointer;}
 
 .loader {position: relative;margin: 0 auto;width: 30px;}
 .loader:before {content: '';display: block;padding-top: 100%;}

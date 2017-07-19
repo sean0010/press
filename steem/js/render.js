@@ -1,5 +1,9 @@
 var Render = (function() {
 	/* Private */
+	var _li = function() {
+		var li = document.createElement('li');
+		return li;
+	};
 	var _div = function(cssClass, html) {
 		var el = document.createElement('div');
 		el.classList.add(cssClass);
@@ -29,11 +33,14 @@ var Render = (function() {
 		var td2 = document.createElement('td'); // Vote
 		var td3 = document.createElement('td'); // Created
 		var co = createLink('[' + comment + ']', '#'); // Comment
+		var tooltipDate = document.createElement('div');
+		tooltipDate.innerHTML = created.mmdd();
+		tooltipDate.setAttribute('title', created.toDateString() + ' ' + created.toTimeString());
 		td.appendChild(link);
 		td.appendChild(co);
 		td1.innerHTML = author;
 		td2.innerHTML = vote;
-		td3.innerHTML = created;
+		td3.appendChild(tooltipDate);
 		tr.appendChild(td);
 		tr.appendChild(td1);
 		tr.appendChild(td2);
@@ -244,7 +251,7 @@ var Render = (function() {
 						var link = createLink(discussion.title, '#' + discussion.category + '/@' + discussion.author + '/' + discussion.permlink);
 						var date = new Date(discussion.created);
 						var payout = getPayout(discussion);
-						var tr = _createTr(link, discussion.children, discussion.author, discussion.net_votes, date.yyyymmdd());
+						var tr = _createTr(link, discussion.children, discussion.author, discussion.net_votes, date);
 						temp.appendChild(tr);
 
 						if (i == len - 1) {
@@ -286,6 +293,15 @@ var Render = (function() {
 				postTags.appendChild(postTag);
 			}
 			return postTags;
+		},
+		votePercentOption: function(percent) {
+			var option = _li('');
+			var vote = _div('voteBtn', percent + '%');
+			vote.setAttribute('data-percent', percent);
+			var clear = _div('voteBtnClear', 'x');
+			option.appendChild(vote);
+			option.appendChild(clear);
+			return option;
 		},
 		reset: function() {
 			_lastPost.permlink = '';

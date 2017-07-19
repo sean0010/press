@@ -1,81 +1,20 @@
 var Vote = (function() {
 	var _author = '';
 	var _permlink = '';
-	var _upvotePower, _upvoteLoader, _upvoteButton;
-	var _downvotePower, _downvoteLoader, _downvoteButton;
+	var _upvoteButton, _upvoteText, _upvoteCount, _upvotePower, _upvoteUl, _upvoteInput, _upvoteAdd, _upvoteLoader;
+	var _upvoteOptions = [1, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 85, 90, 95, 100];
 
-	var _percentClick = function(e) {
-		var percent = e.target.getAttribute('data-percent');
-		var isUpvote = e.target.parentNode.classList.contains('up');
-
-		if (isUpvote) _upvotePower.style.display = 'none';
-		else _downvotePower.style.display = 'none';
-		
-		if (percent !== 'cancel') {
-			var weight = percent * 100;
-
-			if (isUpvote) {
-				_upvoteLoader.style.display = 'block';
-				_upvoteLoader.style.left = isNaN(_upvoteButton.offsetLeft) ? _upvoteButton.offsetLeft : _upvoteButton.offsetLeft + 'px';
-				_upvoteLoader.style.top = isNaN(_upvoteButton.offsetTop) ? _upvoteButton.offsetTop : _upvoteButton.offsetTop + 'px';
-			} else {
-				_downvoteLoader.style.display = 'block';
-				_downvoteLoader.style.left = isNaN(_downvoteButton.offsetLeft) ? _downvoteButton.offsetLeft : _downvoteButton.offsetLeft + 'px';
-				_downvoteLoader.style.top = isNaN(_downvoteButton.offsetTop) ? _downvoteButton.offsetTop : _downvoteButton.offsetTop + 'px';
-			}
-
-			steemconnect.vote(username, _author, _permlink, weight, function(err, result) {
-				if (err === null) {
-					if (isUpvote) {
-						_upvoteButton.classList.add('voted');
-						_getVoteFromContent(_author, _permlink, function(err, up, down) {
-							if (err == null) {
-								_upvoteButton.querySelector('.voteCount').innerHTML = up
-							} else {
-								alert(err);
-							}
-						});
-					} else {
-						_downvoteButton.classList.add('voted');
-						_getVoteFromContent(_author, _permlink, function(err, up, down) {
-							if (err == null) {
-								_downvoteButton.querySelector('.voteCount').innerHTML = down
-							} else {
-								alert(err);
-							}
-						});
-					}
-				} else {
-					console.error('Steemconnect Vote Error:', err);
-					alert(err);
-				}
-				_upvoteLoader.style.display = 'none';
-				_upvoteButton.disabled = false;
-				_downvoteLoader.style.display = 'none';
-				_downvoteButton.disabled = false;
-			});
-		} else {
-			if (isUpvote) {
-				_upvoteButton.disabled = false;
-			} else {
-				_downvoteButton.disabled = false;
-			}
-		}
-	};
 	var _bind = function() {
+		// Bind Upvote Button Click Event
 		_upvoteButton.addEventListener('click', function() {
 			if (window.isAuth) {
 				if (_upvoteButton.classList.contains('voted')) {
 					if (confirm('Cancel?')) {
-						_upvoteLoader.style.display = 'block';
-						_upvoteLoader.style.left = isNaN(_upvoteButton.offsetLeft) ? _upvoteButton.offsetLeft : _upvoteButton.offsetLeft + 'px';
-						_upvoteLoader.style.top = isNaN(_upvoteButton.offsetTop) ? _upvoteButton.offsetTop : _upvoteButton.offsetTop + 'px';
-
+						_upvoteButton.setAttribute('disabled', 'disabled');
 						steemconnect.vote(username, _author, _permlink, 0, function(err, result) {
 							console.log('Vote cancel result:', err, result);
 							if (err === null) {
-								_upvoteLoader.style.display = 'none';
-								_upvoteButton.disabled = false;
+								_upvoteButton.removeAttribute('disabled');
 								_upvoteButton.classList.remove('voted');
 								_getVoteFromContent(_author, _permlink, function(err, up, down) {
 									if (err == null) {
@@ -96,57 +35,115 @@ var Vote = (function() {
 				alert('Login required');
 			}
 		});
-		var i, len = _upvotePower.children.length;
+
+		// Bind All Percent Click Event
+		var i, len = _upvoteOptions.length;
 		for (i = 0; i < len; i++) {
-			var button = _upvotePower.children[i];
-			button.addEventListener('click', _percentClick);
+			var percent = _upvoteOptions[i];
+			var option = Render.votePercentOption(percent);
+			_upvoteUl.appendChild(option);
+			_bindOption(option);
 		}
 
-		_downvoteButton.addEventListener('click', function() {
-			if (window.isAuth) {
-				if (_downvoteButton.classList.contains('voted')) {
-					if (confirm('Are you sure to un-vote?')) {
-						_downvoteLoader.style.display = 'block';
-						_downvoteLoader.style.left = isNaN(_downvoteButton.offsetLeft) ? _downvoteButton.offsetLeft : _downvoteButton.offsetLeft + 'px';
-						_downvoteLoader.style.top = isNaN(_downvoteButton.offsetTop) ? _downvoteButton.offsetTop : _downvoteButton.offsetTop + 'px';
-
-						steemconnect.vote(username, _author, _permlink, 0, function(err, result) {
-							console.log('Vote cancel result:', err, result);
-							if (err === null) {
-								_downvoteLoader.style.display = 'none';
-								_downvoteButton.disabled = false;
-								_downvoteButton.classList.remove('voted');
-								_getVoteFromContent(_author, _permlink, function(err, up, down) {
-									if (err == null) {
-										_downvoteButton.querySelector('.voteCount').innerHTML = down
-									} else {
-										alert(err);
-									}
-								});
-							} else {
-								console.error('Steemconnect Vote Error:', err);
-							}
-						});
-					}
+		// Add Percent Option
+		_upvoteAdd.addEventListener('click', function() {
+			if (_validateUpvote(_upvoteInput)) {
+				var percent = Math.round(_upvoteInput.value);
+				if (_contains(_upvoteOptions, percent)) {
+					alert('Redundant');
 				} else {
-					_showDownvoteOptions();
+					_upvoteOptions.push(percent);
+					var option = Render.votePercentOption(percent);
+					_upvotePower.querySelector('ul').appendChild(option);
+					_bindOption(option);
+
+					_upvoteInput.value = '';
 				}
 			} else {
-				alert('Login required');
+				alert("invalid");
 			}
 		});
-		var j, len2 = _downvotePower.children.length;
-		for (j = 0; j < len2; j++) {
-			var button2 = _downvotePower.children[j];
-			button2.addEventListener('click', _percentClick);
+	};
+
+	var _contains = function(arr, val) {
+		var result = false, i, len = arr.length;
+		for (i = 0; i < len; i++) {
+			if (arr[i] == val) {
+				result = true;
+				break;
+			}
 		}
+		return result;
+	};
+	var _percentClick = function(percent, isUpvote) {
+		var weight = parseFloat(percent) * 100;
+
+		if (isUpvote) {
+			_upvoteLoader.style.display = 'block';
+		}
+
+		steemconnect.vote(username, _author, _permlink, weight, function(err, result) {
+			if (err === null) {
+				if (isUpvote) {
+					_upvoteButton.classList.add('voted');
+					_getVoteFromContent(_author, _permlink, function(err, up, down) {
+						if (err == null) {
+							_upvoteButton.querySelector('.voteCount').innerHTML = up
+						} else {
+							alert(err);
+						}
+					});
+				} else {
+					_downvoteButton.classList.add('voted');
+					_getVoteFromContent(_author, _permlink, function(err, up, down) {
+						if (err == null) {
+							_downvoteButton.querySelector('.voteCount').innerHTML = down
+						} else {
+							alert(err);
+						}
+					});
+				}
+			} else {
+				console.error('Steemconnect Vote Error:', err);
+				_upvoteButton.classList.remove('open');
+				alert(err);
+			}
+			_upvoteLoader.style.display = 'none';
+			_upvotePower.style.display = 'none';
+		});
+	};
+	var _clearClick = function(clear) {
+		var li = clear.parentNode;
+		var btn = li.querySelector('.voteBtn');
+		var percent = btn.getAttribute('data-percent');
+		_upvoteOptions = _.remove(_upvoteOptions, function(n) {
+			return n == percent;
+		});
+		li.parentNode.removeChild(li);
+	};
+
+	var _bindOption = function(el) {
+		var vote = el.querySelector('.voteBtn');
+		var clear = el.querySelector('.voteBtnClear');
+		vote.addEventListener('click', function(e) {
+			var percent = vote.getAttribute('data-percent');
+			console.log('voted', percent);
+			_percentClick(percent, true);
+		});
+		clear.addEventListener('click', function() {
+			console.log('clear  this');
+			_clearClick(clear);
+		});
 	};
 
 	var _showUpvoteOptions = function() {
-		_upvotePower.style.display = 'block';
-		_upvotePower.style.left = isNaN(_upvoteButton.offsetLeft) ? _upvoteButton.offsetLeft : _upvoteButton.offsetLeft + 'px';
-		_upvotePower.style.top = isNaN(_upvoteButton.offsetTop) ? _upvoteButton.offsetTop : _upvoteButton.offsetTop + 'px';
-		_upvoteButton.disabled = true;
+		if (_upvoteButton.classList.contains('open')) {
+			_upvoteButton.classList.remove('open');
+			_upvotePower.style.display = 'none';
+		} else {
+			_upvoteButton.classList.add('open');
+			_upvotePower.style.display = 'block';
+		}
 	};
 
 	var _showDownvoteOptions = function() {
@@ -167,23 +164,34 @@ var Vote = (function() {
 				callback(err);
 			}
 		});
-	}
+	};
+
+	var _validateUpvote = function(input) {
+		var val = input.value
+		if (isNaN(val)) {
+			return false;
+		} else {
+			val = Number(val);
+			if (val > 0 && val <= 100) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	};
 
 	return {
-		init: function(upvotePower, upvoteLoader, upvote, downvotePower, downvoteLoader, downvote) {
-			_upvotePower = upvotePower;
-			_upvoteLoader = upvoteLoader;
-			_upvoteButton = upvote;
-			_downvotePower = downvotePower;
-			_downvoteLoader = downvoteLoader;
-			_downvoteButton = downvote;
+		init: function(container) {
+			_upvoteButton = container.querySelector('.upvote');
+			_upvoteText = container.querySelector('.upvote .voteText');
+			_upvoteCount = container.querySelector('.upvote .voteCount');
+			_upvotePower = container.querySelector('.up.votePower');
+			_upvoteUl = container.querySelector('.up ul');
+			_upvoteInput = container.querySelector('.up .customPercentInput');
+			_upvoteAdd = container.querySelector('.up .addVoteOption');
+			_upvoteLoader = container.querySelector('.up .voteLoader');
 			_bind();
-		},
-		set: function(author, permlink) {
-			_author = author;
-			_permlink = permlink;
-		},
-
+		},	
 		// 0: Not Voted, 1: Upvoted, -1: Downvoted
 		hasVoted: function(votes, voter) {
 			var result = 0;
@@ -201,6 +209,24 @@ var Vote = (function() {
 				}
 			}
 			return result;
+		},
+		set: function(author, permlink, myUsername) {
+			_author = author;
+			_permlink = permlink;
+
+			if (window.isAuth) {
+				steem.api.getActiveVotes(_author, _permlink, function(err, result) {
+					if (err === null) {
+						var voted = Vote.hasVoted(result, myUsername);
+
+						if (voted === 1) {
+							_upvoteButton.classList.add('voted');
+						} else if (voted === -1) {
+							//_downvoteButton.classList.add('voted');
+						}
+					}
+				});
+			}
 		},
 		commentVoteBind: function(btn) {
 			btn.addEventListener('click', function(e) {
@@ -252,5 +278,5 @@ var Vote = (function() {
 				}
 			});
 		}
-	}
+	};
 })();
