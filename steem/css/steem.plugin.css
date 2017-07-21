@@ -28,6 +28,7 @@
 .steemContainer .table tbody th, .steemContainer .table tbody td{padding:7px;}
 .steemContainer .table tbody th{border-top:1px solid #c2c2c2;}
 .steemContainer .table tbody td{border-top:1px solid #ccc}
+.steemContainer .table .createdDate{max-width:32px;white-space:nowrap}
 .steemContainer .loaderSpace{min-height:50px;}
 .steemContainer .more{display:none;}
 .steemContainer .postDetails{display:none;}
@@ -120,4 +121,9 @@ stroke-linecap: round;}
 40% {stroke: #0057e7;}
 66% {stroke: #008744;}
 80%,90% {stroke: #ffa700;}
+}
+
+
+@media (min-width: 480px) {
+	.steemContainer .table .createdDate{min-width:55px;max-width:unset;}
 }

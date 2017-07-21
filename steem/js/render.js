@@ -35,6 +35,7 @@ var Render = (function() {
 		var co = createLink('[' + comment + ']', '#'); // Comment
 		var tooltipDate = document.createElement('div');
 		tooltipDate.innerHTML = created.mmdd();
+		tooltipDate.className = 'createdDate';
 		tooltipDate.setAttribute('title', created.toDateString() + ' ' + created.toTimeString());
 		td.appendChild(link);
 		td.appendChild(co);
