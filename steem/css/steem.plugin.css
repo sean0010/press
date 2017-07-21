@@ -65,7 +65,7 @@
 .steemContainer .vote.voted{background:#4ba2f2;}
 .steemContainer .voted path{fill:#ffffff;}
 .steemContainer .voteCount{display:block;font-size:1.5em;margin-top:0.25em;color:#4ba2f2;font-weight:bold;}
-.steemContainer .votePower{display:none;position:absolute;border:2px solid #283A8E;width:250px;background:#fff;z-index:10;top:75px;left:50%;transform:translateX(-50%);}
+.steemContainer .votePower{display:none;position:absolute;border:2px solid #4ba2f2;width:250px;padding:0px;background:#4ba2f2;z-index:10;top:75px;left:50%;transform:translateX(-50%);}
 .steemContainer .voteLoader{position:absolute;top:0;left:0;display:none;width:100%;height:100%;background:#eee;opacity:0.5;}
 .steemContainer .linksContainer{margin:15px 0;padding:10px;text-align:right;}
 
@@ -87,19 +87,19 @@
 .steemContainer button[disabled="disabled"]{background:#eee;border-color:#999;}
 .steemContainer button[disabled="disabled"] path{fill:#999;}
 
-.steemContainer .addRow{display:block;position:relative;border:1px solid red;}
+.steemContainer .addRow{display:block;position:relative;background:#eee;padding:5px;}
 .steemContainer .customPercentInput{width:165px;padding:4px 8px;display:block;border:1px solid #999;font-size:21px;text-align:right;}
 .steemContainer .customPercentInput:focus{outline:none;}
-.steemContainer .percentSymbol{position:absolute;top:7px;left:185px;font-size:19px;}
-.steemContainer .addVoteOption{position:absolute;top:7px;right:7px;font-size:100%;line-height:1;display:inline-block;cursor:pointer;}
-.steemContainer .plusbutton{position:relative;top:0;left:0;width:19px;height:19px;display:inline-block;border:1px solid #999;border-radius:50%;}
+.steemContainer .percentSymbol{position:absolute;top:12px;left:175px;font-size:19px;}
+.steemContainer .addVoteOption{position:absolute;top:15px;right:15px;font-size:100%;line-height:1;display:inline-block;cursor:pointer;}
+.steemContainer .plusbutton{position:relative;top:0;left:0;width:21px;height:21px;display:inline-block;border:1px solid #999;border-radius:50%;background:#fff;}
 .steemContainer .plusbutton:after{background-color:#999;width:17px;height:1px;position:absolute;top:9px;left:1px;content:'';}
 .steemContainer .plusbutton:before{background-color:#999;width:1px;height:17px;position:absolute;top:1px;left:9px; content:'';}
 
 .steemContainer .votePower ul{list-style:none;padding:0;}
-.steemContainer .votePower ul li{border:1px solid red;display:inline-block;position:relative;}
-.steemContainer .votePower ul li .voteBtn{display:block;border:1px solid blue;padding:0 15px 0 0;cursor:pointer;}
-.steemContainer .votePower ul li .voteBtnClear{position:absolute;top:0;right:0;width:15px;border:1px solid purple;cursor:pointer;}
+.steemContainer .votePower ul li{display:inline-block;position:relative;margin:3px;padding: 0;width: 65px;background: #fff;}
+.steemContainer .votePower ul li .voteBtn{display:block;padding:4px;cursor:pointer;}
+.steemContainer .votePower ul li .voteBtnClear{position:absolute;top:0;right:0;width:15px;color:#e00;cursor:pointer;padding:3px 0;}
 
 .loader {position: relative;margin: 0 auto;width: 30px;}
 .loader:before {content: '';display: block;padding-top: 100%;}

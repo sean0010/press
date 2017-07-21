@@ -590,8 +590,9 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 		hash = hash.substr(1);
 	}
 	var fullUrl = steemitBase + hash;
-	var a = createLink(fullUrl, fullUrl);
+	var a = createLink('Steemit.com Link', fullUrl);
 	a.setAttribute('target', '_blank');
+	linksContainer.innerHTML = '';
 	linksContainer.appendChild(a);
 
 }
