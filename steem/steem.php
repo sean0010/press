@@ -73,7 +73,7 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content .= '   <button class="refreshButton button">Refresh</button>';
     $shortcode_replace_content .= ' </div>';
     $shortcode_replace_content .= ' <div class="discussions">';
-    $shortcode_replace_content .= '  <table class="table"><tbody><tr><th width="*">Title</th><th width="85">Author</th><th width="45">Vote</th><th width="55">Date</th></tr></tbody></table>';
+    $shortcode_replace_content .= '  <table class="table"><tbody><tr><th>Title</th><th>Author</th><th>Vote</th><th>Date</th></tr></tbody></table>';
     $shortcode_replace_content .= '  <div class="loaderSpace"><div class="loader"><svg class="circular" viewBox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4" stroke-miterlimit="10"/></svg></div></div>';
     $shortcode_replace_content .= ' </div>';
     $shortcode_replace_content .= ' <button class="more button">Load More</button>';
