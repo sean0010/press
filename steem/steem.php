@@ -50,7 +50,7 @@ function steem_plugin( $atts ) {
     $shortcode_replace_content .= '  <div class="postFooter">';
     $shortcode_replace_content .= '   <div class="postTagsContainer"></div>';
     $shortcode_replace_content .= '   <div class="voteContainer">';
-    $shortcode_replace_content .= '    <button class="vote upvote"><span class="voteText"><svg enable-background="new 0 0 33 33" version="1.1" viewBox="0 0 33 33" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path d="M16.699,11.293c-0.384-0.38-1.044-0.381-1.429,0l-6.999,6.899c-0.394,0.391-0.394,1.024,0,1.414 c0.395,0.391,1.034,0.391,1.429,0l6.285-6.195l6.285,6.196c0.394,0.391,1.034,0.391,1.429,0c0.394-0.391,0.394-1.024,0-1.414 L16.699,11.293z" fill="#4ba2f2"></path></g></svg></span><span class="voteCount">0</span></button>';
+    $shortcode_replace_content .= '    <button class="vote upvote"><span class="voteText"><svg enable-background="new 0 0 32 32" version="1.1" viewBox="0 0 32 32" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path d="M16.699,11.293c-0.384-0.38-1.044-0.381-1.429,0l-6.999,6.899c-0.394,0.391-0.394,1.024,0,1.414 c0.395,0.391,1.034,0.391,1.429,0l6.285-6.195l6.285,6.196c0.394,0.391,1.034,0.391,1.429,0c0.394-0.391,0.394-1.024,0-1.414 L16.699,11.293z" fill="#4ba2f2"></path></g></svg></span><span class="voteCount">0</span></button>';
     $shortcode_replace_content .= '    <div class="up votePower">';
     $shortcode_replace_content .= '     <ul></ul>';
     $shortcode_replace_content .= '     <div class="addRow">';

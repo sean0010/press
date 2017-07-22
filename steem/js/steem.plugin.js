@@ -166,6 +166,7 @@ function renderPost(container, hash, callback) {
 	var category = args[1].replace('#', '');
 	var author = args[1].replace('@', '');
 	var permlink = args[2];
+
 	steem.api.getContent(author, permlink, function(err, result) {
 		console.log(err, result);
 		if (err === null) {
@@ -578,6 +579,9 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 	}
 
 	Vote.set(author, permlink, username);
+
+	// If percent options dropdown open, close it
+	Vote.hideUpvoteOptions(); 
 
 	replyInput.setAttribute('data-author', author);
 	replyInput.setAttribute('data-permlink', permlink);

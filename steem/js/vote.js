@@ -228,6 +228,12 @@ var Vote = (function() {
 				});
 			}
 		},
+		hideUpvoteOptions: function() {
+			if (_upvoteButton.classList.contains('open')) {
+				_upvoteButton.classList.remove('open');
+				_upvotePower.style.display = 'none';
+			}
+		},
 		commentVoteBind: function(btn) {
 			btn.addEventListener('click', function(e) {
 				if (window.isAuth !== true) {
