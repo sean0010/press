@@ -2,7 +2,19 @@ var Vote = (function() {
 	var _author = '';
 	var _permlink = '';
 	var _upvoteButton, _upvoteText, _upvoteCount, _upvotePower, _upvoteUl, _upvoteInput, _upvoteAdd, _upvoteLoader;
-	var _upvoteOptions = [1, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 85, 90, 95, 100];
+
+	if (typeof(Storage) !== 'undefined') {
+		var upvoteOptions = localStorage.getItem('UpvoteOptions');
+		if (upvoteOptions == null) {
+			localStorage.setItem('UpvoteOptions', JSON.stringify([1, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 75, 80, 85, 90, 95, 100]));
+		} else {
+			console.log('local storage has value');
+		}
+	} else {
+		console.log('Sorry! No Web Storage support..');
+	}
+
+	var _upvoteOptions = JSON.parse(localStorage.getItem('UpvoteOptions'));
 
 	var _bind = function() {
 		// Bind Upvote Button Click Event
@@ -53,6 +65,8 @@ var Vote = (function() {
 					alert('Redundant');
 				} else {
 					_upvoteOptions.push(percent);
+					localStorage.setItem('UpvoteOptions', JSON.stringify(_upvoteOptions));
+
 					var option = Render.votePercentOption(percent);
 					_upvotePower.querySelector('ul').appendChild(option);
 					_bindOption(option);
@@ -116,9 +130,18 @@ var Vote = (function() {
 		var li = clear.parentNode;
 		var btn = li.querySelector('.voteBtn');
 		var percent = btn.getAttribute('data-percent');
-		_upvoteOptions = _.remove(_upvoteOptions, function(n) {
-			return n == percent;
-		});
+		var i, idx, len = _upvoteOptions.length;
+
+		for (i = 0; i < len; i++) {
+			if (_upvoteOptions[i] == percent) {
+				idx = i;
+				break;
+			}
+		}
+		_upvoteOptions.splice(idx, 1);
+		localStorage.setItem('UpvoteOptions', JSON.stringify(_upvoteOptions));
+		console.log(localStorage.getItem('UpvoteOptions'));
+		
 		li.parentNode.removeChild(li);
 	};
 
