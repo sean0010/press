@@ -124,9 +124,11 @@ function steem_plugin_frontend_js() {
     wp_register_script('remarkable.js', 'https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.7.1/remarkable.min.js');
     wp_enqueue_script('remarkable.js');
 
+    wp_register_script('helper.js', plugin_dir_url( __FILE__ ) . 'js/helper.js');
+    wp_enqueue_script('helper.js?v=11');
+
     wp_register_script('render.js', plugin_dir_url( __FILE__ ) . 'js/render.js');
     wp_enqueue_script('render.js?v=11');
-
 
     wp_register_script('vote.js', plugin_dir_url( __FILE__ ) . 'js/vote.js');
     wp_enqueue_script('vote.js?v=11');

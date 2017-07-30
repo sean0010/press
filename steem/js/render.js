@@ -54,7 +54,7 @@ var Render = (function() {
 	var _commentVote = function(commentAuthor, commentPermlink, upvoteComment, downvoteComment) {
 		steem.api.getActiveVotes(commentAuthor, commentPermlink, function(err, votes) {
 			if (err === null) {
-				var v = countVotes(votes);
+				var v = Helper.countVotes(votes);
 				upvoteComment.querySelector('.btnCount').innerHTML = v.up;
 				downvoteComment.querySelector('.btnCount').innerHTML = v.down;
 
@@ -83,7 +83,7 @@ var Render = (function() {
 					var upvoteComment = _btn('upvoteComment', '😊');
 					var downvoteComment = _btn('downvoteComment', '😩');
 					var replyComment = _replyBtn('replyButton', 'Reply');
-					var body = _div('replyBody', markdown2html(reply.body));
+					var body = _div('replyBody', Helper.markdown2html(reply.body));
 					var childrenWrap = _div('childrenWrap', '');
 					Vote.commentVoteBind(upvoteComment);
 					Vote.commentVoteBind(downvoteComment);
@@ -251,7 +251,7 @@ var Render = (function() {
 
 						var link = createLink(discussion.title, '#' + discussion.category + '/@' + discussion.author + '/' + discussion.permlink);
 						var date = new Date(discussion.created);
-						var payout = getPayout(discussion);
+						var payout = Helper.getPayout(discussion);
 						var tr = _createTr(link, discussion.children, discussion.author, discussion.net_votes, date);
 						temp.appendChild(tr);
 
@@ -260,7 +260,7 @@ var Render = (function() {
 							_lastPost.author = discussion.author;
 						}
 
-						var v = countVotes(discussion.active_votes);
+						var v = Helper.countVotes(discussion.active_votes);
 						posts[discussion.permlink] = {
 							title: discussion.title,
 							author: discussion.author,
@@ -280,6 +280,31 @@ var Render = (function() {
 					callback({err: err, el: null});
 				}
 			});
+		},
+		post: function(container, hash, callback) {
+			var args = hash.split('/', 3);
+			console.log('ARGS:', args);
+			var category = args[1].replace('#', '');
+			var author = args[1].replace('@', '');
+			var permlink = args[2];
+
+			steem.api.getContent(author, permlink, function(err, result) {
+				console.log(err, result);
+				if (err === null) {
+					var v = Helper.countVotes(result.active_votes);
+					var tags = JSON.parse(result.json_metadata).tags;
+					showPostDetails(container, result.body, result.title, result.author, permlink, result.created, v.up, v.down, tags);
+					callback();
+				} else {
+					console.error('some error', err);
+				}
+			});
+			Render.replies(author, permlink, 0, function(result) {
+				if (result.err === null) {
+					var replyContainer = document.querySelector('.postDetails .replyContainer');
+					replyContainer.appendChild(result.el);
+				}
+			}); 
 		},
 		replies: function(parentAuthor, parentPermlink, parentDepth, callback) {
 			_replies(parentAuthor, parentPermlink, parentDepth, function(result) {

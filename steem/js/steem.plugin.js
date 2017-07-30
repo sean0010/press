@@ -1,99 +1,6 @@
 /**********
 *	Library
 ***********/
-
-const kebabCase = function(string) {
-  return string.replace(/\s+/g, '-').toLowerCase();
-};
-
-function validateAccountName(value) {
-  var i,
-    label,
-    len,
-    length,
-    ref,
-    suffix;
-
-  suffix = 'Account name should ';
-  if (!value) {
-    return `${suffix}not be empty.`;
-  }
-  length = value.length;
-  if (length < 3) {
-    return `${suffix}be longer.`;
-  }
-  if (length > 16) {
-    return `${suffix}be shorter.`;
-  }
-  if (/\./.test(value)) {
-    suffix = 'Each account segment should ';
-  }
-  ref = value.split('.');
-  for (i = 0, len = ref.length; i < len; i++) {
-    label = ref[i];
-    if (!/^[a-z]/.test(label)) {
-      return `${suffix}start with a letter.`;
-    }
-    if (!/^[a-z0-9-]*$/.test(label)) {
-      return `${suffix}have only letters, digits, or dashes.`;
-    }
-    if (/--/.test(label)) {
-      return `${suffix}have only one dash in a row.`;
-    }
-    if (!/[a-z0-9]$/.test(label)) {
-      return `${suffix}end with a letter or digit.`;
-    }
-    if (!(label.length >= 3)) {
-      return `${suffix}be longer`;
-    }
-  }
-  return null;
-}
-
-function escapeRegExp(str) {
-  return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
-}
-
-function replaceAll(str, find, replace) {
-  return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
-}
-
-const imageRegex = /https?:\/\/(?:[-a-zA-Z0-9._]*[-a-zA-Z0-9])(?::\d{2,5})?(?:[/?#](?:[^\s"'<>\][()]*[^\s"'<>\][().,])?(?:(?:\.(?:tiff?|jpe?g|gif|png|svg|ico)|ipfs\/[a-z\d]{40,})))/ig;
-
-function linkify(content) {
-  // hashtag
-  content = content.replace(/(^|\s)(#[-a-z\d]+)/ig, (tag) => {
-    if (/#[\d]+$/.test(tag)) return tag; // Don't allow numbers to be tags
-    const space = /^\s/.test(tag) ? tag[0] : '';
-    const tag2 = tag.trim().substring(1);
-    const tagLower = tag2.toLowerCase();
-    return `${space}<a href="/trending/${tagLower}">${tag}</a>`;
-  });
-
-  // usertag (mention)
-  content = content.replace(/(^|\s)(@[a-z][-\.a-z\d]+[a-z\d])/ig, (user) => {
-    const space = /^\s/.test(user) ? user[0] : '';
-    const user2 = user.trim().substring(1);
-    const userLower = user2.toLowerCase();
-    const valid = validateAccountName(userLower) == null;
-    return space + (valid ?
-      `<a href="/@${userLower}">@${user2}</a>` :
-      `@${user2}`
-    );
-  });
-
-  // content = content.replace(linksRe.any, (ln) => {
-  //   if (linksRe.image.test(ln)) {
-  //     if (images) images.add(ln);
-  //     return `<img src="${ipfsPrefix(ln)}" />`;
-  //   }
-  //   if (links) links.add(ln);
-  //   return `<a href="${ipfsPrefix(ln)}">${ln}</a>`;
-  // });
-  return content;
-}
-
-
 function ready(fn) {
 	if (document.readyState != 'loading'){
 		fn();
@@ -136,73 +43,6 @@ Date.prototype.datetime = function() {
 	return [this.getFullYear(), '-', (mm > 9 ? '' : '0') + mm, '-', (dd > 9 ? '' : '0') + dd, ' ', hour, ':', minute, ':', second].join('');
 };
 
-
-function getPayout(discussion) {
-	var totalPendingPayout = parseFloat(discussion.total_pending_payout_value.split(' ')[0]);
-	var totalPayoutValue = parseFloat(discussion.total_payout_value.split(' ')[0]);
-	var result = totalPendingPayout + totalPayoutValue;
-	result = '$' + result.toFixed(3);
-	return result;
-}
-
-function debounce(func, wait, immediate) {
-	var timeout;
-	return function() {
-		var context = this, args = arguments;
-		var later = function() {
-			timeout = null;
-			if (!immediate) func.apply(context, args);
-		};
-		var callNow = immediate && !timeout;
-		clearTimeout(timeout);
-		timeout = setTimeout(later, wait);
-		if (callNow) func.apply(context, args);
-	};
-};
-
-function renderPost(container, hash, callback) {
-	var args = hash.split('/', 3);
-	console.log('ARGS:', args);
-	var category = args[1].replace('#', '');
-	var author = args[1].replace('@', '');
-	var permlink = args[2];
-
-	steem.api.getContent(author, permlink, function(err, result) {
-		console.log(err, result);
-		if (err === null) {
-			var v = countVotes(result.active_votes);
-			var tags = JSON.parse(result.json_metadata).tags;
-			showPostDetails(container, result.body, result.title, result.author, permlink, result.created, v.up, v.down, tags);
-			callback();
-		} else {
-			console.error('some error', err);
-		}
-	});
-	Render.replies(author, permlink, 0, function(result) {
-		if (result.err === null) {
-			var replyContainer = document.querySelector('.postDetails .replyContainer');
-			replyContainer.appendChild(result.el);
-		}
-	}); 
-}
-
-function countVotes(votes) {
-	var result = {up: 0, down: 0};
-
-	votes.forEach(function(vote) {
-		var percent = parseInt(vote.percent);
-		if (percent < 0) {
-			result.down += 1;
-		} else if (percent > 0) {
-			result.up += 1;
-		}
-	});
-
-	return result;
-}
-
-
-
 /**********
 *	Constant
 ***********/
@@ -234,15 +74,6 @@ window.isAuth = false;
 
 ready(function() {
 	var steemContainer = document.querySelector('.steemContainer');
-
-	// Config from shortcode attribute value
-	var tag = steemContainer.getAttribute('data-steemtag');
-	var limit = steemContainer.getAttribute('data-limit');
-	Config.init({
-		perPage: limit,
-		steemTag: tag
-	});
-
 	var tagName = steemContainer.querySelector('.tagName');
 	var discussions = steemContainer.querySelector('.discussions');
 	var acc = steemContainer.querySelector('.steemAccount');
@@ -255,6 +86,14 @@ ready(function() {
 	var refresh = steemContainer.querySelector('.refreshButton');
 	var close = steemContainer.querySelector('.postDetailsCloseButton');
 	var detail = document.querySelector('.postDetails');	
+
+	// Config from shortcode attribute value
+	var tag = steemContainer.getAttribute('data-steemtag');
+	var limit = steemContainer.getAttribute('data-limit');
+	Config.init({
+		perPage: limit,
+		steemTag: tag
+	});
 	tagName.innerHTML = Config.steemTag;
 
 	var hash = window.location.hash;
@@ -265,7 +104,7 @@ ready(function() {
 		}
 	} else if (hash.length > 1) {
 		// get details
-		renderPost(detail, hash, function() {
+		Render.post(detail, hash, function() {
 			renderPosts(Config.steemTag, Config.perPage, false);
 		});
 	} else {
@@ -382,8 +221,8 @@ ready(function() {
 		var publish = w.querySelector('.publish');
 		var cancel = w.querySelector('.cancelWrite');
 
-		var markdownPreview = debounce(function() {
-			preview.innerHTML = markdown2html(editor.value);
+		var markdownPreview = Helper.debounce(function() {
+			preview.innerHTML = Helper.markdown2html(editor.value);
 		}, 400);
 		var publishClick = function() {
 			var titleValue = titleField.value.trim();
@@ -482,70 +321,7 @@ ready(function() {
 
 
 
-var remarkable = new Remarkable({
-	html: true, // remarkable renders first then sanitize runs...
-	breaks: true,
-	linkify: false, // linkify is done locally
-	typographer: false, // https://github.com/jonschlinkert/remarkable/issues/142#issuecomment-221546793
-	quotes: '“”‘’'
-});
 
-
-function convertMedia(html) {
-	var pattern1 = /(?:http?s?:\/\/)?(?:www\.)?(?:vimeo\.com)\/?(.+)/g;
-	var pattern2 = /(?:http?s?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(.+)/g;
-
-	if (pattern1.test(html)) {
-		var replacement = '<div style="position:relative;height:0;padding-bottom:56.2%"><iframe width="640" height="360" src="//player.vimeo.com/video/$1" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
-		var html = html.replace(pattern1, replacement);
-	}
-
-	if (pattern2.test(html)) {
-		var replacement = '<div style="position:relative;height:0;padding-bottom:56.2%"><iframe width="640" height="360" src="http://www.youtube.com/embed/$1?rel=0?ecver=2" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>';
-		var html = html.replace(pattern2, replacement);
-	} 
-
-	return html;
-}
-
-function markdown2html(markdown) {
-	var jsonMetadata = {};
-	jsonMetadata.image = jsonMetadata.image || [];
-
-	markdown = markdown.replace(/<!--([\s\S]+?)(-->|$)/g, '(html comment removed: $1)');
-
-	markdown.replace(imageRegex, function(img) {
-		if (_.filter(jsonMetadata.image, i => i.indexOf(img) !== -1).length === 0) {
-			jsonMetadata.image.push(img);
-		}
-	});
-
-	markdown = linkify(markdown);
-	markdown = convertMedia(markdown);
-	markdown = remarkable.render(markdown);
-
-	if (_.has(jsonMetadata, 'image[0]')) {
-		jsonMetadata.image.forEach(function(image) {
-			var newUrl = image;
-			if (/^\/\//.test(image)) { newUrl = `https:${image}`; }
-
-			markdown = replaceAll(markdown, `<a href="${image}">${image}</a>`, `<img src="${newUrl}">`);
-			// not in img tag
-			if (markdown.search(`<img[^>]+src=["']${escapeRegExp(image)}["']`) === -1) {
-				markdown = replaceAll(markdown, image, `<img src="${newUrl}">`);
-			}
-		});
-	}
-
-	markdown.replace(/<img[^>]+src="([^">]+)"/ig, function(img, ...rest) {
-		if (rest.length && rest[0] && rest[0].indexOf('https://steemitimages.com/0x0/') !== 0) {
-			const newUrl = `https://steemitimages.com/0x0/${rest[0]}`;
-			markdown = replaceAll(markdown, rest[0], newUrl);
-		}
-	});
-
-	return markdown;
-}
 
 function showPostDetails(container, markdown, title, author, permlink, created, upvotes, downvotes, tags) {
 	var postBody = container.querySelector('.postBody');
@@ -561,7 +337,7 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 
 	container.style.display = 'block';
 
-	postBody.innerHTML = markdown2html(markdown);
+	postBody.innerHTML = Helper.markdown2html(markdown);
 	postTitle.innerHTML = '<b>' + title + '</b>';
 	postAuthor.innerHTML = author;
 
