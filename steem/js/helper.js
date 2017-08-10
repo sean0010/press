@@ -130,3 +130,35 @@ var Helper = (function() {
 		}
 	}
 })();
+
+/**********
+*	Library
+***********/
+function ready(fn) {
+	if (document.readyState != 'loading'){
+		fn();
+	} else {
+		document.addEventListener('DOMContentLoaded', fn);
+	}
+}
+
+Date.prototype.yyyymmdd = function() {
+	var mm = this.getMonth() + 1; // getMonth() is zero-based
+	var dd = this.getDate();
+	return [this.getFullYear(), '-', (mm > 9 ? '' : '0') + mm, '-', (dd > 9 ? '' : '0') + dd].join('');
+};
+Date.prototype.mmdd = function() {
+	var mm = this.getMonth() + 1; // getMonth() is zero-based
+	var dd = this.getDate();
+	return [(mm > 9 ? '' : '0') + mm, '-', (dd > 9 ? '' : '0') + dd].join('');
+};
+
+Date.prototype.datetime = function() {
+	var mm = this.getMonth() + 1; // getMonth() is zero-based
+	var dd = this.getDate();
+	var hour = this.getHours(); if (hour < 9) { hour = "0" + hour; }
+	var minute = this.getMinutes(); if (minute < 9) { minute = "0" + minute; }
+	var second = this.getSeconds(); if (second < 9) { second = "0" + second; }
+
+	return [this.getFullYear(), '-', (mm > 9 ? '' : '0') + mm, '-', (dd > 9 ? '' : '0') + dd, ' ', hour, ':', minute, ':', second].join('');
+};

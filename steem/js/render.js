@@ -332,6 +332,12 @@ var Render = (function() {
 		reset: function() {
 			_lastPost.permlink = '';
 			_lastPost.author = '';
+		},
+		link: function(title, url) {
+			var el = document.createElement('a');
+			el.textContent = title;
+			el.href = url;
+			return el;
 		}
 	};
 })();

@@ -1,49 +1,4 @@
 /**********
-*	Library
-***********/
-function ready(fn) {
-	if (document.readyState != 'loading'){
-		fn();
-	} else {
-		document.addEventListener('DOMContentLoaded', fn);
-	}
-}
-function createLink(title, url) {
-	var el = document.createElement('a');
-	el.textContent = title;
-	el.href = url;
-	return el;
-}
-function createVoteBtn(author, permlink) {
-	var el = document.createElement('span');
-	el.classList.add('sc-vote');
-	el.setAttribute('data-author', author);
-	el.setAttribute('data-permlink', permlink);
-	return el;
-}
-
-Date.prototype.yyyymmdd = function() {
-	var mm = this.getMonth() + 1; // getMonth() is zero-based
-	var dd = this.getDate();
-	return [this.getFullYear(), '-', (mm > 9 ? '' : '0') + mm, '-', (dd > 9 ? '' : '0') + dd].join('');
-};
-Date.prototype.mmdd = function() {
-	var mm = this.getMonth() + 1; // getMonth() is zero-based
-	var dd = this.getDate();
-	return [(mm > 9 ? '' : '0') + mm, '-', (dd > 9 ? '' : '0') + dd].join('');
-};
-
-Date.prototype.datetime = function() {
-	var mm = this.getMonth() + 1; // getMonth() is zero-based
-	var dd = this.getDate();
-	var hour = this.getHours(); if (hour < 9) { hour = "0" + hour; }
-	var minute = this.getMinutes(); if (minute < 9) { minute = "0" + minute; }
-	var second = this.getSeconds(); if (second < 9) { second = "0" + second; }
-
-	return [this.getFullYear(), '-', (mm > 9 ? '' : '0') + mm, '-', (dd > 9 ? '' : '0') + dd, ' ', hour, ':', minute, ':', second].join('');
-};
-
-/**********
 *	Constant
 ***********/
 var steemconnectApp = 'morning';
@@ -124,14 +79,14 @@ ready(function() {
 		if (!err && result.isAuthenticated) {
 			window.isAuth = true;
 			username = result.username;
-			var accBtn = createLink(username, '#');
-			var createPostBtn = createLink('Write', '#write');
-			var logoutBtn = createLink('Logout', 'https://steemconnect.com/logout?redirect_url=' + window.location.href);
+			var accBtn = Render.link(username, '#');
+			var createPostBtn = Render.link('Write', '#write');
+			var logoutBtn = Render.link('Logout', 'https://steemconnect.com/logout?redirect_url=' + window.location.href);
 			acc.appendChild(createPostBtn);
 			acc.appendChild(accBtn);
 			acc.appendChild(logoutBtn);
 		} else {
-			var loginBtn = createLink('Login', loginURL);
+			var loginBtn = Render.link('Login', loginURL);
 			acc.appendChild(loginBtn);
 		}
 	});
@@ -322,10 +277,6 @@ ready(function() {
 	}
 });
 
-
-
-
-
 function showPostDetails(container, markdown, title, author, permlink, created, upvotes, downvotes, tags) {
 	var postBody = container.querySelector('.postBody');
 	var postAuthor = container.querySelector('.postAuthor');
@@ -373,7 +324,7 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 		hash = hash.substr(1);
 	}
 	var fullUrl = steemitBase + hash;
-	var a = createLink('Steemit.com Link', fullUrl);
+	var a = Render.link('Steemit.com Link', fullUrl);
 	a.setAttribute('target', '_blank');
 	linksContainer.innerHTML = '';
 	linksContainer.appendChild(a);
