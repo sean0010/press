@@ -7,7 +7,7 @@ var Render = (function() {
 	var _div = function(cssClass, html) {
 		var el = document.createElement('div');
 		el.classList.add(cssClass);
-		el.innerHTML = html;
+		if (html !== undefined) el.innerHTML = html;
 		return el;
 	};
 	var _btn = function(cssClass, text) {
@@ -26,29 +26,38 @@ var Render = (function() {
 		b.classList.add(cssClass);
 		return b;
 	};
-	var _createTr = function(link, comment, author, vote, created) {
-		var tr = document.createElement('tr'); // 
-		var td = document.createElement('td'); // title
-		var td1 = document.createElement('td'); // Author
-		var td2 = document.createElement('td'); // Vote
-		var td3 = document.createElement('td'); // Created
-		var co = createLink('[' + comment + ']', '#'); // Comment
+	var _createRow = function(link, comment, author, reward, vote, created) {
+		var row = _div('pRow');
+		var pTitle = _div('pTitle');
+		var pAuthor = _div('pAuthor');
+		var pReward = _div('pReward');
+		var pVote = _div('pVote');
+		var pCreated = _div('pCreated');
+
+		link.classList.add('postLink');
+		pTitle.appendChild(link);
+		if (comment > 0) {
+			var co = Render.createLink('[' + comment + ']', '#'); // Comment
+			co.classList.add('commentLink');
+			pTitle.appendChild(co);
+		}
+		pAuthor.innerHTML = author;
+		pReward.innerHTML = Helper.formatReward(reward);
+		pVote.innerHTML = vote;
+
 		var tooltipDate = document.createElement('div');
 		tooltipDate.innerHTML = created.mmdd();
 		tooltipDate.className = 'createdDate';
 		tooltipDate.setAttribute('title', created.toDateString() + ' ' + created.toTimeString());
-		td.appendChild(link);
-		td.appendChild(co);
-		td1.innerHTML = author;
-		td2.innerHTML = vote;
-		td3.appendChild(tooltipDate);
-		tr.appendChild(td);
-		tr.appendChild(td1);
-		tr.appendChild(td2);
-		tr.appendChild(td3);
-		link.classList.add('postLink');		
-		co.classList.add('commentLink');
-		return tr;
+		pCreated.appendChild(tooltipDate);
+
+		row.appendChild(pTitle);
+		row.appendChild(pAuthor);
+		row.appendChild(pReward);
+		row.appendChild(pVote);
+		row.appendChild(pCreated);
+
+		return row;
 	};
 	var _lastPost = {'permlink': '', 'author': ''};
 	var _commentVote = function(commentAuthor, commentPermlink, upvoteComment, downvoteComment) {
@@ -73,18 +82,18 @@ var Render = (function() {
 	var _replies = function(parentAuthor, parentPermlink, parentDepth, callback) {
 		steem.api.getContentReplies(parentAuthor, parentPermlink, function(err, result) {
 			if (err === null) {
-				var r = _div('replies', '');
+				var r = _div('replies');
 				var i, len = result.length;
 				for (i = 0; i < len; i++) {
 					var reply = result[i];
-					var container = _div('reply', '');
+					var container = _div('reply');
 					var author = _div('replyAuthor', reply.author);
 					var created = _div('replyCreated', (new Date(reply.created)).datetime());
 					var upvoteComment = _btn('upvoteComment', '😊');
 					var downvoteComment = _btn('downvoteComment', '😩');
 					var replyComment = _replyBtn('replyButton', 'Reply');
 					var body = _div('replyBody', Helper.markdown2html(reply.body));
-					var childrenWrap = _div('childrenWrap', '');
+					var childrenWrap = _div('childrenWrap');
 					Vote.commentVoteBind(upvoteComment);
 					Vote.commentVoteBind(downvoteComment);
 					container.setAttribute('data-author', reply.author);
@@ -243,32 +252,32 @@ var Render = (function() {
 				if (err === null) {
 					var i, len = result.length;
 					for (i = 0; i < len; i++) {
-						var discussion = result[i];
-						if (discussion.permlink == _lastPost.permlink && discussion.author == _lastPost.author) {
+						var p = result[i];
+						if (p.permlink == _lastPost.permlink && p.author == _lastPost.author) {
 							// skip, redundant post
 							continue;
 						}
 
-						var link = createLink(discussion.title, '#' + discussion.category + '/@' + discussion.author + '/' + discussion.permlink);
-						var date = new Date(discussion.created);
-						var payout = Helper.getPayout(discussion);
-						var tr = _createTr(link, discussion.children, discussion.author, discussion.net_votes, date);
-						temp.appendChild(tr);
+						var link = Render.createLink(p.title, '#' + p.category + '/@' + p.author + '/' + p.permlink);
+						var date = new Date(p.created);
+						var payout = Helper.getPayout(p);
+						var row = _createRow(link, p.children, p.author, p.pending_payout_value, p.net_votes, date);
+						temp.appendChild(row);
 
 						if (i == len - 1) {
-							_lastPost.permlink = discussion.permlink;
-							_lastPost.author = discussion.author;
+							_lastPost.permlink = p.permlink;
+							_lastPost.author = p.author;
 						}
 
-						var v = Helper.countVotes(discussion.active_votes);
-						posts[discussion.permlink] = {
-							title: discussion.title,
-							author: discussion.author,
-							created: discussion.created,
-							body: discussion.body,
+						var v = Helper.countVotes(p.active_votes);
+						posts[p.permlink] = {
+							title: p.title,
+							author: p.author,
+							created: p.created,
+							body: p.body,
 							upvotes: v.up,
 							downvotes: v.down,
-							tags: JSON.parse(discussion.json_metadata).tags
+							tags: JSON.parse(p.json_metadata).tags
 						};
 					}
 					loader.style.display = 'none';
@@ -333,7 +342,7 @@ var Render = (function() {
 			_lastPost.permlink = '';
 			_lastPost.author = '';
 		},
-		link: function(title, url) {
+		createLink: function(title, url) {
 			var el = document.createElement('a');
 			el.textContent = title;
 			el.href = url;

@@ -35,9 +35,8 @@ ready(function() {
 	var tagName = steemContainer.querySelector('.tagName');
 	var discussions = steemContainer.querySelector('.discussions');
 	var acc = steemContainer.querySelector('.steemAccount');
-	var more = steemContainer.querySelector('.steemContainer .more');
-	var tbody = steemContainer.querySelector('tbody');
-	var thead = tbody.querySelector('tr');
+	var more = steemContainer.querySelector('.more');
+	var postsList = steemContainer.querySelector('.postsList');
 	var voteContainer = steemContainer.querySelector('.voteContainer');
 	var replyInput = document.querySelector('.replyInput');
 	var replyButton = document.querySelector('.replyButton');
@@ -79,14 +78,14 @@ ready(function() {
 		if (!err && result.isAuthenticated) {
 			window.isAuth = true;
 			username = result.username;
-			var accBtn = Render.link(username, '#');
-			var createPostBtn = Render.link('Write', '#write');
-			var logoutBtn = Render.link('Logout', 'https://steemconnect.com/logout?redirect_url=' + window.location.href);
+			var accBtn = Render.createLink(username, '#');
+			var createPostBtn = Render.createLink('Write', '#write');
+			var logoutBtn = Render.createLink('Logout', 'https://steemconnect.com/logout?redirect_url=' + window.location.href);
 			acc.appendChild(createPostBtn);
 			acc.appendChild(accBtn);
 			acc.appendChild(logoutBtn);
 		} else {
-			var loginBtn = Render.link('Login', loginURL);
+			var loginBtn = Render.createLink('Login', loginURL);
 			acc.appendChild(loginBtn);
 		}
 	});
@@ -147,17 +146,12 @@ ready(function() {
 	function renderPosts(tag, limit, refresh, callback) {
 		if (refresh) {
 			Render.reset();
-
-			// Clean up discussions table and give table header
-			var th = thead.cloneNode(true);
-			tbody.innerHTML = '';
-			tbody.appendChild(th);
 		}
 		Render.posts(tag, limit, function(result) {
 			if (result.err === null) {
-				var trs = result.el;
-				trs.forEach(function(tr) {
-					tbody.appendChild(tr.cloneNode(true));
+				var items = result.el;
+				items.forEach(function(item) {
+					postsList.appendChild(item.cloneNode(true));
 				});
 				if (callback !== undefined) {
 					callback();
@@ -324,7 +318,7 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 		hash = hash.substr(1);
 	}
 	var fullUrl = steemitBase + hash;
-	var a = Render.link('Steemit.com Link', fullUrl);
+	var a = Render.createLink('Steemit.com Link', fullUrl);
 	a.setAttribute('target', '_blank');
 	linksContainer.innerHTML = '';
 	linksContainer.appendChild(a);

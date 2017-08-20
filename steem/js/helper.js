@@ -127,6 +127,12 @@ var Helper = (function() {
 			});
 
 			return markdown;
+		},
+		formatReward: function(reward, decimalPlace) {
+			if (decimalPlace == undefined) decimalPlace = 2;
+			var arr = reward.split(' ');
+			var sbd = parseFloat(arr[0]).toFixed(decimalPlace);
+			return '$' + sbd.toString();
 		}
 	}
 })();

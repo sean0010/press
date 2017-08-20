@@ -19,16 +19,16 @@
 .steemPost:before{content:' ';display:table}
 .steemPost:after{content:' ';display:table}
 .steemPost>div{display:table-cell;vertical-align:middle;zoom:1;letter-spacing:normal;word-spacing:normal;padding:5px}
-.steemContainer .table{width:100%;}
-.steemContainer .table tbody tr:nth-child(even){background-color:#fcfcfc;}
-.steemContainer .table tbody tr:hover{background:#eae9f7;}
-.steemContainer .table thead, .steemContainer .table tbody, .steemContainer .table tfoot{border:none}
-.steemContainer .table th, .steemContainer .table td{text-align:center;}
-.steemContainer .table th:first-child, .steemContainer .table td:first-child{text-align:left;}
-.steemContainer .table tbody th, .steemContainer .table tbody td{padding:7px;}
-.steemContainer .table tbody th{border-top:1px solid #c2c2c2;}
-.steemContainer .table tbody td{border-top:1px solid #ccc}
-.steemContainer .table .createdDate{max-width:32px;white-space:nowrap}
+.steemContainer .postsList{border-bottom:1px solid #c2c2c2;}
+	.pRow{width:100%;border-top:1px solid #c2c2c2;display:table;padding:4px 0;}
+	.pTitle, .pAuthor, .pReward, .pVote, .pCreated{display:inline-block;}
+	.pTitle{width:100%;}
+	.pTitle a{padding:7px 0;display:inline;}
+	.pAuthor{width:50%;}
+	.pReward{width:20%;}
+	.pVote{width:15%;}
+	.pCreated{width:15%;text-align:right;}
+
 .steemContainer .loaderSpace{min-height:50px;}
 .steemContainer .more{display:none;}
 .steemContainer .postDetails{display:none;}
@@ -125,5 +125,11 @@ stroke-linecap: round;}
 
 
 @media (min-width: 480px) {
-	.steemContainer .table .createdDate{min-width:55px;max-width:unset;}
+	.pTitle, .pAuthor, .pReward, .pVote, .pCreated{display:table-cell;}
+	.pTitle{width:auto;}
+	.pTitle a{padding:7px 0;display:inline;}
+	.pAuthor{width:auto;text-align:right;}
+	.pReward{width:65px;text-align:right;}
+	.pVote{width:45px;text-align:right;}
+	.pCreated{width:55px;text-align:center;}
 }
