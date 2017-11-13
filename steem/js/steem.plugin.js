@@ -282,6 +282,7 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 	var downvoteCount = container.querySelector('.downvote .voteCount');
 	var replyInput = container.querySelector('.replyInput');
 	var tagsContainer = container.querySelector('.postTagsContainer');
+	var postReward = container.querySelector('.postReward');
 
 	container.style.display = 'block';
 

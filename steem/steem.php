@@ -60,6 +60,7 @@ function steem_plugin( $atts ) {
     $c .= '     <div class="voteLoader"></div>';
     $c .= '    </div>';
     $c .= '   </div>';
+    $c .= '   <div class="postReward"></div>';
     $c .= '   <div class="linksContainer"></div>';
     $c .= '  </div>';
     $c .= '  <div class="replyContainer"></div>';
@@ -124,19 +125,19 @@ function steem_plugin_frontend_js() {
     wp_enqueue_script('remarkable.js');
 
     wp_register_script('helper.js', plugin_dir_url( __FILE__ ) . 'js/helper.js');
-    wp_enqueue_script('helper.js?v=11');
+    wp_enqueue_script('helper.js?v=12');
 
     wp_register_script('render.js', plugin_dir_url( __FILE__ ) . 'js/render.js');
-    wp_enqueue_script('render.js?v=11');
+    wp_enqueue_script('render.js?v=12');
 
     wp_register_script('vote.js', plugin_dir_url( __FILE__ ) . 'js/vote.js');
-    wp_enqueue_script('vote.js?v=11');
+    wp_enqueue_script('vote.js?v=12');
 
     wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
-    wp_enqueue_script('steem.plugin.js?v=11');
+    wp_enqueue_script('steem.plugin.js?v=12');
 
     wp_register_style('steem.plugin.css', plugin_dir_url( __FILE__ ) . 'css/steem.plugin.css');
-    wp_enqueue_style('steem.plugin.css?v=11');
+    wp_enqueue_style('steem.plugin.css?v=12');
 }
 
 if (is_admin()) {
