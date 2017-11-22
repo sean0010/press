@@ -68,14 +68,7 @@ ready(function() {
 		renderPosts(Config.steemTag, Config.perPage, false);
 	}
 	
-	// Draw login button
-	sc2.init({
-		app: 'steemeasy',
-		callbackURL: 'http://localhost:8888/wordpress/steem/',
-		accessToken: 'e054a2b849c46de8e5582d8645f9a4167ccd5e0e23fdbb26',
-		scope: ['vote', 'comment']
-	});	
-
+	// OAuth redirect, save given params and refresh without params
 	if (getParameter('access_token') !== null) {
 		localStorage.setItem('access_token', getParameter('access_token'));
 		localStorage.setItem('expires_in', getParameter('expires_in'));
@@ -84,6 +77,7 @@ ready(function() {
 		return;
 	}
 
+	// Login Button
 	let accessToken = localStorage.getItem('access_token');
 	if (accessToken !== null) {
 		window.isAuth = true;
@@ -117,6 +111,13 @@ ready(function() {
 		acc.appendChild(createPostBtn);
 		acc.appendChild(accBtn);
 		acc.appendChild(logoutBtn);
+
+		sc2.init({
+			app: 'steemeasy',
+			callbackURL: 'http://localhost:8888/wordpress/steem/',
+			accessToken: accessToken,
+			scope: ['vote', 'comment']
+		});	
 	} else {
 		var loginURL = sc2.getLoginURL();
 		var loginBtn = Render.createLink('Login', loginURL);
