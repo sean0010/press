@@ -23,7 +23,7 @@ var Vote = (function() {
 				if (_upvoteButton.classList.contains('voted')) {
 					if (confirm('Cancel?')) {
 						_upvoteButton.setAttribute('disabled', 'disabled');
-						steemconnect.vote(username, _author, _permlink, 0, function(err, result) {
+						sc2.vote(username, _author, _permlink, 0, function(err, result) {
 							console.log('Vote cancel result:', err, result);
 							if (err === null) {
 								_upvoteButton.removeAttribute('disabled');
@@ -36,7 +36,7 @@ var Vote = (function() {
 									}
 								});
 							} else {
-								console.error('Steemconnect Vote Error:', err);
+								console.error('SteemConnect2 Vote Error:', err);
 							}
 						});
 					}
@@ -96,7 +96,7 @@ var Vote = (function() {
 			_upvoteLoader.style.display = 'block';
 		}
 
-		steemconnect.vote(username, _author, _permlink, weight, function(err, result) {
+		sc2.vote(username, _author, _permlink, weight, function(err, result) {
 			if (err === null) {
 				if (isUpvote) {
 					_upvoteButton.classList.add('voted');
@@ -118,7 +118,7 @@ var Vote = (function() {
 					});
 				}
 			} else {
-				console.error('Steemconnect Vote Error:', err);
+				console.error('SteemConnect2 Vote Error:', err);
 				_upvoteButton.classList.remove('open');
 				alert(err);
 			}
@@ -180,7 +180,7 @@ var Vote = (function() {
 		steem.api.getContent(author, permlink, function(err, result) {
 			console.log(err, result);
 			if (err === null) {			
-				var v = countVotes(result.active_votes);
+				var v = Helper.countVotes(result.active_votes);
 				callback(null, v.up, v.down);
 			} else {
 				console.error('some error', err);
@@ -272,7 +272,7 @@ var Vote = (function() {
 					if (confirm('Are you sure to un-vote?')) {
 						btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', true);
 						btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', true);
-						steemconnect.vote(username, commentAuthor, commentPermlink, 0, function(err, result) {
+						sc2.vote(username, commentAuthor, commentPermlink, 0, function(err, result) {
 							_getVoteFromContent(commentAuthor, commentPermlink, function(err, up, down) {
 								if (err == null) {
 									btn.querySelector('.btnCount').innerHTML = up;
@@ -292,7 +292,7 @@ var Vote = (function() {
 
 					btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', true);
 					btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', true);
-					steemconnect.vote(username, commentAuthor, commentPermlink, weight, function(err, result) {
+					sc2.vote(username, commentAuthor, commentPermlink, weight, function(err, result) {
 						_getVoteFromContent(commentAuthor, commentPermlink, function(err, up, down) {
 							if (err == null) {
 								btn.querySelector('.btnCount').innerHTML = isUpvote ? up : down;
