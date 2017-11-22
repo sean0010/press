@@ -68,27 +68,42 @@ ready(function() {
 		renderPosts(Config.steemTag, Config.perPage, false);
 	}
 	
-	// Draw login
-	steemconnect.init({
-		app: steemconnectApp,
-		callbackURL: window.location.href
-	});
-	var loginURL = steemconnect.getLoginURL();
-	steemconnect.isAuthenticated(function(err, result) {
-		if (!err && result.isAuthenticated) {
-			window.isAuth = true;
-			username = result.username;
-			var accBtn = Render.createLink(username, '#');
-			var createPostBtn = Render.createLink('Write', '#write');
-			var logoutBtn = Render.createLink('Logout', 'https://steemconnect.com/logout?redirect_url=' + window.location.href);
-			acc.appendChild(createPostBtn);
-			acc.appendChild(accBtn);
-			acc.appendChild(logoutBtn);
-		} else {
-			var loginBtn = Render.createLink('Login', loginURL);
-			acc.appendChild(loginBtn);
-		}
-	});
+	// Draw login button
+	sc2.init({
+		app: 'steemeasy',
+		callbackURL: 'http://localhost:8888/wordpress/steem/',
+		accessToken: 'e054a2b849c46de8e5582d8645f9a4167ccd5e0e23fdbb26',
+		scope: ['vote', 'comment']
+	});	
+
+	if (getParameter('access_token') !== null) {
+		localStorage.setItem('access_token', getParameter('access_token'));
+		localStorage.setItem('expires_in', getParameter('expires_in'));
+		localStorage.setItem('username', getParameter('username'));
+		window.location.href = '//' + location.host + location.pathname;
+		return;
+	}
+
+	let accessToken = localStorage.getItem('access_token');
+	if (accessToken !== null) {
+		window.isAuth = true;
+		username = getParameter('username');
+		// to do: store expires_in, current timestamp. 
+		// to get remaining auth seconds, compare timestamp and current time
+		
+
+		var accBtn = Render.createLink(username, '#');
+		var createPostBtn = Render.createLink('Write', '#write');
+		var logoutBtn = Render.createLink('Logout', 'https://steemconnect.com/logout?redirect_url=' + window.location.href);
+		acc.appendChild(createPostBtn);
+		acc.appendChild(accBtn);
+		acc.appendChild(logoutBtn);
+	} else {
+		var loginURL = sc2.getLoginURL();
+		var loginBtn = Render.createLink('Login', loginURL);
+		acc.appendChild(loginBtn);
+	}
+
 
 	// Vote button
 	Vote.init(voteContainer);
@@ -125,7 +140,7 @@ ready(function() {
 			var permlink = 're-' + parentPermlink + '-' + Math.floor(Date.now() / 1000);
 			replyInput.setAttribute('disabled', true);
 			replyButton.setAttribute('disabled', true);
-			steemconnect.comment(parentAuthor, parentPermlink, username, permlink, '', inputString, '', function(err, result) {
+			/*steemconnect.comment(parentAuthor, parentPermlink, username, permlink, '', inputString, '', function(err, result) {
 				console.log(err, result);
 
 				Render.replies(parentAuthor, parentPermlink, 0, function(result) {
@@ -139,7 +154,7 @@ ready(function() {
 					replyButton.removeAttribute('disabled');
 					replyInput.value = '';
 				});
-			});
+			});*/
 		}
 	});
 
@@ -200,7 +215,7 @@ ready(function() {
 			publish.setAttribute('disabled', true);
 			cancel.setAttribute('disabled', true);
 
-			steemconnect.comment('', Config.steemTag, username, permlink, titleValue, bodyValue, metaData, function(err, result) {
+			/*steemconnect.comment('', Config.steemTag, username, permlink, titleValue, bodyValue, metaData, function(err, result) {
 				titleField.removeAttribute('disabled');
 				editor.removeAttribute('disabled');
 				publish.removeAttribute('disabled');
@@ -213,7 +228,7 @@ ready(function() {
 					console.error('SteemConnect CreatePost Error:', err);
 					alert('Posting failed');
 				}
-			});
+			});*/
 		};
 		var cancelClick = function() {
 			titleField.value = '';
@@ -324,4 +339,18 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 	linksContainer.innerHTML = '';
 	linksContainer.appendChild(a);
 
+}
+
+function getParameter(paramName) {
+	var searchString = window.location.search.substring(1);
+	var params = searchString.split('&');
+	var i, val;
+
+	for (i = 0; i < params.length; i++) {
+		val = params[i].split('=');
+		if (val[0] == paramName) {
+			return val[1];
+		}
+	}
+	return null;
 }
