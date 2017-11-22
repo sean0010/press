@@ -87,14 +87,33 @@ ready(function() {
 	let accessToken = localStorage.getItem('access_token');
 	if (accessToken !== null) {
 		window.isAuth = true;
-		username = getParameter('username');
+		username = localStorage.getItem('username');
 		// to do: store expires_in, current timestamp. 
 		// to get remaining auth seconds, compare timestamp and current time
 		
 
 		var accBtn = Render.createLink(username, '#');
 		var createPostBtn = Render.createLink('Write', '#write');
-		var logoutBtn = Render.createLink('Logout', 'https://steemconnect.com/logout?redirect_url=' + window.location.href);
+		var logoutBtn = Render.createLink('Logout', '#');
+		logoutBtn.addEventListener('click', function(e) {
+			e.preventDefault();
+
+			sc2.revokeToken(function (err, res) {
+				console.log(err, res);
+
+				localStorage.removeItem('access_token');
+				localStorage.removeItem('expires_in');
+				localStorage.removeItem('username');
+
+				acc.removeChild(logoutBtn);
+				acc.removeChild(createPostBtn);
+				acc.removeChild(accBtn);
+
+				var loginURL = sc2.getLoginURL();
+				var loginBtn = Render.createLink('Login', loginURL);
+				acc.appendChild(loginBtn);
+			});
+		});
 		acc.appendChild(createPostBtn);
 		acc.appendChild(accBtn);
 		acc.appendChild(logoutBtn);
