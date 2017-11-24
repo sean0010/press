@@ -1,11 +1,11 @@
 /**********
 *	Constant
 ***********/
-var steemconnectApp = 'morning';
 var Config = (function() {
 	var o = {};
 	o.perPage = 25;
 	o.steemTag = '';
+	o.app = 'steemeasy/0.2'
 	o.init = function(config) {
 		o.steemTag = config.steemTag;
 		if (config.perPage !== undefined || config.perPage !== '') {
@@ -114,11 +114,18 @@ ready(function() {
 
 		sc2.init({
 			app: 'steemeasy',
-			callbackURL: 'http://localhost:8888/wordpress/steem/',
+			callbackURL: 'http://localhost:8888/wordpress/wpcommumity/',
 			accessToken: accessToken,
-			scope: ['vote', 'comment']
+			scope: ['vote', 'comment', 'comment_options']
 		});	
 	} else {
+		sc2.init({
+			app: 'steemeasy',
+			callbackURL: 'http://localhost:8888/wordpress/wpcommumity/',
+			//accessToken: 'e054a2b849c46de8e5582d8645f9a4167ccd5e0e23fdbb26',
+			scope: ['vote', 'comment', 'comment_options']
+		});	
+
 		var loginURL = sc2.getLoginURL();
 		var loginBtn = Render.createLink('Login', loginURL);
 		acc.appendChild(loginBtn);
@@ -160,7 +167,12 @@ ready(function() {
 			var permlink = 're-' + parentPermlink + '-' + Math.floor(Date.now() / 1000);
 			replyInput.setAttribute('disabled', true);
 			replyButton.setAttribute('disabled', true);
-			/*steemconnect.comment(parentAuthor, parentPermlink, username, permlink, '', inputString, '', function(err, result) {
+			var metaData = {
+				"tags": [Config.steemTag],
+				"app": Config.app,
+				"format": "markdown"
+			};
+			sc2.comment(parentAuthor, parentPermlink, username, permlink, '', inputString, metaData, function(err, result) {
 				console.log(err, result);
 
 				Render.replies(parentAuthor, parentPermlink, 0, function(result) {
@@ -174,7 +186,7 @@ ready(function() {
 					replyButton.removeAttribute('disabled');
 					replyInput.value = '';
 				});
-			});*/
+			});
 		}
 	});
 
@@ -226,7 +238,7 @@ ready(function() {
 			var permlink = _.kebabCase(titleField.value);
 			var metaData = {
 				"tags": [Config.steemTag],
-				"app": "press/0.1",
+				"app": Config.app,
 				"format": "markdown"
 			};
 
@@ -235,7 +247,9 @@ ready(function() {
 			publish.setAttribute('disabled', true);
 			cancel.setAttribute('disabled', true);
 
-			/*steemconnect.comment('', Config.steemTag, username, permlink, titleValue, bodyValue, metaData, function(err, result) {
+			sc2.comment('', Config.steemTag, username, permlink, titleValue, bodyValue, metaData, function (err, res) {
+				console.log(err, res)
+
 				titleField.removeAttribute('disabled');
 				editor.removeAttribute('disabled');
 				publish.removeAttribute('disabled');
@@ -248,7 +262,7 @@ ready(function() {
 					console.error('SteemConnect CreatePost Error:', err);
 					alert('Posting failed');
 				}
-			});*/
+			});
 		};
 		var cancelClick = function() {
 			titleField.value = '';

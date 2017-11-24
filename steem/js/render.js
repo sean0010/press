@@ -195,7 +195,12 @@ var Render = (function() {
 					replyCancel.setAttribute('disabled', true);
 					replySubmit.setAttribute('disabled', true);
 
-					/*steemconnect.comment(parentAuthor, parentPermlink, username, rePermlink, '', inputString, '', function(err, result) {
+					var metaData = {
+						"tags": [Config.steemTag],
+						"app": Config.app,
+						"format": "markdown"
+					};
+					sc2.comment(parentAuthor, parentPermlink, username, rePermlink, '', inputString, '', function(err, result) {
 						console.log(err, result);
 						btn.removeAttribute('disabled');
 						replyContainer.parentNode.removeChild(replyContainer);
@@ -225,7 +230,7 @@ var Render = (function() {
 						parentChildrenWrap.appendChild(container);
 
 						_openReplyCommentForm(replyComment, username, rePermlink);
-					});*/
+					});
 				}
 			});
 		});
