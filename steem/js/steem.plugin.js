@@ -193,6 +193,7 @@ ready(function() {
 	function renderPosts(tag, limit, refresh, callback) {
 		if (refresh) {
 			Render.reset();
+			postsList.innerHTML = '';
 		}
 		Render.posts(tag, limit, function(result) {
 			if (result.err === null) {
