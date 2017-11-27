@@ -116,14 +116,14 @@ ready(function() {
 			app: 'steemeasy',
 			callbackURL: 'http://localhost:8888/wordpress/wpcommumity/',
 			accessToken: accessToken,
-			scope: ['vote', 'comment', 'comment_options']
+			scope: ['login', 'vote', 'comment', 'comment_options']
 		});	
 	} else {
 		sc2.init({
 			app: 'steemeasy',
 			callbackURL: 'http://localhost:8888/wordpress/wpcommumity/',
 			//accessToken: 'e054a2b849c46de8e5582d8645f9a4167ccd5e0e23fdbb26',
-			scope: ['vote', 'comment', 'comment_options']
+			scope: ['login', 'vote', 'comment', 'comment_options']
 		});	
 
 		var loginURL = sc2.getLoginURL();
@@ -248,21 +248,50 @@ ready(function() {
 			publish.setAttribute('disabled', true);
 			cancel.setAttribute('disabled', true);
 
-			sc2.comment('', Config.steemTag, username, permlink, titleValue, bodyValue, metaData, function (err, res) {
-				console.log(err, res)
-
+			sc2.broadcast([
+				['comment', {
+					'parent_author': '', 
+					'parent_permlink': Config.steemTag, 
+					'author': username, 
+					'permlink': permlink, 
+					'title': titleValue, 
+					'body': bodyValue, 
+					'json_metadata': JSON.stringify(metaData)
+				}],
+				['comment_options', {
+					'author': username, 
+					'permlink': permlink, 
+					'max_accepted_payout': '1000000.000 SBD',
+					'percent_steem_dollars': 10000,
+					'allow_votes': true,
+					'allow_curation_rewards': true,				
+					'extensions': [
+						[0, {
+							'beneficiaries': [{
+								'account': 'morning',
+								'weight': 100
+							}, {
+								'account': 'null',
+								'weight': 200
+							}]
+						}]
+					]
+				}]
+			]).then(function(result) {
+				console.log('Promise Callback', result);
 				titleField.removeAttribute('disabled');
 				editor.removeAttribute('disabled');
 				publish.removeAttribute('disabled');
 				cancel.removeAttribute('disabled');
-				
-				if (err === null) {
-					cancelClick();
-					renderPosts(Config.steemTag, Config.perPage, true);
-				} else {
-					console.error('SteemConnect CreatePost Error:', err);
-					alert('Posting failed');
-				}
+				cancelClick();
+				renderPosts(Config.steemTag, Config.perPage, true);
+			}).catch(function(error) {
+				console.log('Promise error:', error);
+				titleField.removeAttribute('disabled');
+				editor.removeAttribute('disabled');
+				publish.removeAttribute('disabled');
+				cancel.removeAttribute('disabled');
+				alert('Posting failed');
 			});
 		};
 		var cancelClick = function() {

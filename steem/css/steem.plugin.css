@@ -123,6 +123,37 @@ stroke-linecap: round;}
 80%,90% {stroke: #ffa700;}
 }
 
+.segmented {
+    display: inline-block;
+}
+.segmented .label {
+    background-color: #eee;
+    color: #777;
+    cursor: pointer;
+    float: left;
+    padding: 8px;
+    text-align: center;
+    font-size:80%;
+}
+.segmented :first-child .label {
+    border-radius: 10px 0 0 10px;
+}
+.segmented :last-child .label {
+    border-radius: 0 10px 10px 0;
+}
+.segmented input {
+    display: none;
+}
+.segmented input:checked + .label {
+    background-color: #00f;
+    color: #fff;
+}
+.segmented .label {
+    background-color: #eee;
+}
+.segmented input:checked + span {
+    background-image: blue;
+}
 
 @media (min-width: 480px) {
 	.pTitle, .pAuthor, .pReward, .pVote, .pCreated{display:table-cell;}
