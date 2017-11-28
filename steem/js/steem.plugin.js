@@ -165,8 +165,8 @@ ready(function() {
 		} else {
 			console.log(inputString, parentAuthor, parentPermlink);
 			var permlink = 're-' + parentPermlink + '-' + Math.floor(Date.now() / 1000);
-			replyInput.setAttribute('disabled', true);
-			replyButton.setAttribute('disabled', true);
+			replyInput.setAttribute('disabled', 'disabled');
+			replyButton.setAttribute('disabled', 'disabled');
 			var metaData = {
 				"tags": [Config.steemTag],
 				"app": Config.app,
@@ -180,9 +180,7 @@ ready(function() {
 						replyContainer.innerHTML = '';
 						replyContainer.appendChild(result.el);
 					}
-					replyInput.setAttribute('disabled', false);
 					replyInput.removeAttribute('disabled');
-					replyButton.setAttribute('disabled', false);
 					replyButton.removeAttribute('disabled');
 					replyInput.value = '';
 				});
@@ -243,56 +241,26 @@ ready(function() {
 				"format": "markdown"
 			};
 
-			titleField.setAttribute('disabled', true);
-			editor.setAttribute('disabled', true);
-			publish.setAttribute('disabled', true);
-			cancel.setAttribute('disabled', true);
+			titleField.setAttribute('disabled', 'disabled');
+			editor.setAttribute('disabled', 'disabled');
+			publish.setAttribute('disabled', 'disabled');
+			cancel.setAttribute('disabled', 'disabled');
 
-			sc2.broadcast([
-				['comment', {
-					'parent_author': '', 
-					'parent_permlink': Config.steemTag, 
-					'author': username, 
-					'permlink': permlink, 
-					'title': titleValue, 
-					'body': bodyValue, 
-					'json_metadata': JSON.stringify(metaData)
-				}],
-				['comment_options', {
-					'author': username, 
-					'permlink': permlink, 
-					'max_accepted_payout': '1000000.000 SBD',
-					'percent_steem_dollars': 10000,
-					'allow_votes': true,
-					'allow_curation_rewards': true,				
-					'extensions': [
-						[0, {
-							'beneficiaries': [{
-								'account': 'morning',
-								'weight': 100
-							}, {
-								'account': 'null',
-								'weight': 200
-							}]
-						}]
-					]
-				}]
-			]).then(function(result) {
+			broadcastPost(Config.steemTag, username, permlink, titleValue, bodyValue, metaData, false, false, function(result) {
 				console.log('Promise Callback', result);
 				titleField.removeAttribute('disabled');
 				editor.removeAttribute('disabled');
 				publish.removeAttribute('disabled');
 				cancel.removeAttribute('disabled');
 				cancelClick();
-				renderPosts(Config.steemTag, Config.perPage, true);
-			}).catch(function(error) {
+			}, function(error) {
 				console.log('Promise error:', error);
 				titleField.removeAttribute('disabled');
 				editor.removeAttribute('disabled');
 				publish.removeAttribute('disabled');
 				cancel.removeAttribute('disabled');
 				alert('Posting failed');
-			});
+			})
 		};
 		var cancelClick = function() {
 			titleField.value = '';
@@ -417,4 +385,50 @@ function getParameter(paramName) {
 		}
 	}
 	return null;
+}
+
+function broadcastPost(primaryTag, author, permlink, title, body, jsonMetadata, decline, halfHalf, successCallback, errorCallback) {
+	var commentOptions = {
+		'author': author, 
+		'permlink': permlink, 
+		'max_accepted_payout': '1000000.000 SBD',
+		'percent_steem_dollars': 10000,
+		'allow_votes': true,
+		'allow_curation_rewards': true,				
+		'extensions': [
+			[0, {
+				'beneficiaries': [{
+					'account': 'morning',
+					'weight': 100
+				}]
+			}]
+		]
+	};
+	if (decline) {		
+		commentOptions.max_accepted_payout = '0.000 SBD';
+		commentOptions.allow_votes = false;
+		commentOptions.allow_curation_rewards = false;
+	} else if (halfHalf) {
+		commentOptions.percent_steem_dollars = 5000;
+	} else {
+		// 100% Steem Power Up
+		commentOptions.percent_steem_dollars = 0;
+	}
+
+	sc2.broadcast([
+		['comment', {
+			'parent_author': '', 
+			'parent_permlink': primaryTag, 
+			'author': author, 
+			'permlink': permlink, 
+			'title': title, 
+			'body': body, 
+			'json_metadata': JSON.stringify(jsonMetadata)
+		}],
+		['comment_options', commentOptions]
+	]).then(function(result) {
+		successCallback(result);
+	}).catch(function(error) {
+		errorCallback(error);
+	});
 }
