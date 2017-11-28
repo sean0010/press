@@ -37,7 +37,7 @@ function steem_plugin( $atts ) {
     $c .= '   <label><input type="radio" name="payout" value="50"><span class="label">50% 50%</span></label>';
     $c .= '   <label><input type="radio" name="payout" value="decline" checked><span class="label">Decline</span></label>';
     $c .= '  </span>';
-    $c .= '  <div class="selfVoteContainer"><input type="checkbox" name="selfVote">Upvote</div>';
+    $c .= '  <div class="selfVoteContainer"><input type="checkbox" class="selfVote" name="selfVote">Upvote</div>';
     $c .= '  <button class="publish button">Publish</button>';
     $c .= '  <button class="cancelWrite button">Cancel</button>';
     $c .= '  <div class="preview"></div>';

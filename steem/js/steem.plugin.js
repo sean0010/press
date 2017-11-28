@@ -218,7 +218,6 @@ ready(function() {
 		var preview = w.querySelector('.preview');
 		var publish = w.querySelector('.publish');
 		var cancel = w.querySelector('.cancelWrite');
-
 		var markdownPreview = Helper.debounce(function() {
 			preview.innerHTML = Helper.markdown2html(editor.value);
 		}, 400);
@@ -246,7 +245,14 @@ ready(function() {
 			publish.setAttribute('disabled', 'disabled');
 			cancel.setAttribute('disabled', 'disabled');
 
-			broadcastPost(Config.steemTag, username, permlink, titleValue, bodyValue, metaData, false, false, function(result) {
+			var payout = w.querySelector('input[type=radio]:checked');
+			var selfVote = w.querySelector('.selfVote');
+			var isDeclined = payout.value == '0' ? true : false;
+			var isHalfHalf = payout.value == '50' ? true : false;
+			var isSelfVoted = selfVote.value ? true : false;
+			console.log(isDeclined, isHalfHalf, isSelfVoted);
+			
+			broadcastPost(Config.steemTag, username, permlink, titleValue, bodyValue, metaData, isDeclined, isHalfHalf, isSelfVoted, function(result) {
 				console.log('Promise Callback', result);
 				titleField.removeAttribute('disabled');
 				editor.removeAttribute('disabled');
@@ -260,7 +266,7 @@ ready(function() {
 				publish.removeAttribute('disabled');
 				cancel.removeAttribute('disabled');
 				alert('Posting failed');
-			})
+			});			
 		};
 		var cancelClick = function() {
 			titleField.value = '';
@@ -387,7 +393,16 @@ function getParameter(paramName) {
 	return null;
 }
 
-function broadcastPost(primaryTag, author, permlink, title, body, jsonMetadata, decline, halfHalf, successCallback, errorCallback) {
+function broadcastPost(primaryTag, author, permlink, title, body, jsonMetadata, decline, halfHalf, selfVote, successCallback, errorCallback) {
+	var operations = [['comment', {
+			'parent_author': '', 
+			'parent_permlink': primaryTag, 
+			'author': author, 
+			'permlink': permlink, 
+			'title': title, 
+			'body': body, 
+			'json_metadata': JSON.stringify(jsonMetadata)
+		}]];
 	var commentOptions = {
 		'author': author, 
 		'permlink': permlink, 
@@ -415,18 +430,13 @@ function broadcastPost(primaryTag, author, permlink, title, body, jsonMetadata, 
 		commentOptions.percent_steem_dollars = 0;
 	}
 
-	sc2.broadcast([
-		['comment', {
-			'parent_author': '', 
-			'parent_permlink': primaryTag, 
-			'author': author, 
-			'permlink': permlink, 
-			'title': title, 
-			'body': body, 
-			'json_metadata': JSON.stringify(jsonMetadata)
-		}],
-		['comment_options', commentOptions]
-	]).then(function(result) {
+	operations.push(['comment_options', commentOptions]);
+
+	if (selfVote) {
+		operations.push(['vote', { voter: author, 'author': author, 'permlink': permlink, 'weight': 10000 }]);
+	}
+
+	sc2.broadcast(operations).then(function(result) {
 		successCallback(result);
 	}).catch(function(error) {
 		errorCallback(error);
