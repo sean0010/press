@@ -114,15 +114,14 @@ ready(function() {
 
 		sc2.init({
 			app: 'steemeasy',
-			callbackURL: 'http://localhost:8888/wordpress/wpcommumity/',
+			callbackURL: 'https://steemeasy.com/kr/',
 			accessToken: accessToken,
 			scope: ['login', 'vote', 'comment', 'comment_options']
 		});	
 	} else {
 		sc2.init({
 			app: 'steemeasy',
-			callbackURL: 'http://localhost:8888/wordpress/wpcommumity/',
-			//accessToken: 'e054a2b849c46de8e5582d8645f9a4167ccd5e0e23fdbb26',
+			callbackURL: 'https://steemeasy.com/kr/',
 			scope: ['login', 'vote', 'comment', 'comment_options']
 		});	
 
@@ -447,7 +446,7 @@ function broadcastPost(primaryTag, author, permlink, title, body, jsonMetadata, 
 		'extensions': [
 			[0, {
 				'beneficiaries': [{
-					'account': 'morning',
+					'account': 'coin-on',
 					'weight': 100
 				}]
 			}]
@@ -497,7 +496,7 @@ function broadcastComment(parentAuthor, parentPermlink, author, body, jsonMetada
 		'extensions': [
 			[0, {
 				'beneficiaries': [{
-					'account': 'morning',
+					'account': 'coin-on',
 					'weight': 100
 				}]
 			}]
