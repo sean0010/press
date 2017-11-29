@@ -34,8 +34,8 @@ function steem_plugin( $atts ) {
     $c .= '  <textarea class="editor"></textarea>';
     $c .= '  <span class="segmented">';
     $c .= '   <label><input type="radio" name="payout" value="100"><span class="label">Power Up 100%</span></label>';
-    $c .= '   <label><input type="radio" name="payout" value="50"><span class="label">50% 50%</span></label>';
-    $c .= '   <label><input type="radio" name="payout" value="decline" checked><span class="label">Decline</span></label>';
+    $c .= '   <label><input type="radio" name="payout" value="50" checked><span class="label">50% | 50%</span></label>';
+    $c .= '   <label><input type="radio" name="payout" value="0"><span class="label">Decline</span></label>';
     $c .= '  </span>';
     $c .= '  <div class="selfVoteContainer"><input type="checkbox" class="selfVote" name="selfVote">Upvote</div>';
     $c .= '  <button class="publish button">Publish</button>';

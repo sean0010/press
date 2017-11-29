@@ -218,9 +218,34 @@ ready(function() {
 		var preview = w.querySelector('.preview');
 		var publish = w.querySelector('.publish');
 		var cancel = w.querySelector('.cancelWrite');
+		var payoutRadios = w.querySelectorAll('input[type=radio]');
+		var selfVoteCheckbox = w.querySelector('.selfVote');
+
 		var markdownPreview = Helper.debounce(function() {
 			preview.innerHTML = Helper.markdown2html(editor.value);
 		}, 400);
+
+		var radioClick = function() {
+			var payout = w.querySelector('input[type=radio]:checked');
+			var selfVote = w.querySelector('.selfVote');
+			if (payout.value == '0' && selfVote.checked == true) {
+				console.log('radioClick', payout.value, selfVote.checked);
+				selfVote.checked = false
+			}
+		};
+		var checkboxClick = function() {
+			var payout = w.querySelector('input[type=radio]:checked');
+			var selfVote = w.querySelector('.selfVote');
+			if (payout.value == '0' && selfVote.checked == true) {
+				console.log('checkboxClick', payout.value, selfVote.checked);
+
+				payoutRadios.forEach(function(radio, index) {
+					if (radio.value == '50') {
+						radio.click();
+					}
+				});
+			}
+		};
 		var publishClick = function() {
 			var titleValue = titleField.value.trim();
 			var bodyValue = editor.value.trim();
@@ -249,7 +274,7 @@ ready(function() {
 			var selfVote = w.querySelector('.selfVote');
 			var isDeclined = payout.value == '0' ? true : false;
 			var isHalfHalf = payout.value == '50' ? true : false;
-			var isSelfVoted = selfVote.value ? true : false;
+			var isSelfVoted = selfVote.checked ? true : false;
 			console.log(isDeclined, isHalfHalf, isSelfVoted);
 			
 			broadcastPost(Config.steemTag, username, permlink, titleValue, bodyValue, metaData, isDeclined, isHalfHalf, isSelfVoted, function(result) {
@@ -284,6 +309,10 @@ ready(function() {
 			editor.removeEventListener('click', markdownPreview);
 			publish.removeEventListener('click', publishClick);
 			cancel.removeEventListener('click', cancelClick);
+			payoutRadios.forEach(function(radio, index) {
+				radio.removeEventListener('change', radioClick);
+			});
+			selfVoteCheckbox.removeEventListener('change', checkboxClick);
 		};
 		w.style.display = 'block';
 		detail.style.display = 'none';
@@ -293,6 +322,10 @@ ready(function() {
 		editor.addEventListener('keyup', markdownPreview);
 		publish.addEventListener('click', publishClick);
 		cancel.addEventListener('click', cancelClick);
+		payoutRadios.forEach(function(radio, index) {
+			radio.addEventListener('change', radioClick);
+		});
+		selfVoteCheckbox.addEventListener('change', checkboxClick);
 	}
 
 	window.addEventListener('hashchange', onHashChange, false);
@@ -421,8 +454,7 @@ function broadcastPost(primaryTag, author, permlink, title, body, jsonMetadata, 
 	};
 	if (decline) {		
 		commentOptions.max_accepted_payout = '0.000 SBD';
-		commentOptions.allow_votes = false;
-		commentOptions.allow_curation_rewards = false;
+		delete commentOptions['extensions'];
 	} else if (halfHalf) {
 		commentOptions.percent_steem_dollars = 5000;
 	} else {
@@ -432,10 +464,10 @@ function broadcastPost(primaryTag, author, permlink, title, body, jsonMetadata, 
 
 	operations.push(['comment_options', commentOptions]);
 
-	if (selfVote) {
+	if (!decline && selfVote) {
 		operations.push(['vote', { voter: author, 'author': author, 'permlink': permlink, 'weight': 10000 }]);
 	}
-
+	
 	sc2.broadcast(operations).then(function(result) {
 		successCallback(result);
 	}).catch(function(error) {
