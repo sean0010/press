@@ -200,8 +200,8 @@ var Render = (function() {
 						"app": Config.app,
 						"format": "markdown"
 					};
-					sc2.comment(parentAuthor, parentPermlink, username, rePermlink, '', inputString, '', function(err, result) {
-						console.log(err, result);
+					broadcastComment(parentAuthor, parentPermlink, username, inputString, metaData, function(result) {
+						console.log('broadcastComment:', parentAuthor, parentPermlink, username, inputString, metaData, result);
 						btn.removeAttribute('disabled');
 						replyContainer.parentNode.removeChild(replyContainer);
 
@@ -230,6 +230,8 @@ var Render = (function() {
 						parentChildrenWrap.appendChild(container);
 
 						_openReplyCommentForm(replyComment, username, rePermlink);
+					}, function(error) {
+						alert(error);
 					});
 				}
 			});

@@ -172,18 +172,19 @@ ready(function() {
 				"app": Config.app,
 				"format": "markdown"
 			};
-			sc2.comment(parentAuthor, parentPermlink, username, permlink, '', inputString, metaData, function(err, result) {
-				console.log(err, result);
-
+			broadcastComment(parentAuthor, parentPermlink, username, inputString, metaData, function(result) {
 				Render.replies(parentAuthor, parentPermlink, 0, function(result) {
-					if (result.err === null) {
-						replyContainer.innerHTML = '';
-						replyContainer.appendChild(result.el);
-					}
+					replyContainer.innerHTML = '';
+					replyContainer.appendChild(result.el);
 					replyInput.removeAttribute('disabled');
 					replyButton.removeAttribute('disabled');
 					replyInput.value = '';
 				});
+			}, function(error) {
+				replyInput.removeAttribute('disabled');
+				replyButton.removeAttribute('disabled');
+				replyInput.value = '';
+				alert(error);
 			});
 		}
 	});
@@ -467,6 +468,56 @@ function broadcastPost(primaryTag, author, permlink, title, body, jsonMetadata, 
 	if (!decline && selfVote) {
 		operations.push(['vote', { voter: author, 'author': author, 'permlink': permlink, 'weight': 10000 }]);
 	}
+	
+	sc2.broadcast(operations).then(function(result) {
+		successCallback(result);
+	}).catch(function(error) {
+		errorCallback(error);
+	});
+}
+
+function broadcastComment(parentAuthor, parentPermlink, author, body, jsonMetadata, successCallback, errorCallback) {
+	var permlink = 're-' + parentPermlink + '-' + Math.floor(Date.now() / 1000);
+	var operations = [['comment', {
+			'parent_author': parentAuthor, 
+			'parent_permlink': parentPermlink, 
+			'author': author, 
+			'permlink': permlink, 
+			'title': '', 
+			'body': body, 
+			'json_metadata': JSON.stringify(jsonMetadata)
+		}]];
+	var commentOptions = {
+		'author': author, 
+		'permlink': permlink, 
+		'max_accepted_payout': '1000000.000 SBD',
+		'percent_steem_dollars': 10000,
+		'allow_votes': true,
+		'allow_curation_rewards': true,				
+		'extensions': [
+			[0, {
+				'beneficiaries': [{
+					'account': 'morning',
+					'weight': 100
+				}]
+			}]
+		]
+	};
+	//if (decline) {		
+	//	commentOptions.max_accepted_payout = '0.000 SBD';
+	//	delete commentOptions['extensions'];
+	//} else if (halfHalf) {
+	//	commentOptions.percent_steem_dollars = 5000;
+	//} else {
+	//	// 100% Steem Power Up
+	//	commentOptions.percent_steem_dollars = 0;
+	//}
+
+	operations.push(['comment_options', commentOptions]);
+
+	//if (!decline && selfVote) {
+	//	operations.push(['vote', { voter: author, 'author': author, 'permlink': permlink, 'weight': 10000 }]);
+	//}
 	
 	sc2.broadcast(operations).then(function(result) {
 		successCallback(result);
