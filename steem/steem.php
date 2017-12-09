@@ -3,7 +3,7 @@
 Plugin Name: Steem
 Plugin URI:  https://github.com/sean0010/press
 Description: Steem Wordpress Plugin
-Version:     0.0.1
+Version:     0.0.2
 Author:      morning
 Author URI:  htps://steemit.com/@morning
 Text Domain: steemit

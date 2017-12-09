@@ -78,6 +78,9 @@ ready(function() {
 	}
 
 	// Login Button
+
+	let callbackURL = location.protocol + '//' + location.host + location.pathname;
+	console.log(location.protocol, location.host, location.pathname);
 	let accessToken = localStorage.getItem('access_token');
 	if (accessToken !== null) {
 		window.isAuth = true;
@@ -114,14 +117,16 @@ ready(function() {
 
 		sc2.init({
 			app: 'steemeasy',
-			callbackURL: 'https://steemeasy.com/kr/',
+			callbackURL: callbackURL,
+			//callbackURL: 'https://steemeasy.com/kr/',
 			accessToken: accessToken,
 			scope: ['login', 'vote', 'comment', 'comment_options']
 		});	
 	} else {
 		sc2.init({
 			app: 'steemeasy',
-			callbackURL: 'https://steemeasy.com/kr/',
+			callbackURL: callbackURL,
+			//callbackURL: 'https://steemeasy.com/kr/',
 			scope: ['login', 'vote', 'comment', 'comment_options']
 		});	
 
