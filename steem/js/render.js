@@ -275,15 +275,16 @@ var Render = (function() {
 							_lastPost.permlink = p.permlink;
 							_lastPost.author = p.author;
 						}
-
 						var v = Helper.countVotes(p.active_votes);
-						posts[p.permlink] = {
+						var key = p.author + '_' + p.permlink;
+						posts[key] = {
 							title: p.title,
 							author: p.author,
 							created: p.created,
 							body: p.body,
 							upvotes: v.up,
 							downvotes: v.down,
+							payout: p.pending_payout_value,
 							tags: JSON.parse(p.json_metadata).tags
 						};
 					}
@@ -300,7 +301,7 @@ var Render = (function() {
 		post: function(container, hash, callback) {
 			var args = hash.split('/', 3);
 			console.log('ARGS:', args);
-			var category = args[1].replace('#', '');
+			var category = args[0].replace('#', '');
 			var author = args[1].replace('@', '');
 			var permlink = args[2];
 
@@ -309,7 +310,7 @@ var Render = (function() {
 				if (err === null) {
 					var v = Helper.countVotes(result.active_votes);
 					var tags = JSON.parse(result.json_metadata).tags;
-					showPostDetails(container, result.body, result.title, result.author, permlink, result.created, v.up, v.down, tags);
+					showPostDetails(container, result.body, result.title, result.author, permlink, result.created, v.up, v.down, result.pending_payout_value, tags);
 					callback();
 				} else {
 					console.error('some error', err);

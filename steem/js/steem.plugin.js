@@ -342,15 +342,17 @@ ready(function() {
 			return;
 		}
 		var args = hash.split('/', 3);
+		var hashAuthor = args[1].replace('@', '');
+		var hashPermlink = args[2];
+		var key = hashAuthor + '_' + hashPermlink;
 		if (args.length == 3) {
-			var permlink = args[2];
 			var detail = document.querySelector('.postDetails');
 			var replyContainer = detail.querySelector('.replyContainer');
 			replyContainer.innerHTML = '';
 			if (args.length === 3) {
-				var post = posts[permlink];
-				showPostDetails(detail, post.body, post.title, post.author, permlink, post.created, post.upvotes, post.downvotes, post.tags);
-				Render.replies(post.author, permlink, 0, function(result) {
+				var post = posts[key];
+				showPostDetails(detail, post.body, post.title, post.author, hashPermlink, post.created, post.upvotes, post.downvotes, post.payout, post.tags);
+				Render.replies(post.author, hashPermlink, 0, function(result) {
 					if (result.err === null) {
 						replyContainer.appendChild(result.el);
 					}
@@ -362,7 +364,7 @@ ready(function() {
 	}
 });
 
-function showPostDetails(container, markdown, title, author, permlink, created, upvotes, downvotes, tags) {
+function showPostDetails(container, markdown, title, author, permlink, created, upvotes, downvotes, payout, tags) {
 	var postBody = container.querySelector('.postBody');
 	var postAuthor = container.querySelector('.postAuthor');
 	var postTitle = container.querySelector('.postTitle');
@@ -414,6 +416,7 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 	a.setAttribute('target', '_blank');
 	linksContainer.innerHTML = '';
 	linksContainer.appendChild(a);
+	postReward.innerHTML = payout;
 
 }
 

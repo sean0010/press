@@ -65,8 +65,8 @@ function steem_plugin( $atts ) {
     $c .= '     </div>';
     $c .= '     <div class="voteLoader"></div>';
     $c .= '    </div>';
+    $c .= '    <div class="postReward"></div>';
     $c .= '   </div>';
-    $c .= '   <div class="postReward"></div>';
     $c .= '   <div class="linksContainer"></div>';
     $c .= '  </div>';
     $c .= '  <div class="replyContainer"></div>';
