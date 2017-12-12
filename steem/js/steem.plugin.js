@@ -117,9 +117,10 @@ ready(function() {
 		sc2.init({
 			app: 'steemeasy',
 			callbackURL: callbackURL,
-			accessToken: accessToken,
+			//accessToken: accessToken,
 			scope: ['vote', 'comment', 'comment_options']
 		});	
+		sc2.setAccessToken(accessToken);
 	} else {
 		sc2.init({
 			app: 'steemeasy',
@@ -260,7 +261,10 @@ ready(function() {
 				alert('Content is required');
 				return;
 			}
-			var permlink = _.kebabCase(titleField.value);
+			const kebabCasedTitle = _.kebabCase(titleField.value.replace(/\D/g,''));
+			const timeStr = new Date().toISOString().replace(/[^a-zA-Z0-9]+/g, '').toLowerCase();
+			const permlink = kebabCasedTitle + timeStr;
+
 			var metaData = {
 				"tags": [Config.steemTag],
 				"app": Config.app,
