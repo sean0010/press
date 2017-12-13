@@ -1,7 +1,8 @@
 var Vote = (function() {
 	var _author = '';
 	var _permlink = '';
-	var _upvoteButton, _upvoteText, _upvoteCount, _upvotePower, _upvoteUl, _upvoteInput, _upvoteAdd, _upvoteLoader;
+	var _posts;
+	var _container, _upvoteButton, _upvoteText, _upvoteCount, _upvotePower, _upvoteUl, _upvoteInput, _upvoteAdd, _upvoteLoader;
 
 	if (typeof(Storage) !== 'undefined') {
 		var upvoteOptions = localStorage.getItem('UpvoteOptions');
@@ -28,9 +29,12 @@ var Vote = (function() {
 							if (err === null) {
 								_upvoteButton.removeAttribute('disabled');
 								_upvoteButton.classList.remove('voted');
-								_getVoteFromContent(_author, _permlink, function(err, up, down) {
+								// Update Upvote count, Downvote count, Payout SBD
+								_getVoteFromContent(_author, _permlink, function(err, up, down, payout) {
 									if (err == null) {
-										_upvoteButton.querySelector('.voteCount').innerHTML = up
+										_upvoteButton.querySelector('.voteCount').innerHTML = up;
+										//_downvoteButton.querySelector('.voteCount').innerHTML = down;
+										_container.querySelector('.postReward').innerHTML = payout;
 									} else {
 										alert(err);
 									}
@@ -100,23 +104,21 @@ var Vote = (function() {
 			if (err === null) {
 				if (isUpvote) {
 					_upvoteButton.classList.add('voted');
-					_getVoteFromContent(_author, _permlink, function(err, up, down) {
-						if (err == null) {
-							_upvoteButton.querySelector('.voteCount').innerHTML = up
-						} else {
-							alert(err);
-						}
-					});
 				} else {
-					_downvoteButton.classList.add('voted');
-					_getVoteFromContent(_author, _permlink, function(err, up, down) {
-						if (err == null) {
-							_downvoteButton.querySelector('.voteCount').innerHTML = down
-						} else {
-							alert(err);
-						}
-					});
+					//_downvoteButton.classList.add('voted');
 				}
+
+				// Update Upvote count, Downvote count, Payout SBD
+				_getVoteFromContent(_author, _permlink, function(err, up, down, payout) {
+					if (err == null) {
+						_upvoteButton.querySelector('.voteCount').innerHTML = up;
+						//_downvoteButton.querySelector('.voteCount').innerHTML = down;
+						_container.querySelector('.postReward').innerHTML = payout;
+					} else {
+						alert(err);
+					}
+				});
+
 			} else {
 				console.error('SteemConnect2 Vote Error:', err);
 				_upvoteButton.classList.remove('open');
@@ -170,18 +172,26 @@ var Vote = (function() {
 	};
 
 	var _showDownvoteOptions = function() {
-		_downvotePower.style.display = 'block';
-		_downvotePower.style.left = isNaN(_downvoteButton.offsetLeft) ? _downvoteButton.offsetLeft : _downvoteButton.offsetLeft + 'px';
-		_downvotePower.style.top = isNaN(_downvoteButton.offsetTop) ? _downvoteButton.offsetTop : _downvoteButton.offsetTop + 'px';
-		_downvotePower.disabled = true;
+		//_downvotePower.style.display = 'block';
+		//_downvotePower.style.left = isNaN(_downvoteButton.offsetLeft) ? _downvoteButton.offsetLeft : _downvoteButton.offsetLeft + 'px';
+		//_downvotePower.style.top = isNaN(_downvoteButton.offsetTop) ? _downvoteButton.offsetTop : _downvoteButton.offsetTop + 'px';
+		//_downvotePower.disabled = true;
 	};
 
 	var _getVoteFromContent = function(author, permlink, callback) {
 		steem.api.getContent(author, permlink, function(err, result) {
-			console.log(err, result);
-			if (err === null) {			
+			//console.log(err, result);
+			if (err === null) {
+				var payout = result.pending_payout_value;
 				var v = Helper.countVotes(result.active_votes);
-				callback(null, v.up, v.down);
+				var key = author + '_' + permlink;
+				var post = _posts[key];
+
+				post.upvotes = v.up;
+				post.downvotes = v.down;
+				post.payout = payout;
+
+				callback(null, v.up, v.down, payout);
 			} else {
 				console.error('some error', err);
 				callback(err);
@@ -204,7 +214,9 @@ var Vote = (function() {
 	};
 
 	return {
-		init: function(container) {
+		init: function(container, posts) {
+			_posts = posts;
+			_container = container;
 			_upvoteButton = container.querySelector('.upvote');
 			_upvoteText = container.querySelector('.upvote .voteText');
 			_upvoteCount = container.querySelector('.upvote .voteCount');

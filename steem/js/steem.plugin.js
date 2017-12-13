@@ -135,7 +135,7 @@ ready(function() {
 
 
 	// Vote button
-	Vote.init(voteContainer);
+	Vote.init(voteContainer, posts);
 
 	close.addEventListener('click', function() {
 		var detail = document.querySelector('.postDetails');
