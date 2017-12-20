@@ -103,6 +103,7 @@
 .steemContainer .votePower ul li .voteBtnClear{position:absolute;top:0;right:0;width:15px;color:#e00;cursor:pointer;padding:3px 0;}
 
 .steemContainer .postReward{display:inline-block;font-weight:bold;color:#4ba2f2;}
+.steemContainer .postTags{width:100%;margin:0 0 10px 0;}
 
 .loader {position: relative;margin: 0 auto;width: 30px;}
 .loader:before {content: '';display: block;padding-top: 100%;}

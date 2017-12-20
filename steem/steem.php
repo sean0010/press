@@ -32,6 +32,7 @@ function steem_plugin( $atts ) {
     $c .= ' <div class="postWrite">';
     $c .= '  <input type="text" class="postTitle" placeholder="Title">';
     $c .= '  <textarea class="editor"></textarea>';
+    $c .= '  <input type="text" class="postTags" placeholder="Tags">';
     $c .= '  <span class="segmented">';
     $c .= '   <label><input type="radio" name="payout" value="100"><span class="label">Power Up 100%</span></label>';
     $c .= '   <label><input type="radio" name="payout" value="50" checked><span class="label">50% | 50%</span></label>';
@@ -131,19 +132,22 @@ function steem_plugin_frontend_js() {
     wp_enqueue_script('remarkable.js');
 
     wp_register_script('helper.js', plugin_dir_url( __FILE__ ) . 'js/helper.js');
-    wp_enqueue_script('helper.js?v=12');
+    wp_enqueue_script('helper.js?v=13');
 
     wp_register_script('render.js', plugin_dir_url( __FILE__ ) . 'js/render.js');
-    wp_enqueue_script('render.js?v=12');
+    wp_enqueue_script('render.js?v=13');
 
     wp_register_script('vote.js', plugin_dir_url( __FILE__ ) . 'js/vote.js');
-    wp_enqueue_script('vote.js?v=12');
+    wp_enqueue_script('vote.js?v=13');
+
+    wp_register_script('tag.js', plugin_dir_url( __FILE__ ) . 'js/tag.js');
+    wp_enqueue_script('tag.js?v=13');
 
     wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
-    wp_enqueue_script('steem.plugin.js?v=12');
+    wp_enqueue_script('steem.plugin.js?v=13');
 
     wp_register_style('steem.plugin.css', plugin_dir_url( __FILE__ ) . 'css/steem.plugin.css');
-    wp_enqueue_style('steem.plugin.css?v=12');
+    wp_enqueue_style('steem.plugin.css?v=13');
 }
 
 if (is_admin()) {

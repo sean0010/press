@@ -224,7 +224,10 @@ ready(function() {
 		var payoutRadios = w.querySelectorAll('input[type=radio]');
 		var selfVoteCheckbox = w.querySelector('.selfVote');
 
+		Tag.init(tagsField);
+
 		var markdownPreview = Helper.debounce(function() {
+			console.log('debounced');
 			preview.innerHTML = Helper.markdown2html(editor.value);
 		}, 400);
 
@@ -261,15 +264,21 @@ ready(function() {
 				alert('Content is required');
 				return;
 			}
-			const kebabCasedTitle = _.kebabCase(titleField.value.replace(/\D/g,''));
-			const timeStr = new Date().toISOString().replace(/[^a-zA-Z0-9]+/g, '').toLowerCase();
-			const permlink = kebabCasedTitle + timeStr;
+			var kebabCasedTitle = titleField.value.replace(/[\W_]+/g," ");
+			kebabCasedTitle = _.kebabCase(kebabCasedTitle);
 
+			const timeStr = new Date().toISOString().replace(/\W+/g, "").toLowerCase();
+
+			const permlink = kebabCasedTitle + timeStr;
 			var metaData = {
 				"tags": [Config.steemTag],
 				"app": Config.app,
 				"format": "markdown"
 			};
+
+			// Prepend primary tag to json metadata tags. 1st item becomes category.
+			var additionalTags = Tag.tags();
+			metaData.tags = _.concat([Config.steemTag], additionalTags);
 
 			titleField.setAttribute('disabled', 'disabled');
 			editor.setAttribute('disabled', 'disabled');
@@ -297,7 +306,8 @@ ready(function() {
 				publish.removeAttribute('disabled');
 				cancel.removeAttribute('disabled');
 				alert('Posting failed');
-			});			
+			});
+
 		};
 		var cancelClick = function() {
 			titleField.value = '';
