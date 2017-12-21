@@ -61,7 +61,31 @@ var Render = (function() {
 	};
 	var _lastPost = {'permlink': '', 'author': ''};
 	var _commentVote = function(commentAuthor, commentPermlink, upvoteComment, downvoteComment) {
-		steem.api.getActiveVotes(commentAuthor, commentPermlink, function(err, votes) {
+
+		steem.api.getContent(commentAuthor, commentPermlink, function(err, result) {
+			//console.log(err, result);
+			if (err === null) {
+				var payout = result.pending_payout_value;
+				var v = Helper.countVotes(result.active_votes);
+
+				upvoteComment.querySelector('.btnCount').innerHTML = v.up + '/' + payout;
+
+				// Logged In User Already Voted Mark
+				if (window.isAuth) {
+					var voted = Vote.hasVoted(votes, username);
+					if (voted === 1) {
+						upvoteComment.classList.add('voted');
+					} else if (voted === -1) {
+						downvoteComment.classList.add('voted');
+					}
+				}
+			} else {
+				console.error('some error', err);
+			}
+		});
+
+		/*steem.api.getActiveVotes(commentAuthor, commentPermlink, function(err, votes) {
+			debugger;
 			if (err === null) {
 				var v = Helper.countVotes(votes);
 				upvoteComment.querySelector('.btnCount').innerHTML = v.up;
@@ -77,7 +101,7 @@ var Render = (function() {
 					}
 				}
 			}
-		});
+		});*/
 	};
 	var _replies = function(parentAuthor, parentPermlink, parentDepth, callback) {
 		steem.api.getContentReplies(parentAuthor, parentPermlink, function(err, result) {
@@ -89,7 +113,7 @@ var Render = (function() {
 					var container = _div('reply');
 					var author = _div('replyAuthor', reply.author);
 					var created = _div('replyCreated', (new Date(reply.created)).datetime());
-					var upvoteComment = _btn('upvoteComment', '😊');
+					var upvoteComment = _btn('upvoteComment', '↑');
 					var downvoteComment = _btn('downvoteComment', '😩');
 					var replyComment = _replyBtn('replyButton', 'Reply');
 					var body = _div('replyBody', Helper.markdown2html(reply.body));
@@ -101,7 +125,7 @@ var Render = (function() {
 					container.appendChild(author);
 					container.appendChild(created);
 					container.appendChild(upvoteComment);
-					container.appendChild(downvoteComment);
+					//container.appendChild(downvoteComment);
 					container.appendChild(replyComment);
 					container.appendChild(body);
 					container.appendChild(childrenWrap);
@@ -210,7 +234,7 @@ var Render = (function() {
 						var container = _div('reply', '');
 						var author = _div('replyAuthor', username);
 						var created = _div('replyCreated', (new Date()).datetime());
-						var upvoteComment = _btn('upvoteComment', '😊');
+						var upvoteComment = _btn('upvoteComment', '↑');
 						var downvoteComment = _btn('downvoteComment', '😩');
 						var replyComment = _replyBtn('replyButton', 'Reply');
 						var body = _div('replyBody', inputString);
@@ -223,7 +247,7 @@ var Render = (function() {
 						container.appendChild(author);
 						container.appendChild(created);
 						container.appendChild(upvoteComment);
-						container.appendChild(downvoteComment);
+						//container.appendChild(downvoteComment);
 						container.appendChild(replyComment);
 						container.appendChild(body);
 						container.appendChild(childrenWrap);

@@ -285,9 +285,9 @@ var Vote = (function() {
 						btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', true);
 						btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', true);
 						sc2.vote(username, commentAuthor, commentPermlink, 0, function(err, result) {
-							_getVoteFromContent(commentAuthor, commentPermlink, function(err, up, down) {
+							_getVoteFromContent(commentAuthor, commentPermlink, function(err, up, down, payout) {
 								if (err == null) {
-									btn.querySelector('.btnCount').innerHTML = up;
+									btn.querySelector('.btnCount').innerHTML = up + '/' + payout;
 								} else {
 									alert(err);
 								}
@@ -305,9 +305,10 @@ var Vote = (function() {
 					btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', true);
 					btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', true);
 					sc2.vote(username, commentAuthor, commentPermlink, weight, function(err, result) {
-						_getVoteFromContent(commentAuthor, commentPermlink, function(err, up, down) {
+						_getVoteFromContent(commentAuthor, commentPermlink, function(err, up, down, payout) {
 							if (err == null) {
-								btn.querySelector('.btnCount').innerHTML = isUpvote ? up : down;
+								var voteCount = isUpvote ? up : down;
+								btn.querySelector('.btnCount').innerHTML = voteCount + '/' + payout;
 							} else {
 								alert(err);
 							}
