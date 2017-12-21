@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Steem
+Plugin Name: Steemeasy
 Plugin URI:  https://github.com/sean0010/press
 Description: Steem Wordpress Plugin
 Version:     0.0.2
