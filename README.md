@@ -1,23 +1,49 @@
-# press
+# steemeasy
 
-Integrate Steem posting into Wordpress.
-Steem is a blockchain-based social media platform where anyone can earn rewards.
-Current Version: `0.0.1`
+Steem blockchain's particular tag can be included in your Wordpress blog page.
 
-## How to try
-1. Install
- - Upload `/steem` directory into `YOUR_WORDPRESS_ROOT/wp-contents/plugins`
- - Admin - Plugins - Installed Plugins
- - Activate **Steem** 
 
-2. Configure
- - Enter a Steem tag and Save
- - Create a Page
- - Put `[steemplugin tag="wpcommunity"]` in its content
-   (the tag wpcommunity is a steem tag)
- - Set number of posts per page like this. `[steemplugin tag="wpcommunity" limit="25"]` (Maximum 100)
- - Go to https://steemconnect.com/apps/setup, add the wordpress URL to both "Allowed origins" and "Allowed redirect urls"
- 
-3. Check
- - Go to the page at Wordpress Front-end
- - You'll see Steem posts by the given tag.
+## Install
+### Set up SteemConnect2
+You should have Steem account with more than 6 STEEM. It costs 6 STEEM to create an app under SteemConnect V2.
+
+Login with yor Steem account here
+https://v2.steemconnect.com/dashboard
+
+Then go to here
+https://v2.steemconnect.com/apps/me
+
+Press 'New App' button to go to here
+https://v2.steemconnect.com/apps/create
+
+Create account
+
+Now you will have to sign in with funding account(which has more than 6 STEEM) and its active key
+
+
+Enter App Name and Redirect URI(s). You can leave others blank.
+
+Redirect URI example
+After OAuth login, only registered URI can end up having successful login.
+https://imgsafe.org/image/b698e74bdb
+
+You can enter multiple URIs such as
+http://localhost:8888/wordpress/steem/
+http://localhost:8888/wordpress/webtoon/
+https://mywordpresswebsite.com/page1/
+https://mywordpresswebsite.com/page2/
+
+https://imgsafe.org/image/b69d1d6797
+
+
+### Set up Wordpress plugin
+1. Activate plugin
+2. Create new wordpress page
+3. Enter page content like this.
+https://imgsafe.org/image/b697e36ea7
+
+[steemplugin tag="webtoon" limit="25"]
+tag is Steem tag. (eg: kr)
+limit is items per page before showing Load more button. (eg: 1 ~ 100)
+
+
