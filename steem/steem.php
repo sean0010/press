@@ -118,18 +118,17 @@ function wporg_shortcodes_init() {
 * Display DB.options.steemtag at front-end
 */
 function steem_plugin_frontend_js() {
-    wp_register_script('sc2.js', 'https://steemit.github.io/sc2-angular/sc2.min.js');
-    wp_enqueue_script('sc2.js');
+    wp_register_script('sc2.min.js', plugin_dir_url( __FILE__ ) . 'js/sc2.min.js');
+    wp_enqueue_script('sc2.min.js');
 
-    wp_register_script('steem.min.js', 'https://cdn.steemjs.com/lib/latest/steem.min.js');
-    //wp_register_script('steem.min.js', plugin_dir_url( __FILE__ ) . 'js/steem.min.js');
+    wp_register_script('steem.min.js', plugin_dir_url( __FILE__ ) . 'js/steem.min.js');
     wp_enqueue_script('steem.min.js');
 
-    wp_register_script('lodash.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js');
+    wp_register_script('lodash.min.js', plugin_dir_url( __FILE__ ) . 'js/lodash.min.js');
     wp_enqueue_script('lodash.min.js');
 
-    wp_register_script('remarkable.js', 'https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.7.1/remarkable.min.js');
-    wp_enqueue_script('remarkable.js');
+    wp_register_script('remarkable.min.js', plugin_dir_url( __FILE__ ) . 'js/remarkable.min.js');
+    wp_enqueue_script('remarkable.min.js');
 
     wp_register_script('helper.js', plugin_dir_url( __FILE__ ) . 'js/helper.js');
     wp_enqueue_script('helper.js?v=13');
