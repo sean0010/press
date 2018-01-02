@@ -43,7 +43,9 @@ https://imgsafe.org/image/b69d1d6797
 https://imgsafe.org/image/b697e36ea7
 
 [steemplugin tag="webtoon" limit="25"]
+
 tag is Steem tag. (eg: kr)
+
 limit is items per page before showing Load more button. (eg: 1 ~ 100)
 
 
