@@ -88,14 +88,14 @@ function steem_plugin( $atts ) {
     return $c;
 }
 
-function wporg_shortcode($atts = [], $content = null, $tag = '') {
+function steem_shortcode($atts = [], $content = null, $tag = '') {
     // normalize attribute keys, lowercase
     $atts = array_change_key_case((array)$atts, CASE_LOWER);
     // override default attributes with user attributes
-    $wporg_atts = shortcode_atts(['title' => 'WordPress.org'], $atts, $tag); 
+    $steemeasy_atts = shortcode_atts(['title' => 'steemeasy.com'], $atts, $tag); 
     $o = ''; 
-    $o .= '<div class="wporg-box">'; 
-    $o .= '<h2>' . esc_html__($wporg_atts['title'], 'wporg') . '</h2>';
+    $o .= '<div class="steemeasy-box">'; 
+    $o .= '<h2>' . esc_html__($steemeasy_atts['title'], 'steemeasy') . '</h2>';
  
     // enclosing tags
     if (!is_null($content)) {
@@ -108,8 +108,8 @@ function wporg_shortcode($atts = [], $content = null, $tag = '') {
     return $o;
 }
  
-function wporg_shortcodes_init() {
-    add_shortcode('wporg', 'wporg_shortcode');
+function steem_shortcodes_init() {
+    add_shortcode('steemeasy', 'steem_shortcode');
 }
  
 
@@ -157,7 +157,7 @@ if (is_admin()) {
     add_action('admin_enqueue_scripts', 'steem_plugin_backend_js');
 } else {
     // Front-end
-    add_action('init', 'wporg_shortcodes_init');
+    add_action('init', 'steem_shortcodes_init');
     add_shortcode('steemplugin', 'steem_plugin');
     add_action('steem_plugin_frontend_js', 'steem_plugin_frontend_js');
     do_action('steem_plugin_frontend_js');
