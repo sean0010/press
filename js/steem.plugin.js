@@ -25,10 +25,7 @@ var lastPost = {'permlink': '', 'author': ''};
 var posts = {};
 var username = '';
 window.isAuth = false;
-//steem.config.set('websocket','wss://node.steem.ws');
-//steem.config.set('websocket', 'wss://this.piston.rocks');
-//steem.config.set('websocket', 'wss://steemd.steemitdev.com');
-
+steem.config.set('websocket','wss://api.steemit.com');
 
 ready(function() {
 	var steemContainer = document.querySelector('.steemContainer');
