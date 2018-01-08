@@ -119,10 +119,10 @@ function steem_shortcodes_init() {
 */
 function steem_plugin_frontend_js() {
     wp_register_script('sc2.min.js', plugin_dir_url( __FILE__ ) . 'js/sc2.min.js');
-    wp_enqueue_script('sc2.min.js');
+    wp_enqueue_script('sc2.min.js?v=14');
 
     wp_register_script('steem.min.js', plugin_dir_url( __FILE__ ) . 'js/steem.min.js');
-    wp_enqueue_script('steem.min.js');
+    wp_enqueue_script('steem.min.js?v=14');
 
     wp_register_script('lodash.min.js', plugin_dir_url( __FILE__ ) . 'js/lodash.min.js');
     wp_enqueue_script('lodash.min.js');
@@ -131,22 +131,22 @@ function steem_plugin_frontend_js() {
     wp_enqueue_script('remarkable.min.js');
 
     wp_register_script('helper.js', plugin_dir_url( __FILE__ ) . 'js/helper.js');
-    wp_enqueue_script('helper.js?v=13');
+    wp_enqueue_script('helper.js?v=14');
 
     wp_register_script('render.js', plugin_dir_url( __FILE__ ) . 'js/render.js');
-    wp_enqueue_script('render.js?v=13');
+    wp_enqueue_script('render.js?v=14');
 
     wp_register_script('vote.js', plugin_dir_url( __FILE__ ) . 'js/vote.js');
-    wp_enqueue_script('vote.js?v=13');
+    wp_enqueue_script('vote.js?v=14');
 
     wp_register_script('tag.js', plugin_dir_url( __FILE__ ) . 'js/tag.js');
-    wp_enqueue_script('tag.js?v=13');
+    wp_enqueue_script('tag.js?v=14');
 
     wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
-    wp_enqueue_script('steem.plugin.js?v=13');
+    wp_enqueue_script('steem.plugin.js?v=14');
 
     wp_register_style('steem.plugin.css', plugin_dir_url( __FILE__ ) . 'css/steem.plugin.css');
-    wp_enqueue_style('steem.plugin.css?v=13');
+    wp_enqueue_style('steem.plugin.css?v=14');
 }
 
 if (is_admin()) {
