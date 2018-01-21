@@ -8,6 +8,7 @@
 .steemContainer hr{height:1px}
 .steemContainer li{margin:0.75em 0}
 .steemContainer img{max-width:100%;height:auto;}
+.steemContainer .strikethrough{text-decoration:line-through;opacity:0.5;}
 .steemContainer blockquote{padding:5px;border:none;margin:0;}
 .steemContainer blockquote > p{margin:0!important;}
 .steemContainer .postBody > p{margin:0;padding:0 0 1em 0;}

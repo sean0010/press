@@ -49,6 +49,17 @@ var Helper = (function() {
 
 
 	return {
+		/**
+		* https://github.com/steemit/steemit.com/blob/47fd0e0846bd8c7c941ee4f95d5f971d3dc3981d/app/utils/ParsersAndFormatters.js
+		*/
+		isDeclinePayout: function(discussion) {
+			var maxPayout = parseFloat(String(discussion.max_accepted_payout).replace(/\s[A-Z]*$/, ''));
+			if (maxPayout == 0) {
+				return true;
+			} else {
+				return false;
+			}
+		},
 		getPayout: function(discussion) {
 			var totalPendingPayout = parseFloat(discussion.total_pending_payout_value.split(' ')[0]);
 			var totalPayoutValue = parseFloat(discussion.total_payout_value.split(' ')[0]);

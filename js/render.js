@@ -26,7 +26,7 @@ var Render = (function() {
 		b.classList.add(cssClass);
 		return b;
 	};
-	var _createRow = function(link, comment, author, reward, vote, created) {
+	var _createRow = function(link, comment, author, reward, vote, created, declinePayout) {
 		var row = _div('pRow');
 		var pTitle = _div('pTitle');
 		var pAuthor = _div('pAuthor');
@@ -44,6 +44,10 @@ var Render = (function() {
 		pAuthor.innerHTML = author;
 		pReward.innerHTML = Helper.formatReward(reward);
 		pVote.innerHTML = vote;
+
+		if (declinePayout) {
+			pReward.classList.add('strikethrough');
+		}
 
 		var tooltipDate = document.createElement('div');
 		tooltipDate.innerHTML = created.mmdd();
@@ -292,7 +296,8 @@ var Render = (function() {
 						var link = Render.createLink(p.title, '#' + p.category + '/@' + p.author + '/' + p.permlink);
 						var date = new Date(p.created);
 						var payout = Helper.getPayout(p);
-						var row = _createRow(link, p.children, p.author, p.pending_payout_value, p.net_votes, date);
+						var isDeclined = Helper.isDeclinePayout(p);
+						var row = _createRow(link, p.children, p.author, p.pending_payout_value, p.net_votes, date, isDeclined);
 						temp.appendChild(row);
 
 						if (i == len - 1) {
@@ -309,6 +314,7 @@ var Render = (function() {
 							upvotes: v.up,
 							downvotes: v.down,
 							payout: p.pending_payout_value,
+							decline: isDeclined,
 							tags: JSON.parse(p.json_metadata).tags
 						};
 					}
@@ -334,7 +340,8 @@ var Render = (function() {
 				if (err === null) {
 					var v = Helper.countVotes(result.active_votes);
 					var tags = JSON.parse(result.json_metadata).tags;
-					showPostDetails(container, result.body, result.title, result.author, permlink, result.created, v.up, v.down, result.pending_payout_value, tags);
+					var isDeclined = Helper.isDeclinePayout(result);
+					showPostDetails(container, result.body, result.title, result.author, permlink, result.created, v.up, v.down, result.pending_payout_value, isDeclined, tags);
 					callback();
 				} else {
 					console.error('some error', err);
