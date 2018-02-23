@@ -42,7 +42,9 @@ https://imgsafe.org/image/b69d1d6797
 3. Enter page content like this.
 https://imgsafe.org/image/b697e36ea7
 
+~~~~
 [steemplugin tag="webtoon" limit="25"]
+~~~~
 
 tag is Steem tag. (eg: kr)
 

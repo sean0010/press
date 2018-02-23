@@ -143,7 +143,7 @@ var Vote = (function() {
 		_upvoteOptions.splice(idx, 1);
 		localStorage.setItem('UpvoteOptions', JSON.stringify(_upvoteOptions));
 		console.log(localStorage.getItem('UpvoteOptions'));
-		
+
 		li.parentNode.removeChild(li);
 	};
 
@@ -185,11 +185,16 @@ var Vote = (function() {
 				var payout = result.pending_payout_value;
 				var v = Helper.countVotes(result.active_votes);
 				var key = author + '_' + permlink;
-				var post = _posts[key];
 
-				post.upvotes = v.up;
-				post.downvotes = v.down;
-				post.payout = payout;
+				if (_posts.hasOwnProperty(key)) {
+					// Root Post
+					var post = _posts[key];
+					post.upvotes = v.up;
+					post.downvotes = v.down;
+					post.payout = payout;
+				} else {
+					// Reply of a post
+				}
 
 				callback(null, v.up, v.down, payout);
 			} else {
@@ -226,7 +231,7 @@ var Vote = (function() {
 			_upvoteAdd = container.querySelector('.up .addVoteOption');
 			_upvoteLoader = container.querySelector('.up .voteLoader');
 			_bind();
-		},	
+		},
 		// 0: Not Voted, 1: Upvoted, -1: Downvoted
 		hasVoted: function(votes, voter) {
 			var result = 0;
@@ -282,7 +287,7 @@ var Vote = (function() {
 
 				if (isVoted) {
 					if (confirm('Are you sure to un-vote?')) {
-						btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', true);
+						//btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', true);
 						btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', true);
 						sc2.vote(username, commentAuthor, commentPermlink, 0, function(err, result) {
 							_getVoteFromContent(commentAuthor, commentPermlink, function(err, up, down, payout) {
@@ -291,18 +296,18 @@ var Vote = (function() {
 								} else {
 									alert(err);
 								}
-								
+
 								btn.classList.remove('voted');
 								btn.parentNode.querySelector('.upvoteComment').removeAttribute('disabled');
-								btn.parentNode.querySelector('.downvoteComment').removeAttribute('disabled');
-							});							
+								//btn.parentNode.querySelector('.downvoteComment').removeAttribute('disabled');
+							});
 						});
 					}
 				} else {
 					var weight = 10000;
 					if (!isUpvote) weight = -10000;
 
-					btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', true);
+					//btn.parentNode.querySelector('.downvoteComment').setAttribute('disabled', true);
 					btn.parentNode.querySelector('.upvoteComment').setAttribute('disabled', true);
 					sc2.vote(username, commentAuthor, commentPermlink, weight, function(err, result) {
 						_getVoteFromContent(commentAuthor, commentPermlink, function(err, up, down, payout) {
@@ -314,7 +319,7 @@ var Vote = (function() {
 							}
 							btn.classList.add('voted');
 							btn.parentNode.querySelector('.upvoteComment').removeAttribute('disabled');
-							btn.parentNode.querySelector('.downvoteComment').removeAttribute('disabled');
+							//btn.parentNode.querySelector('.downvoteComment').removeAttribute('disabled');
 						});
 					});
 				}

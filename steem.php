@@ -3,7 +3,7 @@
 Plugin Name: Steemeasy
 Plugin URI:  https://github.com/sean0010/press
 Description: Steem Wordpress Plugin
-Version:     0.0.4
+Version:     0.5.2
 Author:      morning
 Author URI:  htps://steemit.com/@morning
 Text Domain: steemit
@@ -23,10 +23,11 @@ if (!function_exists('add_action')) {
 function steem_plugin( $atts ) {
     $a = shortcode_atts( array(
         'tag' => get_option('steem_tag'),
-        'limit' => get_option('limit')
+        'limit' => get_option('limit'),
+        'ann' => get_option('ann')
     ), $atts );
-    
-    $c = '<div class="steemContainer" data-steemtag="'.esc_html__($a['tag']).'" data-limit="'.esc_html__($a['limit']).'">';
+
+    $c = '<div class="steemContainer" data-steemtag="'.esc_html__($a['tag']).'" data-limit="'.esc_html__($a['limit']).'" data-appname="'.esc_html__(get_option('sc2_appname')).'" data-beneficiaryaccount="'.esc_html__(get_option('beneficiary_account')).'" data-beneficiarypercentage="'.esc_html__(get_option('beneficiary_percentage')).'">';
     $c .= ' <div class="tagLabel">TAG: </div><div class="tagName"></div>';
     $c .= ' <div class="steemAccount"></div>';
     $c .= ' <div class="postWrite">';
@@ -79,6 +80,7 @@ function steem_plugin( $atts ) {
     $c .= ' <div class="refreshButtonContainer">';
     $c .= '   <button class="refreshButton button">Refresh</button>';
     $c .= ' </div>';
+    $c .= ' <div class="ann" data-param="'.esc_html__($a['ann']).'"></div>';
     $c .= ' <div class="discussions">';
     $c .= '  <div class="postsList"></div>';
     $c .= '  <div class="loaderSpace"><div class="loader"><svg class="circular" viewBox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="4" stroke-miterlimit="10"/></svg></div></div>';
@@ -92,11 +94,11 @@ function steem_shortcode($atts = [], $content = null, $tag = '') {
     // normalize attribute keys, lowercase
     $atts = array_change_key_case((array)$atts, CASE_LOWER);
     // override default attributes with user attributes
-    $steemeasy_atts = shortcode_atts(['title' => 'steemeasy.com'], $atts, $tag); 
-    $o = ''; 
-    $o .= '<div class="steemeasy-box">'; 
+    $steemeasy_atts = shortcode_atts(['title' => 'steemeasy.com'], $atts, $tag);
+    $o = '';
+    $o .= '<div class="steemeasy-box">';
     $o .= '<h2>' . esc_html__($steemeasy_atts['title'], 'steemeasy') . '</h2>';
- 
+
     // enclosing tags
     if (!is_null($content)) {
         // secure output by executing the_content filter hook on $content
@@ -107,11 +109,11 @@ function steem_shortcode($atts = [], $content = null, $tag = '') {
     $o .= '</div>';
     return $o;
 }
- 
+
 function steem_shortcodes_init() {
     add_shortcode('steemeasy', 'steem_shortcode');
 }
- 
+
 
 
 /**
@@ -119,10 +121,10 @@ function steem_shortcodes_init() {
 */
 function steem_plugin_frontend_js() {
     wp_register_script('sc2.min.js', plugin_dir_url( __FILE__ ) . 'js/sc2.min.js');
-    wp_enqueue_script('sc2.min.js?v=14');
+    wp_enqueue_script('sc2.min.js?v=23');
 
     wp_register_script('steem.min.js', plugin_dir_url( __FILE__ ) . 'js/steem.min.js');
-    wp_enqueue_script('steem.min.js?v=14');
+    wp_enqueue_script('steem.min.js?v=23');
 
     wp_register_script('lodash.min.js', plugin_dir_url( __FILE__ ) . 'js/lodash.min.js');
     wp_enqueue_script('lodash.min.js');
@@ -131,22 +133,69 @@ function steem_plugin_frontend_js() {
     wp_enqueue_script('remarkable.min.js');
 
     wp_register_script('helper.js', plugin_dir_url( __FILE__ ) . 'js/helper.js');
-    wp_enqueue_script('helper.js?v=15');
+    wp_enqueue_script('helper.js?v=23');
 
     wp_register_script('render.js', plugin_dir_url( __FILE__ ) . 'js/render.js');
-    wp_enqueue_script('render.js?v=15');
+    wp_enqueue_script('render.js?v=23');
 
     wp_register_script('vote.js', plugin_dir_url( __FILE__ ) . 'js/vote.js');
-    wp_enqueue_script('vote.js?v=14');
+    wp_enqueue_script('vote.js?v=23');
 
     wp_register_script('tag.js', plugin_dir_url( __FILE__ ) . 'js/tag.js');
-    wp_enqueue_script('tag.js?v=14');
+    wp_enqueue_script('tag.js?v=23');
 
     wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
-    wp_enqueue_script('steem.plugin.js?v=15');
+    wp_enqueue_script('steem.plugin.js?v=23');
 
     wp_register_style('steem.plugin.css', plugin_dir_url( __FILE__ ) . 'css/steem.plugin.css');
-    wp_enqueue_style('steem.plugin.css?v=15');
+    wp_enqueue_style('steem.plugin.css?v=23');
+}
+
+function steem_plugin_menu() {
+    //create new top-level menu
+    add_menu_page('Steemeasy Settings', 'Steemeasy', 'administrator', 'steemeasy', 'steemeasy_settings_page' , null );
+    //call register settings function
+    //add_action('admin_init', 'register_steem_plugin_settings' );
+    register_setting( 'steemeasy-settings-group', 'sc2_appname' );
+    register_setting( 'steemeasy-settings-group', 'beneficiary_account' );
+    register_setting( 'steemeasy-settings-group', 'beneficiary_percentage' );
+    add_option('sc2_appname');
+    add_option('beneficiary_account');
+    add_option('beneficiary_percentage');
+}
+
+function steemeasy_settings_page() {
+?>
+<div class="wrap">
+    <h1>Steemeasy Settings</h1>
+
+    <form method="post" action="options.php">
+        <?php settings_fields( 'steemeasy-settings-group' ); ?>
+        <?php do_settings_sections( 'steemeasy-settings-group' ); ?>
+        <table class="form-table">
+            <tr>
+                <th scope="row">SteemConnect2 App Name</th>
+                <td><input type="text" name="sc2_appname" value="<?php echo esc_attr( get_option('sc2_appname') ); ?>" /></td>
+            </tr>
+        </table>
+        <hr>
+        <table class="form-table">
+            <tr>
+              <th>Beneficiaries</th>
+              <td><a target="_blank" href="https://steemit.com/steem/@steemitblog/steem-0-17-change-proposal-introduction">steemitblog posting</a>, <a target="_blank" href="https://github.com/steemit/steem/issues/773">Github issue</a></td>
+            <tr>
+                <th scope="row">Beneficiary Steem Account</th>
+                <td>@<input type="text" name="beneficiary_account" value="<?php echo esc_attr( get_option('beneficiary_account') ); ?>" /></td>
+            </tr>
+            <tr>
+                <th scope="row">Beneficiary Percentage (1~99)</th>
+                <td><input type="text" name="beneficiary_percentage" value="<?php echo esc_attr( get_option('beneficiary_percentage') ); ?>" />%</td>
+            </tr>
+        </table>
+        <?php submit_button(); ?>
+    </form>
+</div>
+<?php
 }
 
 if (is_admin()) {
@@ -162,4 +211,3 @@ if (is_admin()) {
     add_action('steem_plugin_frontend_js', 'steem_plugin_frontend_js');
     do_action('steem_plugin_frontend_js');
 }
-

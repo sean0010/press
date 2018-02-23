@@ -9,7 +9,7 @@
 .steemContainer li{margin:0.75em 0}
 .steemContainer img{max-width:100%;height:auto;}
 .steemContainer .strikethrough{text-decoration:line-through;opacity:0.5;}
-.steemContainer blockquote{padding:5px;border:none;margin:0;}
+.steemContainer blockquote{padding:0 0 0 10px;border:none;border-left:2px solid #ccc;margin: 0 0 10px 0;}
 .steemContainer blockquote > p{margin:0!important;}
 .steemContainer .postBody > p{margin:0;padding:0 0 1em 0;}
 .steemContainer .postReply > p{margin:0;}
@@ -50,7 +50,7 @@
 .steemContainer .postLink{}
 .steemContainer .commentLink{margin-left:5px;color:#6e6e6e;font-size:80%}
 .steemContainer .replyContainer{margin:15px 0;}
-.steemContainer .reply{padding:5px 10px;border-bottom:1px solid #eee;}
+.steemContainer .reply{padding:5px 0 5px 10px;border-bottom:1px solid #eee;}
 .steemContainer .replyAuthor{display:inline-block;font-weight:bold;}
 .steemContainer .replyCreated{display:inline-block;margin-left:10px;}
 .steemContainer .replyBody{display:block;}
@@ -108,6 +108,9 @@
 .steemContainer .postReward{display:inline-block;font-weight:bold;color:#4ba2f2;}
 .steemContainer .postTags{width:100%;margin:0 0 10px 0;}
 
+.steemContainer .ann{margin:5px 0;font-weight:bold;}
+.steemContainer .ann .pRow{border:none}
+.steemContainer .ann .pTitle a{font-weight:bold;}
 .loader {position: relative;margin: 0 auto;width: 30px;}
 .loader:before {content: '';display: block;padding-top: 100%;}
 .circular {animation: rotate 2s linear infinite;height: 100%;transform-origin: center center;width: 100%;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;}
@@ -147,7 +150,7 @@ stroke-linecap: round;}
 .segmented :last-child .label {
     border-radius: 0 10px 10px 0;
 }
-.segmented input {
+.segmented input[type="radio"]  {
     display: none;
 }
 .segmented input:checked + .label {

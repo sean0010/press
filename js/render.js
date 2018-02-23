@@ -26,7 +26,7 @@ var Render = (function() {
 		b.classList.add(cssClass);
 		return b;
 	};
-	var _createRow = function(link, comment, author, reward, vote, created, declinePayout) {
+	var _createRow = function(key, link, comment, author, reward, vote, created, declinePayout) {
 		var row = _div('pRow');
 		var pTitle = _div('pTitle');
 		var pAuthor = _div('pAuthor');
@@ -35,6 +35,7 @@ var Render = (function() {
 		var pCreated = _div('pCreated');
 
 		link.classList.add('postLink');
+		link.setAttribute('data-key', key);
 		pTitle.appendChild(link);
 		if (comment > 0) {
 			var co = Render.createLink('[' + comment + ']', '#'); // Comment
@@ -66,34 +67,16 @@ var Render = (function() {
 	var _lastPost = {'permlink': '', 'author': ''};
 	var _commentVote = function(commentAuthor, commentPermlink, upvoteComment, downvoteComment) {
 
-		steem.api.getContent(commentAuthor, commentPermlink, function(err, result) {
-			//console.log(err, result);
-			if (err === null) {
-				var payout = result.pending_payout_value;
-				var v = Helper.countVotes(result.active_votes);
-
-				upvoteComment.querySelector('.btnCount').innerHTML = v.up + '/' + payout;
-
-				// Logged In User Already Voted Mark
-				if (window.isAuth) {
-					var voted = Vote.hasVoted(votes, username);
-					if (voted === 1) {
-						upvoteComment.classList.add('voted');
-					} else if (voted === -1) {
-						downvoteComment.classList.add('voted');
-					}
-				}
-			} else {
-				console.error('some error', err);
-			}
-		});
-
-		/*steem.api.getActiveVotes(commentAuthor, commentPermlink, function(err, votes) {
-			debugger;
+		steem.api.getActiveVotes(commentAuthor, commentPermlink, function(err, votes) {
 			if (err === null) {
 				var v = Helper.countVotes(votes);
 				upvoteComment.querySelector('.btnCount').innerHTML = v.up;
-				downvoteComment.querySelector('.btnCount').innerHTML = v.down;
+				steem.api.getContent(commentAuthor, commentPermlink, function(err, result) {
+					if (err === null) {
+						var payout = result.pending_payout_value;
+						upvoteComment.querySelector('.btnCount').innerHTML = upvoteComment.querySelector('.btnCount').innerHTML + '/' + payout;
+					}
+				});
 
 				// Logged In User Already Voted Mark
 				if (window.isAuth) {
@@ -105,7 +88,7 @@ var Render = (function() {
 					}
 				}
 			}
-		});*/
+		});
 	};
 	var _replies = function(parentAuthor, parentPermlink, parentDepth, callback) {
 		steem.api.getContentReplies(parentAuthor, parentPermlink, function(err, result) {
@@ -123,9 +106,9 @@ var Render = (function() {
 					var body = _div('replyBody', Helper.markdown2html(reply.body));
 					var childrenWrap = _div('childrenWrap');
 					Vote.commentVoteBind(upvoteComment);
-					Vote.commentVoteBind(downvoteComment);
+					//Vote.commentVoteBind(downvoteComment);
 					container.setAttribute('data-author', reply.author);
-					container.setAttribute('data-permlink', reply.permlink);					
+					container.setAttribute('data-permlink', reply.permlink);
 					container.appendChild(author);
 					container.appendChild(created);
 					container.appendChild(upvoteComment);
@@ -134,7 +117,6 @@ var Render = (function() {
 					container.appendChild(body);
 					container.appendChild(childrenWrap);
 					r.appendChild(container);
-
 					_commentVote(reply.author, reply.permlink, upvoteComment, downvoteComment);
 					_openReplyCommentForm(replyComment, reply.author, reply.permlink);
 
@@ -145,7 +127,7 @@ var Render = (function() {
 						childrenWrap.setAttribute('data-author', reply.author);
 						childrenWrap.setAttribute('data-permlink', reply.permlink);
 						childrenWrap.setAttribute('data-depth', reply.depth);
-						container.appendChild(child);							
+						container.appendChild(child);
 						_openChildren(child, childrenWrap);
 					}
 				}
@@ -157,7 +139,7 @@ var Render = (function() {
 		});
 	};
 	var _openChildren = function(expandButton, childrenWrap) {
-		//expandButton.addEventListener('click', function(e) {
+		expandButton.addEventListener('click', function(e) {
 			var parentAuthor = childrenWrap.getAttribute('data-author');
 			var parentPermlink = childrenWrap.getAttribute('data-permlink');
 			var parentDepth = childrenWrap.getAttribute('data-depth');
@@ -172,8 +154,8 @@ var Render = (function() {
 				} else {
 					expandButton.removeAttribute('disabled');
 				}
-			}); 
-		//});
+			});
+		});
 	};
 
 	var _openReplyCommentForm = function(btn, author, permlink) {
@@ -212,7 +194,7 @@ var Render = (function() {
 			var submitClick = replySubmit.addEventListener('click', function() {
 				var parentReply = replySubmit.parentNode.parentNode;
 				var parentAuthor = parentReply.getAttribute('data-author');
-				var parentPermlink = parentReply.getAttribute('data-permlink');				
+				var parentPermlink = parentReply.getAttribute('data-permlink');
 				var rePermlink = 're-' + parentPermlink + '-' + Math.floor(Date.now() / 1000);
 				var inputString = replyTextArea.value.trim();
 
@@ -245,9 +227,9 @@ var Render = (function() {
 						var childrenWrap = _div('childrenWrap', '');
 
 						Vote.commentVoteBind(upvoteComment);
-						Vote.commentVoteBind(downvoteComment);
+						//Vote.commentVoteBind(downvoteComment);
 						container.setAttribute('data-author', username);
-						container.setAttribute('data-permlink', rePermlink);					
+						container.setAttribute('data-permlink', rePermlink);
 						container.appendChild(author);
 						container.appendChild(created);
 						container.appendChild(upvoteComment);
@@ -268,6 +250,17 @@ var Render = (function() {
 
 	/* Public */
 	return {
+		ann: function(p) {
+			var temp = _div('temp', '');
+			var link = Render.createLink(p.title, '#' + p.category + '/@' + p.author + '/' + p.permlink);
+			var date = new Date(p.created);
+			var payout = Helper.getPayout(p);
+			var isDeclined = Helper.isDeclinePayout(p);
+			var key = p.author + '_' + p.permlink;
+			var row = _createRow(key, link, p.children, p.author, p.pending_payout_value, p.net_votes, date, isDeclined);
+			temp.appendChild(row);
+			return temp.childNodes;
+		},
 		posts: function(tag, limit, callback) {
 			var temp = _div('temp', '');
 			var loader = document.querySelector('.loaderSpace');
@@ -297,7 +290,8 @@ var Render = (function() {
 						var date = new Date(p.created);
 						var payout = Helper.getPayout(p);
 						var isDeclined = Helper.isDeclinePayout(p);
-						var row = _createRow(link, p.children, p.author, p.pending_payout_value, p.net_votes, date, isDeclined);
+						var key = p.author + '_' + p.permlink;
+						var row = _createRow(key, link, p.children, p.author, p.pending_payout_value, p.net_votes, date, isDeclined);
 						temp.appendChild(row);
 
 						if (i == len - 1) {
@@ -305,7 +299,6 @@ var Render = (function() {
 							_lastPost.author = p.author;
 						}
 						var v = Helper.countVotes(p.active_votes);
-						var key = p.author + '_' + p.permlink;
 						posts[key] = {
 							title: p.title,
 							author: p.author,
@@ -341,6 +334,8 @@ var Render = (function() {
 					var v = Helper.countVotes(result.active_votes);
 					var tags = JSON.parse(result.json_metadata).tags;
 					var isDeclined = Helper.isDeclinePayout(result);
+					currentPostKey = author + '_' + permlink;
+					console.log('Render.post:', currentPostKey);
 					showPostDetails(container, result.body, result.title, result.author, permlink, result.created, v.up, v.down, result.pending_payout_value, isDeclined, tags);
 					callback();
 				} else {
@@ -352,7 +347,7 @@ var Render = (function() {
 					var replyContainer = document.querySelector('.postDetails .replyContainer');
 					replyContainer.appendChild(result.el);
 				}
-			}); 
+			});
 		},
 		replies: function(parentAuthor, parentPermlink, parentDepth, callback) {
 			_replies(parentAuthor, parentPermlink, parentDepth, function(result) {

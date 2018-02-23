@@ -27,12 +27,15 @@ var Tag = (function() {
 		init: function(inputTextField) {
 			_inputTextField = inputTextField;
 			_bind();
-		},	
+		},
 		deinit: function() {
 			_inputTextField.removeEventListener('keyup');
 			_inputTextField.removeEventListener('paste');
 		},
 		tags: function() {
+			if (_inputTextField.value === '') {
+				return null;
+			}
 			var result = _inputTextField.value.split(' ');
 			var index = result.indexOf(Config.steemTag);
 			if (index !== -1) {
