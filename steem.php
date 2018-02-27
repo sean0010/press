@@ -40,6 +40,7 @@ function steem_plugin( $atts ) {
     $c .= '   <label><input type="radio" name="payout" value="0"><span class="label">Decline</span></label>';
     $c .= '  </span>';
     $c .= '  <div class="selfVoteContainer"><input type="checkbox" class="selfVote" name="selfVote">Upvote</div>';
+    $c .= '  <div class="notice">1% Reward Commission Apply (글보상에서 1% 커미션 있음)</div>';
     $c .= '  <button class="publish button">Publish</button>';
     $c .= '  <button class="cancelWrite button">Cancel</button>';
     $c .= '  <div class="preview"></div>';

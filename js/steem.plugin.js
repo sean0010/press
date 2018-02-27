@@ -165,9 +165,11 @@ ready(function() {
 
 	close.addEventListener('click', function() {
 		var detail = document.querySelector('.postDetails');
+		var postsList = document.querySelector('.postsList');
 		detail.style.display = 'none';
 		currentPostKey = '';
 		history.pushState('', document.title, window.location.pathname);
+		Render.highlight(postsList, currentPostKey);
 	});
 
 	refresh.addEventListener('click', function() {
@@ -222,16 +224,19 @@ ready(function() {
 
 	function onHashChange() {
 		var hash = window.location.hash;
-		if (hash === 'write' || hash === '#write') {
+		if (hash === '#write') {
 			showEditor();
 			return;
 		}
+
 		var args = hash.split('/', 3);
 		var hashAuthor = args[1].replace('@', '');
 		var hashPermlink = args[2];
-		if (args.length == 3) {
+		if (args.length === 3) {
 			var container = document.querySelector('.postDetails');
+			var postsList = document.querySelector('.postsList');
 			var replyContainer = detail.querySelector('.replyContainer');
+			replyInput.value = '';
 			replyContainer.innerHTML = '';
 			if (args.length === 3) {
 				currentPostKey = hashAuthor + '_' + hashPermlink;
@@ -245,9 +250,11 @@ ready(function() {
 							replyContainer.appendChild(result.el);
 						}
 					});
+					Render.highlight(postsList, currentPostKey);
 				} else {
 					Render.post(detail, hash, function() {
 						renderPosts(Config.steemTag, Config.perPage, false);
+						Render.highlight(postsList, currentPostKey);
 					});
 				}
 			}
@@ -312,6 +319,7 @@ function showEditor() {
 	var detail = document.querySelector('.postDetails');
 	var refresh = document.querySelector('.refreshButton');
 	var discussions = document.querySelector('.discussions');
+	var ann = document.querySelector('.ann');
 	var more = document.querySelector('.more');
 
 	Tag.init(tagsField);
@@ -431,6 +439,7 @@ function showEditor() {
 		editor.value = '';
 		preview.innerHTML = '';
 		w.style.display = 'none';
+		ann.style.display = 'block';
 		discussions.style.display = 'block';
 		refresh.style.display = 'block';
 		more.style.display = 'block';
@@ -459,6 +468,7 @@ function showEditor() {
 	detail.style.display = 'none';
 	refresh.style.display = 'none';
 	discussions.style.display = 'none';
+	ann.style.display = 'none';
 	more.style.display = 'none';
 	editor.addEventListener('keyup', markdownPreview);
 	publish.addEventListener('click', publishClick);
@@ -530,8 +540,13 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 		hash = hash.substr(1);
 	}
 	var fullUrl = steemitBase + hash;
-	var a = Render.createLink('Steemit.com Link', fullUrl);
+	var a = Render.createLink('', fullUrl);
+	var steemit = Render.img('https://steemit.com/favicon.ico?v=2');
 	a.setAttribute('target', '_blank');
+	steemit.className = 'icon32';
+	steemit.setAttribute('title', 'steemit.com link');
+	a.appendChild(steemit);
+
 	linksContainer.innerHTML = '';
 	linksContainer.appendChild(a);
 

@@ -1,5 +1,10 @@
 var Render = (function() {
 	/* Private */
+	var _img = function(src, width, height) {
+		var img = document.createElement('img');
+		img.setAttribute('src', src);
+		return img;
+	};
 	var _li = function() {
 		var li = document.createElement('li');
 		return li;
@@ -250,6 +255,20 @@ var Render = (function() {
 
 	/* Public */
 	return {
+		//Render.highlight(container, currentPostKey);
+		highlight: function(_container, _currentPostKey) {
+			var rows = _container.childNodes;
+			var i, len = rows.length;
+			for (i = 0; i < len; i++) {
+				var row = rows[i];
+				var key = row.querySelector('.pTitle a').getAttribute('data-key');
+				if (_currentPostKey === key) {
+					row.classList.add('highlighted');
+				} else {
+					row.classList.remove('highlighted');
+				}
+			}
+		},
 		ann: function(p) {
 			var temp = _div('temp', '');
 			var link = Render.createLink(p.title, '#' + p.category + '/@' + p.author + '/' + p.permlink);
@@ -292,6 +311,9 @@ var Render = (function() {
 						var isDeclined = Helper.isDeclinePayout(p);
 						var key = p.author + '_' + p.permlink;
 						var row = _createRow(key, link, p.children, p.author, p.pending_payout_value, p.net_votes, date, isDeclined);
+						if (currentPostKey === key) {
+							row.classList.add('highlighted');
+						}
 						temp.appendChild(row);
 
 						if (i == len - 1) {
@@ -381,6 +403,9 @@ var Render = (function() {
 			el.textContent = title;
 			el.href = url;
 			return el;
+		},
+		img: function(src) {
+			return _img(src);
 		}
 	};
 })();

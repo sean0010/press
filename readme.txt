@@ -4,14 +4,14 @@ Tags: steem,steemeasy
 Requires at least: 4.8.4
 Tested up to: 4.9.1
 Requires PHP: 5.6.10
-Stable tag: 0.0.3
+Stable tag: 0.5.1
 License: MIT
 
 Bring Steem blockchain's specific tag into your Wordpress page.
 
 == Description ==
 Integrate Steem blockchain into your Wordpress blog!
-With this plugin, you can 
+With this plugin, you can
 - retrieve latest posts list of specific tag.
 - See post details
 - Login with Steem ID (Using SteemConnect2)
@@ -19,7 +19,7 @@ With this plugin, you can
 
 == Installation ==
 1. Set up SteemConnect2
-You should have Steem account with more than 6 STEEM. It costs 6 STEEM to create an app under SteemConnect V2.
+You should have Steem account with more than 3 STEEM. It costs 3 STEEM to create an app under SteemConnect V2.
 Login with yor Steem account here https://v2.steemconnect.com/dashboard
 Then go to here https://v2.steemconnect.com/apps/me
 Press 'New App' button to go to here https://v2.steemconnect.com/apps/create
@@ -32,6 +32,7 @@ https://imgsafe.org/image/b69d1d6797
 
 2. Set up Wordpress plugin
 Activate plugin.
+Go to Steemeasy Settings, set App Name same as SteemConnect2 App Name https://steemitimages.com/DQmen3GNjTCYtfDc2eNgzYaeJkZhmF1mAmn97D4WndSujSk/Screen%20Shot%202018-02-01%20at%201.58.31%20PM.png
 Create new wordpress page.
 Enter page content like this. https://imgsafe.org/image/b697e36ea7
 
@@ -47,8 +48,21 @@ limit is items per page before showing Load more button. (eg: 1 ~ 100)
 
 
 == Changelog ==
+= 0.5.1 =
+* Bugfix
 
-= 1.0 =
+= 0.5 =
+* Edit Posting
+* You can set SteemConnect2 App Name at Wordpress Steemeasy Settings
+* You can set Wordpress owner beneficiary(Steem account name and reward percentage) at Wordpress Steemeasy Settings
+* Login expire bug fix
+
+= 0.4 =
+* Decline Payout posts are visualised and can be distinguished by strike line
+* Bug fixes
+
+
+= 0.3 =
 * Updated steem.js to v0.6.4
 * steem.js web socket endpoint api.steemit.com (steemd.steemit.com is depreciated)
 * Some CSS fix to support TwentySixteen Theme

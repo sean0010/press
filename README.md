@@ -38,9 +38,11 @@ https://imgsafe.org/image/b69d1d6797
 
 ### Set up Wordpress plugin
 1. Activate plugin
-2. Create new wordpress page
-3. Enter page content like this.
-https://imgsafe.org/image/b697e36ea7
+2. Go to Steemeasy Settings, set App Name same as SteemConnect2 App Name
+ - ![appname](https://steemitimages.com/DQmen3GNjTCYtfDc2eNgzYaeJkZhmF1mAmn97D4WndSujSk/Screen%20Shot%202018-02-01%20at%201.58.31%20PM.png)
+3. Create new wordpress page
+4. Enter page content like this.
+ - ![page](https://steemitimages.com/DQmcWjMSppkCGbSr18fRQbPhUvYRmqwdHv1383KoWJ6jkSE/aa.png)
 
 ~~~~
 [steemplugin tag="webtoon" limit="25"]
@@ -49,5 +51,3 @@ https://imgsafe.org/image/b697e36ea7
 tag is Steem tag. (eg: kr)
 
 limit is items per page before showing Load more button. (eg: 1 ~ 100)
-
-
