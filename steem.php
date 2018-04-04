@@ -3,7 +3,7 @@
 Plugin Name: Steemeasy
 Plugin URI:  https://github.com/sean0010/press
 Description: Steem Wordpress Plugin
-Version:     0.5.2
+Version:     0.5.4
 Author:      morning
 Author URI:  htps://steemit.com/@morning
 Text Domain: steemit
@@ -22,18 +22,23 @@ if (!function_exists('add_action')) {
 */
 function steem_plugin( $atts ) {
     $a = shortcode_atts( array(
+        'locale' => '',
+        'replyimoticons' => '',
+        'mute' => '',
+        'mutepermlinks' => '',
         'tag' => get_option('steem_tag'),
         'limit' => get_option('limit'),
         'ann' => get_option('ann')
     ), $atts );
 
-    $c = '<div class="steemContainer" data-steemtag="'.esc_html__($a['tag']).'" data-limit="'.esc_html__($a['limit']).'" data-appname="'.esc_html__(get_option('sc2_appname')).'" data-beneficiaryaccount="'.esc_html__(get_option('beneficiary_account')).'" data-beneficiarypercentage="'.esc_html__(get_option('beneficiary_percentage')).'">';
-    $c .= ' <div class="tagLabel">TAG: </div><div class="tagName"></div>';
+    $c = '<div class="steemContainer" data-locale="'.esc_html__($a['locale']).'" data-imoticons="'.esc_html__($a['replyimoticons']).'" data-mute="'.esc_html__($a['mute']).'" data-mutepermlinks="'.esc_html__($a['mutepermlinks']).'" data-steemtag="'.esc_html__($a['tag']).'" data-limit="'.esc_html__($a['limit']).'" data-appname="'.esc_html__(get_option('sc2_appname')).'" data-beneficiaryaccount="'.esc_html__(get_option('beneficiary_account')).'" data-beneficiarypercentage="'.esc_html__(get_option('beneficiary_percentage')).'">';
+    $c .= ' <div class="tagLabel">#</div><div class="tagName"></div>';
+    $c .= ' <div class="refreshButtonContainer"><button class="refreshButton button" title="Refresh">↻</button></div>';
     $c .= ' <div class="steemAccount"></div>';
     $c .= ' <div class="postWrite">';
     $c .= '  <input type="text" class="postTitle" placeholder="Title">';
     $c .= '  <textarea class="editor"></textarea>';
-    $c .= '  <input type="text" class="postTags" placeholder="Tags">';
+    $c .= '  <div class="tagRow"><div class="mainTagLabel">Tag:</div><div class="mainTag"></div><input type="text" class="postTags"></div>';
     $c .= '  <span class="segmented">';
     $c .= '   <label><input type="radio" name="payout" value="100"><span class="label">Power Up 100%</span></label>';
     $c .= '   <label><input type="radio" name="payout" value="50" checked><span class="label">50% | 50%</span></label>';
@@ -47,7 +52,7 @@ function steem_plugin( $atts ) {
     $c .= ' </div>';
     $c .= ' <div class="postDetails">';
     $c .= '  <div class="postDetailsCloseContainer">';
-    $c .= '   <button class="postDetailsCloseButton button">Close</button>';
+    $c .= '   <button class="postDetailsCloseButton button">ⓧ</button>';
     $c .= '  </div>';
     $c .= '  <div class="postHeader">';
     $c .= '   <div class="postTitle"></div>';
@@ -75,11 +80,10 @@ function steem_plugin( $atts ) {
     $c .= '  <div class="replyContainer"></div>';
     $c .= '  <div class="replyForm">';
     $c .= '   <textarea class="replyInput" placeholder="Comment"></textarea>';
+    $c .= '   <div class="replyPreview"></div>';
+    $c .= '   <div class="replyImoticonButtons"></div>';
     $c .= '   <button class="replyButton button">Submit</button>';
     $c .= '  </div>';
-    $c .= ' </div>';
-    $c .= ' <div class="refreshButtonContainer">';
-    $c .= '   <button class="refreshButton button">Refresh</button>';
     $c .= ' </div>';
     $c .= ' <div class="ann" data-param="'.esc_html__($a['ann']).'"></div>';
     $c .= ' <div class="discussions">';
@@ -134,22 +138,22 @@ function steem_plugin_frontend_js() {
     wp_enqueue_script('remarkable.min.js');
 
     wp_register_script('helper.js', plugin_dir_url( __FILE__ ) . 'js/helper.js');
-    wp_enqueue_script('helper.js?v=23');
+    wp_enqueue_script('helper.js?v=29');
 
     wp_register_script('render.js', plugin_dir_url( __FILE__ ) . 'js/render.js');
-    wp_enqueue_script('render.js?v=23');
+    wp_enqueue_script('render.js?v=32');
 
     wp_register_script('vote.js', plugin_dir_url( __FILE__ ) . 'js/vote.js');
     wp_enqueue_script('vote.js?v=23');
 
     wp_register_script('tag.js', plugin_dir_url( __FILE__ ) . 'js/tag.js');
-    wp_enqueue_script('tag.js?v=23');
+    wp_enqueue_script('tag.js?v=24');
 
     wp_register_script('steem.plugin.js', plugin_dir_url( __FILE__ ) . 'js/steem.plugin.js');
-    wp_enqueue_script('steem.plugin.js?v=23');
+    wp_enqueue_script('steem.plugin.js?v=31');
 
     wp_register_style('steem.plugin.css', plugin_dir_url( __FILE__ ) . 'css/steem.plugin.css');
-    wp_enqueue_style('steem.plugin.css?v=23');
+    wp_enqueue_style('steem.plugin.css?v=28');
 }
 
 function steem_plugin_menu() {

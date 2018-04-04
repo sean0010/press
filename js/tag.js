@@ -22,15 +22,22 @@ var Tag = (function() {
 		}, 400);
 	};
 
+	var _limitedTags = function() {
+		if (Config.isGazua) {
+			//console.log('Gazua!');
+			_inputTextField.setAttribute('readonly', 'readonly');
+			_inputTextField.style.border = 'none';
+		} else {
+			//console.log('Plain Steemeasy');
+		}
+	};
+
 
 	return {
 		init: function(inputTextField) {
 			_inputTextField = inputTextField;
 			_bind();
-		},
-		deinit: function() {
-			_inputTextField.removeEventListener('keyup');
-			_inputTextField.removeEventListener('paste');
+			_limitedTags();
 		},
 		tags: function() {
 			if (_inputTextField.value === '') {

@@ -31,7 +31,16 @@ var Render = (function() {
 		b.classList.add(cssClass);
 		return b;
 	};
-	var _createRow = function(key, link, comment, author, reward, vote, created, declinePayout) {
+	var _replyImoBtn = function(code, title, src) {
+		var b = document.createElement('button');
+		b.classList.add('replyImoticonButton');
+		b.classList.add('button');
+		b.setAttribute('data-code', code);
+		b.setAttribute('data-src', src);
+		b.innerHTML = title;
+		return b;
+	};
+	var _createRow = function(key, link, comment, author, reward, vote, created, declinePayout, isSteemGazua) {
 		var row = _div('pRow');
 		var pTitle = _div('pTitle');
 		var pAuthor = _div('pAuthor');
@@ -47,8 +56,15 @@ var Render = (function() {
 			co.classList.add('commentLink');
 			pTitle.appendChild(co);
 		}
+		if (isSteemGazua) {
+			var gazuaOriginal = document.createElement('span');
+			gazuaOriginal.className = 'gazuaOriginal';
+			gazuaOriginal.innerHTML = '♥';
+			gazuaOriginal.title = 'Steemeasy Beneficiary Applied';
+			pTitle.appendChild(gazuaOriginal);
+		}
 		pAuthor.innerHTML = author;
-		pReward.innerHTML = Helper.formatReward(reward);
+		pReward.innerHTML = reward;
 		pVote.innerHTML = vote;
 
 		if (declinePayout) {
@@ -56,9 +72,9 @@ var Render = (function() {
 		}
 
 		var tooltipDate = document.createElement('div');
-		tooltipDate.innerHTML = created.mmdd();
+		tooltipDate.innerHTML = created.localeDate().mmdd();
 		tooltipDate.className = 'createdDate';
-		tooltipDate.setAttribute('title', created.toDateString() + ' ' + created.toTimeString());
+		tooltipDate.setAttribute('title', created.localeDate().toLocaleDateString(Config.dateLocale, Config.dateOptions));
 		pCreated.appendChild(tooltipDate);
 
 		row.appendChild(pTitle);
@@ -70,7 +86,7 @@ var Render = (function() {
 		return row;
 	};
 	var _lastPost = {'permlink': '', 'author': ''};
-	var _commentVote = function(commentAuthor, commentPermlink, upvoteComment, downvoteComment) {
+	var _commentVote = function(commentAuthor, commentPermlink, upvoteComment) {
 
 		steem.api.getActiveVotes(commentAuthor, commentPermlink, function(err, votes) {
 			if (err === null) {
@@ -78,7 +94,7 @@ var Render = (function() {
 				upvoteComment.querySelector('.btnCount').innerHTML = v.up;
 				steem.api.getContent(commentAuthor, commentPermlink, function(err, result) {
 					if (err === null) {
-						var payout = result.pending_payout_value;
+						var payout = Helper.getPayout(result);
 						upvoteComment.querySelector('.btnCount').innerHTML = upvoteComment.querySelector('.btnCount').innerHTML + '/' + payout;
 					}
 				});
@@ -89,7 +105,7 @@ var Render = (function() {
 					if (voted === 1) {
 						upvoteComment.classList.add('voted');
 					} else if (voted === -1) {
-						downvoteComment.classList.add('voted');
+						//downvoteComment.classList.add('voted');
 					}
 				}
 			}
@@ -102,27 +118,30 @@ var Render = (function() {
 				var i, len = result.length;
 				for (i = 0; i < len; i++) {
 					var reply = result[i];
+
+					// Skip Blacklisted Account
+					if (Config.blackAccounts.indexOf(reply.author) !== -1) {
+						continue;
+					}
+
 					var container = _div('reply');
 					var author = _div('replyAuthor', reply.author);
-					var created = _div('replyCreated', (new Date(reply.created)).datetime());
+					var created = _div('replyCreated', (new Date(reply.created)).localeDate().toLocaleDateString(Config.dateLocale, Config.dateOptions));
 					var upvoteComment = _btn('upvoteComment', '↑');
-					var downvoteComment = _btn('downvoteComment', '😩');
 					var replyComment = _replyBtn('replyButton', 'Reply');
 					var body = _div('replyBody', Helper.markdown2html(reply.body));
 					var childrenWrap = _div('childrenWrap');
 					Vote.commentVoteBind(upvoteComment);
-					//Vote.commentVoteBind(downvoteComment);
 					container.setAttribute('data-author', reply.author);
 					container.setAttribute('data-permlink', reply.permlink);
 					container.appendChild(author);
 					container.appendChild(created);
 					container.appendChild(upvoteComment);
-					//container.appendChild(downvoteComment);
 					container.appendChild(replyComment);
 					container.appendChild(body);
 					container.appendChild(childrenWrap);
 					r.appendChild(container);
-					_commentVote(reply.author, reply.permlink, upvoteComment, downvoteComment);
+					_commentVote(reply.author, reply.permlink, upvoteComment);
 					_openReplyCommentForm(replyComment, reply.author, reply.permlink);
 
 					if (reply.children > 0) {
@@ -177,6 +196,8 @@ var Render = (function() {
 			var permlink = btn.getAttribute('data-permlink');
 			var replyContainer = _div('replyContainer', '');
 			var replyTextArea = document.createElement('textarea');
+			var replyPreview = document.createElement('div');
+			var replyImoticonButtons = document.createElement('div');
 			var replySubmit = document.createElement('button');
 			var replyCancel = document.createElement('button');
 
@@ -186,11 +207,17 @@ var Render = (function() {
 			replyCancel.textContent = 'Cancel';
 			replyTextArea.setAttribute('placeholder', 'Input Comment');
 			replyTextArea.classList.add('replyInput');
+			replyPreview.className = 'replyPreview';
+			replyImoticonButtons.className = 'replyImoticonButtons';
 
 			replyContainer.appendChild(replyTextArea);
+			replyContainer.appendChild(replyPreview);
+			replyContainer.appendChild(replyImoticonButtons);
 			replyContainer.appendChild(replySubmit);
 			replyContainer.appendChild(replyCancel);
 			btn.parentNode.appendChild(replyContainer);
+
+			Render.replyImoticons(replyImoticonButtons);
 
 			var cancelClick = replyCancel.addEventListener('click', function() {
 				btn.removeAttribute('disabled');
@@ -224,11 +251,11 @@ var Render = (function() {
 						var parentChildrenWrap = replyElement.querySelector('.childrenWrap');
 						var container = _div('reply', '');
 						var author = _div('replyAuthor', username);
-						var created = _div('replyCreated', (new Date()).datetime());
+						var created = _div('replyCreated', (new Date()).toLocaleDateString(Config.dateLocale, Config.dateOptions));
 						var upvoteComment = _btn('upvoteComment', '↑');
 						var downvoteComment = _btn('downvoteComment', '😩');
 						var replyComment = _replyBtn('replyButton', 'Reply');
-						var body = _div('replyBody', inputString);
+						var body = _div('replyBody', Helper.markdown2html(inputString));
 						var childrenWrap = _div('childrenWrap', '');
 
 						Vote.commentVoteBind(upvoteComment);
@@ -255,6 +282,30 @@ var Render = (function() {
 
 	/* Public */
 	return {
+		replyImoticons: function(container) {
+			var textarea = container.parentNode.parentNode.querySelector('textarea');
+			var replyPreview = textarea.parentNode.querySelector('.replyPreview');
+			var markdownReplyPreview = Helper.debounce(function() {
+				replyPreview.innerHTML = Helper.markdown2html(textarea.value);
+			}, 400);
+
+			textarea.addEventListener('keyup', markdownReplyPreview);
+
+			var i, len = Config.replyImoticons.length;
+			for (i = 0; i < len; i++) {
+				var imoticon = Config.replyImoticons[i];
+				var replyIB = _replyImoBtn(imoticon.code, imoticon.title, imoticon.src);
+
+				replyIB.addEventListener('click', function() {
+					var code = this.getAttribute('data-code');
+					var src = this.getAttribute('data-src');
+					if (textarea.value != '') textarea.value += '\n';
+					textarea.value += src;
+					replyPreview.innerHTML = Helper.markdown2html(textarea.value);
+				});
+				container.appendChild(replyIB);
+			}
+		},
 		//Render.highlight(container, currentPostKey);
 		highlight: function(_container, _currentPostKey) {
 			var rows = _container.childNodes;
@@ -275,8 +326,9 @@ var Render = (function() {
 			var date = new Date(p.created);
 			var payout = Helper.getPayout(p);
 			var isDeclined = Helper.isDeclinePayout(p);
+			var isSteemGazua = Helper.isSteemGazua(p);
 			var key = p.author + '_' + p.permlink;
-			var row = _createRow(key, link, p.children, p.author, p.pending_payout_value, p.net_votes, date, isDeclined);
+			var row = _createRow(key, link, p.children, p.author, payout, p.net_votes, date, isDeclined, isSteemGazua);
 			temp.appendChild(row);
 			return temp.childNodes;
 		},
@@ -300,8 +352,18 @@ var Render = (function() {
 					var i, len = result.length;
 					for (i = 0; i < len; i++) {
 						var p = result[i];
+
+						// Skip Redundant, which is caused by "Load More" logic
 						if (p.permlink == _lastPost.permlink && p.author == _lastPost.author) {
-							// skip, redundant post
+							continue;
+						}
+
+						// Skip Blacklisted Account
+						if (Config.blackAccounts.indexOf(p.author) !== -1) {
+							if (i == len - 1) {
+								_lastPost.permlink = p.permlink;
+								_lastPost.author = p.author;
+							}
 							continue;
 						}
 
@@ -310,10 +372,13 @@ var Render = (function() {
 						var payout = Helper.getPayout(p);
 						var isDeclined = Helper.isDeclinePayout(p);
 						var key = p.author + '_' + p.permlink;
-						var row = _createRow(key, link, p.children, p.author, p.pending_payout_value, p.net_votes, date, isDeclined);
+						var isSteemGazua = Helper.isSteemGazua(p);
+						var row = _createRow(key, link, p.children, p.author, payout, p.net_votes, date, isDeclined, isSteemGazua);
+
 						if (currentPostKey === key) {
 							row.classList.add('highlighted');
 						}
+
 						temp.appendChild(row);
 
 						if (i == len - 1) {
@@ -345,7 +410,7 @@ var Render = (function() {
 		},
 		post: function(container, hash, callback) {
 			var args = hash.split('/', 3);
-			console.log('ARGS:', args);
+			//console.log('ARGS:', args);
 			var category = args[0].replace('#', '');
 			var author = args[1].replace('@', '');
 			var permlink = args[2];
@@ -356,9 +421,10 @@ var Render = (function() {
 					var v = Helper.countVotes(result.active_votes);
 					var tags = JSON.parse(result.json_metadata).tags;
 					var isDeclined = Helper.isDeclinePayout(result);
+					var payout = Helper.getPayout(result);
 					currentPostKey = author + '_' + permlink;
 					console.log('Render.post:', currentPostKey);
-					showPostDetails(container, result.body, result.title, result.author, permlink, result.created, v.up, v.down, result.pending_payout_value, isDeclined, tags);
+					showPostDetails(container, result.body, result.title, result.author, permlink, result.created, v.up, v.down, payout, isDeclined, tags);
 					callback();
 				} else {
 					console.error('some error', err);
@@ -378,10 +444,14 @@ var Render = (function() {
 		},
 		tags: function(tagsArray) {
 			var postTags = _div('postTags', '');
+			var uniqueChecker = [];
 			var i, len = tagsArray.length;
 			for (i = 0; i < len; i++) {
-				var postTag = _div('postTag', tagsArray[i]);
-				postTags.appendChild(postTag);
+				if (uniqueChecker.indexOf(tagsArray[i]) === -1) {
+					uniqueChecker.push(tagsArray[i]);
+					var postTag = _div('postTag', tagsArray[i]);
+					postTags.appendChild(postTag);
+				}
 			}
 			return postTags;
 		},
@@ -397,6 +467,9 @@ var Render = (function() {
 		reset: function() {
 			_lastPost.permlink = '';
 			_lastPost.author = '';
+		},
+		isRefreshed: function() {
+			return _lastPost.permlink == '';
 		},
 		createLink: function(title, url) {
 			var el = document.createElement('a');

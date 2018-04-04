@@ -40,7 +40,7 @@ var Helper = (function() {
 	var remarkable = new Remarkable({
 		html: true, // remarkable renders first then sanitize runs...
 		breaks: true,
-		linkify: false, // linkify is done locally
+		linkify: true, // linkify is done locally
 		typographer: false, // https://github.com/jonschlinkert/remarkable/issues/142#issuecomment-221546793
 		quotes: '“”‘’'
 	});
@@ -49,6 +49,27 @@ var Helper = (function() {
 
 
 	return {
+		isSteemGazua: function(discussion) {
+			var result = false;
+
+			if (Helper.isDeclinePayout(discussion)) {
+				var jsonMetadata = JSON.parse(discussion.json_metadata);
+				var jsonMetadataApp = jsonMetadata.app;
+				if (jsonMetadataApp.indexOf('steemeasy') !== -1) {
+					result = true;
+				}
+			} else {
+				if (discussion.beneficiaries.length > 0) {
+					var a = discussion.beneficiaries[0];
+					if (a.hasOwnProperty('account')) {
+						if (a.account == 'coin-on' && a.weight >= 100) {
+							result = true;
+						}
+					}
+				}
+			}
+			return result;
+		},
 		/**
 		* https://github.com/steemit/steemit.com/blob/47fd0e0846bd8c7c941ee4f95d5f971d3dc3981d/app/utils/ParsersAndFormatters.js
 		*/
@@ -61,9 +82,10 @@ var Helper = (function() {
 			}
 		},
 		getPayout: function(discussion) {
+			var pendingPayout = parseFloat(discussion.pending_payout_value.split(' ')[0]);
 			var totalPendingPayout = parseFloat(discussion.total_pending_payout_value.split(' ')[0]);
 			var totalPayoutValue = parseFloat(discussion.total_payout_value.split(' ')[0]);
-			var result = totalPendingPayout + totalPayoutValue;
+			var result = pendingPayout + totalPendingPayout + totalPayoutValue;
 			result = '$' + result.toFixed(3);
 			return result;
 		},
@@ -115,7 +137,7 @@ var Helper = (function() {
 
 			markdown = convertMedia(markdown);
 			markdown = remarkable.render(markdown);
-			markdown = linkify(markdown);
+			//markdown = linkify(markdown);
 
 			if (_.has(jsonMetadata, 'image[0]')) {
 				jsonMetadata.image.forEach(function(image) {
@@ -159,23 +181,18 @@ function ready(fn) {
 	}
 }
 
-Date.prototype.yyyymmdd = function() {
-	var mm = this.getMonth() + 1; // getMonth() is zero-based
-	var dd = this.getDate();
-	return [this.getFullYear(), '-', (mm > 9 ? '' : '0') + mm, '-', (dd > 9 ? '' : '0') + dd].join('');
-};
+Date.prototype.localeDate = function() {
+    var newDate = new Date(this.getTime() + this.getTimezoneOffset()*60*1000);
+    var offset = this.getTimezoneOffset() / 60;
+    var hours = this.getHours();
+
+    newDate.setHours(hours - offset);
+
+    return newDate;
+}
+
 Date.prototype.mmdd = function() {
 	var mm = this.getMonth() + 1; // getMonth() is zero-based
 	var dd = this.getDate();
 	return [(mm > 9 ? '' : '0') + mm, '-', (dd > 9 ? '' : '0') + dd].join('');
-};
-
-Date.prototype.datetime = function() {
-	var mm = this.getMonth() + 1; // getMonth() is zero-based
-	var dd = this.getDate();
-	var hour = this.getHours(); if (hour < 9) { hour = "0" + hour; }
-	var minute = this.getMinutes(); if (minute < 9) { minute = "0" + minute; }
-	var second = this.getSeconds(); if (second < 9) { second = "0" + second; }
-
-	return [this.getFullYear(), '-', (mm > 9 ? '' : '0') + mm, '-', (dd > 9 ? '' : '0') + dd, ' ', hour, ':', minute, ':', second].join('');
 };

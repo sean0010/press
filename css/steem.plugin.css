@@ -1,7 +1,9 @@
 .steemContainer{font-size:15px;font-family:Gulim,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
 .entry-content .steemContainer a, .entry-summary .steemContainer a, .page-content .steemContainer a, .comment-content .steemContainer a, .pingback .steemContainer .comment-body > a,
 .steemContainer a, .steemContainer a:hover{text-decoration:none;border:none;box-shadow:none;}
-.steemContainer a:link, .steemContainer a:visited, .steemContainer a:active, .steemContainer a:hover{font-weight:normal;color:#333;}
+.steemContainer a:link, .steemContainer a:visited, .steemContainer a:active, .steemContainer a:hover{font-weight:normal;}
+.pRow a:link, .pRow a:visited, .pRow a:active, .pRow a:hover{color:#333;}
+.steemAccount a:link, .steemAccount a:visited, .steemAccount a:active, .steemAccount a:hover{color:#333;}
 .steemContainer h1{margin:0.3em 0}
 .steemContainer h2, .steemContainer h3, .steemContainer h4{margin:0.2em 0}
 .steemContainer h5, .steemContainer h6{margin:0.1em 0}
@@ -10,11 +12,13 @@
 .steemContainer img{max-width:100%;height:auto;}
 .steemContainer .icon32{width:32px;height:32px;}
 .steemContainer .strikethrough{text-decoration:line-through;opacity:0.5;}
-.steemContainer blockquote{padding:0 0 0 10px;border:none;border-left:2px solid #ccc;margin: 0 0 10px 0;}
+.steemContainer blockquote{padding:0 0 0 10px;border:none;border-left:2px solid #ccc;margin: 0 0 10px 0;font-size: 100%; color: #777;}
 .steemContainer blockquote > p{margin:0!important;}
 .steemContainer .postBody > p{margin:0;padding:0 0 1em 0;}
 .steemContainer .postReply > p{margin:0;}
-.steemContainer .tagLabel,.steemContainer .tagName{font-weight:bold;font-size:120%;display:inline-block;}
+.steemContainer .tagLabel,.steemContainer .tagName{font-weight:bold;display:inline-block;color:#283A8E}
+.steemContainer .refreshButtonContainer{display:inline-block;}
+.steemContainer .refreshButtonContainer button{font-size:18px;font-weight:bold;background:none;line-height:1;padding:4px}
 .steemContainer .steemAccount{float:right;display:inline-block;}
 .steemContainer .steemAccount a{padding:4px;}
 .steemPost{width:100%;min-width:320px;border-bottom:1px solid #ccc;position:relative;display:table}
@@ -33,12 +37,13 @@
 	.pReward{width:20%;}
 	.pVote{width:15%;}
 	.pCreated{width:15%;text-align:right;}
+	.pTitle .gazuaOriginal{padding: 0 0 0 3px;color: #ccc;font-size: 18px;line-height: 1;}
 
 .steemContainer .loaderSpace{min-height:50px;}
 .steemContainer .more{display:none;}
 .steemContainer .postDetails{display:none;position:relative;}
-.steemContainer .postDetailsCloseContainer{position:absolute;right:0}
-.steemContainer .postDetailsCloseContainer button{font-size:12px;padding:8px;line-height:1;}
+.steemContainer .postDetailsCloseContainer{position:fixed;right:0;top:0}
+.steemContainer .postDetailsCloseContainer button{font-size:32px;padding:0;margin:0;line-height:1;border:none}
 .steemContainer .postDetails .postHeader{display:block;background:#f0f0f0;padding:5px 10px;margin-bottom:15px;}
 .steemContainer .postDetails .postHeader:after{content:' ';width:100%;display:block;}
 .steemContainer .postDetails .postTitle{display:block;}
@@ -58,13 +63,14 @@
 .steemContainer .replyAuthor{display:inline-block;font-weight:bold;}
 .steemContainer .replyCreated{display:inline-block;margin-left:10px;}
 .steemContainer .replyBody{display:block;}
-.steemContainer .replyBody img{max-width:400px;max-height:400px;}
-.steemContainer .reply button{position:relative;padding:4px;background:#fff;border:1px solid #283A8E;color:#283A8E;margin-left:5px;border-radius:4px;text-transform: none}
+.steemContainer .replyBody img{max-width:480px;}
+.steemContainer .reply button{position:relative;padding-left:4px;padding-right:4px;background:#fff;margin-left:5px;margin-bottom:0;border-radius:4px;text-transform: none}
 .steemContainer .reply button .btnIcon{position:absolute;line-height:inherit;height:auto;}
 .steemContainer .reply button .btnCount{padding-left:20px;line-height:inherit;height:auto;}
 .steemContainer .reply .voted{background:#283A8E;color:#fff;}
 .steemContainer .replyForm textarea{background:none;border:1px solid #bbb;}
 .steemContainer .replyContainer textarea{background:none;border:1px solid #bbb;}
+.steemContainer .replyContainer .replyPreview{}
 .steemContainer .postFooter{text-align:center;position:relative;}
 .steemContainer button:focus{outline:0;}
 .steemContainer .voteContainer{display:block;margin:15px;min-height:60px;position:relative;}
@@ -97,6 +103,7 @@
 
 .steemContainer button[disabled="disabled"]{background:#eee;border-color:#999;}
 .steemContainer button[disabled="disabled"] path{fill:#999;}
+.steemContainer button.replyImoticonButton{margin:0;padding:2px;height:32px;line-height:1}
 
 .steemContainer .addRow{display:block;position:relative;background:#eee;padding:5px;}
 .steemContainer .customPercentInput{width:165px;padding:4px 8px;display:block;border:1px solid #999;font-size:21px;text-align:right;}
@@ -113,10 +120,16 @@
 .steemContainer .votePower ul li .voteBtnClear{position:absolute;top:0;right:0;width:15px;color:#e00;cursor:pointer;padding:3px 0;}
 
 .steemContainer .postReward{display:inline-block;font-weight:bold;color:#4ba2f2;}
-.steemContainer .postTags{width:100%;margin:0 0 10px 0;}
+.steemContainer .postWrite .tagRow{display:table}
+.steemContainer .postWrite .tagRow > *{margin:0}
+.steemContainer .postWrite .tagRow .mainTagLabel{display:table-cell}
+.steemContainer .postWrite .tagRow .mainTag{display:table-cell}
+.steemContainer .postWrite .tagRow .postTags{margin:0 0 10px 0;}
+.steemContainer .postWrite .altTagContainer{margin:0 0 10px 0;}
+.steemContainer .postWrite .altTagContainer input[type="checkbox"]{margin-right:5px;}
 
-.steemContainer .ann{margin:5px 0;font-weight:bold;}
-.steemContainer .ann .pRow{border:none}
+.steemContainer .ann{margin: 0; font-weight: bold; background: #e6efef;}
+.steemContainer .ann .pRow{}
 .steemContainer .ann .pTitle a{font-weight:bold;}
 .loader {position: relative;margin: 0 auto;width: 30px;}
 .loader:before {content: '';display: block;padding-top: 100%;}

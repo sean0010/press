@@ -4,7 +4,7 @@ Tags: steem,steemeasy
 Requires at least: 4.8.4
 Tested up to: 4.9.1
 Requires PHP: 5.6.10
-Stable tag: 0.5.1
+Stable tag: 0.5.3
 License: MIT
 
 Bring Steem blockchain's specific tag into your Wordpress page.
@@ -37,17 +37,28 @@ Create new wordpress page.
 Enter page content like this. https://imgsafe.org/image/b697e36ea7
 
 ~~~~
-[steemplugin tag="webtoon" limit="25"]
+[steemplugin tag="webtoon" limit="25" locale="ko-KR" ann="peepeem/2018-3-27,mmcartoon-kr/33dzgm" mute="alessandro2000,betesda,blackpace,vnzlasteemit,xtreme2015,steemit2015,vanessa2015,cekna,ripnews,a-0-0,boyhaque,samsulbahri1991,steemian1,balia,kamerlighn"]
 ~~~~
 
 tag is Steem tag. (eg: kr)
 limit is items per page before showing Load more button. (eg: 1 ~ 100)
-
+locale is for posts and replies' datetime format locale. Default(if not set): ko-KR. Examples: en-US, de-DE ...
+ann is comma separated permlinks([ACCOUNT]/[PERMLINK],[ACCOUNT],[PERMLINK],[ACCOUNT],[PERMLINK]...) sticky posts. Up to 5 posts can be sticky.
+mute is comma separated accounts. Muted accounts' posts and replies will not be displayed.
 
 == Frequently Asked Questions ==
 
 
 == Changelog ==
+= 0.5.3 =
+* Multiple sticky announcement posts
+* Mute accounts
+* Post created datetime bug fix, locale format can be configured
+
+= 0.5.2 =
+* Sticky announcement post
+* Highlight current post in postsList
+
 = 0.5.1 =
 * Bugfix
 

@@ -5,14 +5,32 @@ var Config = (function() {
 	var o = {};
 	o.perPage = 25;
 	o.steemTag = '';
-	o.app = 'steemeasy/0.2'
+	o.app = 'steemeasy/0.2';
+	o.isGazua = location.href.indexOf('steemgazua.com') !== -1;
+	o.blackAccounts = [];
+	o.blackPermlinks = [];
+	o.replyImoticons = [];
+	o.dateLocale = 'ko-KR';
+	o.dateOptions = { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'};
+	o.dateOptionsMMDD = { month: '2-digit', day: '2-digit'};
 	o.init = function(config) {
 		o.steemTag = config.steemTag;
-		if (config.perPage !== undefined || config.perPage !== '') {
+		if (config.perPage !== undefined && config.perPage !== '') {
 			var limit = parseInt(config.perPage);
 			if (limit > 0 && limit <= 100) {
 				o.perPage = limit;
 			}
+		}
+		if (config.blackAccounts !== undefined && config.blackAccounts !== '') {
+			o.blackAccounts = config.blackAccounts.split(',');
+		}
+		if (config.replyImoticons !== undefined && config.replyImoticons !== '') {
+			var decoded = decodeURI(config.replyImoticons);
+			var parsed = JSON.parse(decoded);
+			o.replyImoticons = parsed;
+		}
+		if (config.locale !== undefined && config.locale !== '') {
+			o.dateLocale = config.locale;
 		}
 	};
 	return o;
@@ -21,18 +39,17 @@ var Config = (function() {
 /**********
 *	DOM manipulation
 ***********/
-var lastPost = {'permlink': '', 'author': ''};
 var posts = {};
 var currentPostKey = '';
 var username = '';
 window.isAuth = false;
 var beneficiaryAccount, beneficiaryPercentage;
-var annAuthor, annPermlink;
 //steem.api.setOptions({'url': 'wss://steemd.dist.one'});
 
 ready(function() {
 	var c = document.querySelector('.steemContainer');
 	var tagName = c.querySelector('.tagName');
+	var mainTag = c.querySelector('.mainTag');
 	var ann = c.querySelector('.ann');
 	var discussions = c.querySelector('.discussions');
 	var acc = c.querySelector('.steemAccount');
@@ -43,19 +60,29 @@ ready(function() {
 	var refresh = c.querySelector('.refreshButton');
 	var close = c.querySelector('.postDetailsCloseButton');
 	var detail = c.querySelector('.postDetails');
+	var postTags = c.querySelector('.postTags');
 
 	// Config from shortcode attribute value
 	var tag = c.getAttribute('data-steemtag');
 	var limit = c.getAttribute('data-limit');
 	var appName = c.getAttribute('data-appname');
+	var mute = c.getAttribute('data-mute');
+	var mutePermlinks = c.getAttribute('data-mutepermlinks');
+	var imoticons = c.getAttribute('data-imoticons');
+	var locale = c.getAttribute('data-locale');
 	beneficiaryAccount = c.getAttribute('data-beneficiaryaccount');
 	beneficiaryPercentage = c.getAttribute('data-beneficiarypercentage');
 
 	Config.init({
 		perPage: limit,
-		steemTag: tag
+		steemTag: tag,
+		blackAccounts: mute,
+		blackPermlinks: mutePermlinks,
+		replyImoticons: imoticons,
+		locale: locale
 	});
 	tagName.innerHTML = Config.steemTag;
+	mainTag.innerHTML = Config.steemTag;
 
 	var hash = window.location.hash;
 	if (hash === '#write') {
@@ -159,9 +186,11 @@ ready(function() {
 		acc.appendChild(loginBtn);
 	}
 
-
 	// Vote button
 	Vote.init(voteContainer, posts);
+
+	// Tags
+	Tag.init(postTags);
 
 	close.addEventListener('click', function() {
 		var detail = document.querySelector('.postDetails');
@@ -210,6 +239,8 @@ ready(function() {
 					replyInput.removeAttribute('disabled');
 					replyButton.removeAttribute('disabled');
 					replyInput.value = '';
+
+					replyButton.parentNode.querySelector('.replyPreview').innerHTML = '';
 				});
 			}, function(error) {
 				replyInput.removeAttribute('disabled');
@@ -219,6 +250,8 @@ ready(function() {
 			});
 		}
 	});
+
+	Render.replyImoticons(document.querySelector('.replyImoticonButtons'));
 
 	window.addEventListener('hashchange', onHashChange, false);
 
@@ -236,8 +269,10 @@ ready(function() {
 			var container = document.querySelector('.postDetails');
 			var postsList = document.querySelector('.postsList');
 			var replyContainer = detail.querySelector('.replyContainer');
+			var replyPreview = detail.querySelector('.replyPreview');
 			replyInput.value = '';
 			replyContainer.innerHTML = '';
+			replyPreview.innerHTML = '';
 			if (args.length === 3) {
 				currentPostKey = hashAuthor + '_' + hashPermlink;
 				console.log('onHashChange:', currentPostKey);
@@ -290,17 +325,24 @@ function renderPosts(tag, limit, refresh, callback) {
 
 	var annParam = ann.getAttribute('data-param');
 
-	if (annParam.indexOf('/') !== -1 && annParam.length > 5) {
-		var annParamSplit = annParam.split('/');
-		steem.api.getContent(annParamSplit[0], annParamSplit[1], function(err, result) {
-			if (!err) {
-				ann.innerHTML = '';
-				var items = Render.ann(result);
-				items.forEach(function(item) {
-					ann.appendChild(item);
+	if (Render.isRefreshed()) {
+		if (annParam.indexOf('/') !== -1 && annParam.length > 5) {
+			var annArray = annParam.split(',', 5);
+
+			ann.innerHTML = '';
+			for (var i = 0; i < annArray.length; i++) {
+				var annEachItem = annArray[i].trim();
+				var annParamSplit = annEachItem.split('/');
+				steem.api.getContent(annParamSplit[0], annParamSplit[1], function(err, result) {
+					if (!err) {
+						var items = Render.ann(result);
+						items.forEach(function(item) {
+							ann.appendChild(item);
+						});
+					}
 				});
 			}
-		});
+		}
 	}
 }
 
@@ -308,7 +350,6 @@ function showEditor() {
 	var w = document.querySelector('.steemContainer .postWrite');
 	var editor = w.querySelector('.editor');
 	var titleField = w.querySelector('.postTitle');
-	var tagsField = w.querySelector('.postTags');
 	var preview = w.querySelector('.preview');
 	var publish = w.querySelector('.publish');
 	var cancel = w.querySelector('.cancelWrite');
@@ -321,11 +362,7 @@ function showEditor() {
 	var discussions = document.querySelector('.discussions');
 	var ann = document.querySelector('.ann');
 	var more = document.querySelector('.more');
-
-	Tag.init(tagsField);
-
 	var markdownPreview = Helper.debounce(function() {
-		console.log('debounced');
 		preview.innerHTML = Helper.markdown2html(editor.value);
 	}, 400);
 
@@ -512,7 +549,7 @@ function showPostDetails(container, markdown, title, author, permlink, created, 
 	postAuthor.innerHTML = author;
 
 	var date = new Date(created);
-	postCreated.innerHTML = date.datetime();
+	postCreated.innerHTML = date.localeDate().toLocaleDateString(Config.dateLocale, Config.dateOptions);
 
 	window.scrollTo(0, document.querySelector('.steemContainer').offsetTop);
 
@@ -618,7 +655,7 @@ function broadcastPost(primaryTag, author, permlink, title, body, jsonMetadata, 
 		commentOptions.max_accepted_payout = '0.000 SBD';
 		delete commentOptions['extensions'];
 	} else if (halfHalf) {
-		commentOptions.percent_steem_dollars = 5000;
+		commentOptions.percent_steem_dollars = 10000;
 
 		// Additional beneficiary setting from wordpress backend
 		if (beneficiary.account && beneficiary.weight) {
